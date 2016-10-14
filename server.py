@@ -147,4 +147,7 @@ def delete_user(user):
 if __name__ == "__main__":
     # Get bindings from the environment
     port = os.getenv('PORT', '5000')
+    hostname = os.getenv('HOSTNAME','127.0.0.1')
+    redis_port = os.getenv('REDIS_PORT','6379')
+    redis_server = redis.Redis(host=hostname, port=int(redis_port))
     app.run(host='0.0.0.0', port=int(port), debug=True)
