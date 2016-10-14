@@ -26,50 +26,117 @@ HTTP_409_CONFLICT = 409
 # Create Flask application
 app = Flask(__name__)
 
+database = {
+            0 : ["commodity", "gold", 1286.59],
+            1 : ["real-estate", "NYC real estate index", 16255.18],
+            2 : ["commodity", "brent crude oil", 51.45],
+            3 : ["fixed income", "US 10Y T-Note", 130.77]
+            }
+
+class Asset(object):
+    def __init__(self, id, quantity = 0):
+        self.id = id
+        self.asset_class = database[id][0]
+        self.name = database[id][1]
+        self.price = database[id][2]
+        self.quantity = quantity
+        self.nav = self.quantity * self.price
+        
+    def buy(self, Q):
+        self.quantity += Q
+        self.nav = self.quantity * self.price
+        
+    def sell(self, Q):
+        if self.quantity - Q < 0:
+            raise Error("The quantity of the asset would then be negative")
+        self.quantity -= Q
+        self.nav = self.quantity * self.price
+
+
+class Portfolio(object):
+    def __init__(self, user): #constructor
+        self.user = user
+        self.assets = []
+       
+    def buy(self, id, Q): #This also creates new asset in the portfolio
+        for asset in assets:
+            if asset.id == id:
+                asset.buy(Q)
+                return
+        assets.append(Asset(id, Q))
+        
+    def sell(self, id, Q):
+        for asset in assets:
+            if asset.id == id:
+                asset.sell(Q) #should catch the error somewhere
+                if asset.quantity == 0:
+                    self.assets.remove(asset)
+                return
+        raise Error("The asset could not be found in the portfolio.")
+        
+        
 ######################################################################
 # GET INDEX
 ######################################################################
 @app.route('/')
 def index():
-    return jsonify(name='My REST API Service', version='1.0', url='/resources'), HTTP_200_OK
+    return "jsonify(name='My REST API Service', version='1.0', url='/resources')", HTTP_200_OK
 
 ######################################################################
-# LIST ALL resourceS
+# LIST ALL users
 ######################################################################
-@app.route('/resources', methods=['GET'])
-def list_resources():
+@app.route('/api/v1/portfolios', methods=['GET'])
+def list_users():
     # YOUR CODE here (remove pass)
     pass
 
 ######################################################################
-# RETRIEVE A resource
+# LIST ALL assets of a user
 ######################################################################
-@app.route('/resources/<id>', methods=['GET'])
-def get_resource(id):
+@app.route('/api/v1/portfolios/<user>', methods=['GET'])
+def list_assets():
+    # YOUR CODE here (remove pass)
+    pass
+
+######################################################################
+# RETRIEVE the quantity and total value of an asset in a portfolio
+######################################################################
+@app.route('/api/v1/portfolios/<user>/<asset_id>', methods=['GET'])
+def get_resource(asset_id):
     # YOUR CODE here (remove pass)
     pass
 
 ######################################################################
 # ADD A NEW resource
 ######################################################################
-@app.route('/resources', methods=['POST'])
+@app.route('/api/v1/portfolios/<user>', methods=['POST'])
 def create_resource():
+    # Put the asset id and the eventual quantity in the body
     # YOUR CODE here (remove pass)
     pass
 
 ######################################################################
 # UPDATE AN EXISTING resource
 ######################################################################
-@app.route('/resources/<id>', methods=['PUT'])
+@app.route('/api/v1/portfolios/<user>/<asset_id>', methods=['PUT'])
 def update_resource():
+    # Put the add/sell and quantity in the body
     # YOUR CODE here (remove pass)
     pass
 
 ######################################################################
-# DELETE A resource
+# DELETE an asset from a user's portfolio
 ######################################################################
-@app.route('/resources/<id>', methods=['DELETE'])
-def delete_resource(id):
+@app.route('/api/v1/portfolios/<user>/<asset_id>', methods=['DELETE'])
+def delete_asset(id):
+    # YOUR CODE here (remove pass)
+    pass
+
+######################################################################
+# DELETE a user (or its portfolio)
+######################################################################
+@app.route('/api/v1/portfolios/<user>', methods=['DELETE'])
+def delete_user(user):
     # YOUR CODE here (remove pass)
     pass
 
