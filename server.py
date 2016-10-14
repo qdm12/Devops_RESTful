@@ -124,7 +124,7 @@ def create_user():
     # Put the asset id and the eventual quantity in the body
     payload = json.loads(request.data)
     if is_valid(payload):
-        user = payload['user'])
+        user = payload['user']
         for portfolio in portfolios:
             if portfolio.user == user: #user already exists
                 message = { 'error' : 'User %s already exists' % user }
