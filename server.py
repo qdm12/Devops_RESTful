@@ -57,18 +57,26 @@ class Portfolio(object):
     def __init__(self, user): #constructor
         self.user = user
         self.assets = []
+        self.nav = 0
        
     def buy(self, id, Q): #This also creates new asset in the portfolio
         for asset in assets:
             if asset.id == id:
+                # Asset was present in portfolio
                 asset.buy(Q)
+                self.nav += asset.price * Q
                 return
-        assets.append(Asset(id, Q))
+        # Asset was not present in portfolio
+        asset = Asset(id, Q)
+        self.nav += asset.price * Q
+        assets.append(asset)
+        
         
     def sell(self, id, Q):
         for asset in assets:
             if asset.id == id:
-                asset.sell(Q) #should catch the error somewhere
+                asset.sell(Q) #should catch the error somewhere if negative
+                self.nav -= asset.price * Q
                 if asset.quantity == 0:
                     self.assets.remove(asset)
                 return
