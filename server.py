@@ -14,6 +14,7 @@
 
 import os
 from flask import Flask, Response, jsonify, request, json
+from sklearn.ensemble.gradient_boosting import QuantileEstimator
 
 # Status Codes
 HTTP_200_OK = 200
@@ -60,7 +61,7 @@ class Portfolio(object):
         self.nav = 0
        
     def buy(self, id, Q): #This also creates new asset in the portfolio
-        for asset in assets:
+        for asset in self.assets:
             if asset.id == id:
                 # Asset was present in portfolio
                 asset.buy(Q)
@@ -73,7 +74,7 @@ class Portfolio(object):
         
         
     def sell(self, id, Q):
-        for asset in assets:
+        for asset in self.assets:
             if asset.id == id:
                 asset.sell(Q) #should catch the error somewhere if negative
                 self.nav -= asset.price * Q
@@ -82,7 +83,8 @@ class Portfolio(object):
                 return
         raise Error("The asset could not be found in the portfolio.")
         
-        
+portfolios = []
+
 ######################################################################
 # GET INDEX
 ######################################################################
@@ -115,13 +117,52 @@ def get_resource(asset_id):
     pass
 
 ######################################################################
-# ADD A NEW resource
+# ADD A NEW user portfolio
+######################################################################
+@app.route('/api/v1/portfolios', methods=['POST'])
+def create_user():
+    # Put the asset id and the eventual quantity in the body
+    payload = json.loads(request.data)
+    if is_valid(payload):
+        user = payload['user'])
+        for portfolio in portfolios:
+            if portfolio.user == user: #user already exists
+                message = { 'error' : 'User %s already exists' % user }
+                rc = HTTP_409_CONFLICT
+                return reply(message, rc)
+        #User does not exist yet
+        portfolios.append(Portfolio(user))
+        rc = HTTP_201_CREATED
+    else:
+        message = { 'error' : 'Data is not valid' }
+        rc = HTTP_400_BAD_REQUEST
+    return reply(message, rc)
+
+######################################################################
+# ADD A NEW asset
 ######################################################################
 @app.route('/api/v1/portfolios/<user>', methods=['POST'])
-def create_resource():
+def create_asset():
     # Put the asset id and the eventual quantity in the body
-    # YOUR CODE here (remove pass)
-    pass
+    payload = json.loads(request.data)
+    if is_valid(payload):
+        asset_id = int(payload['asset_id'])
+        quantity = int(payload['quantity'])
+        if asset_id not in database: #asset_id exists and is associated
+            message = { 'error' : 'Asset id does not exist in database' }
+            rc = HTTP_400_BAD_REQUEST
+        else:
+            for portfolio in portfolios:
+                if portfolio.user == user:
+                    portfolio.buy(asset_id, quantity)
+                    rc = HTTP_201_CREATED
+                    return reply(message, rc)
+            message = { 'error' : 'User not found' }
+            rc = HTTP_400_BAD_REQUEST
+    else:
+        message = { 'error' : 'Data is not valid' }
+        rc = HTTP_400_BAD_REQUEST
+    return reply(message, rc)
 
 ######################################################################
 # UPDATE AN EXISTING resource
