@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import os
+import redis
 from flask import Flask, Response, jsonify, request, json
 
 # Status Codes
@@ -89,7 +90,7 @@ portfolios = []
 ######################################################################
 @app.route('/')
 def index():
-    return "jsonify(name='My REST API Service', version='1.0', url='/resources')", HTTP_200_OK
+    return jsonify(name='My REST API Service', version='1.0', url='/resources'), HTTP_200_OK
 
 ######################################################################
 # LIST ALL users
