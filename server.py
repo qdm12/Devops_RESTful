@@ -105,8 +105,15 @@ def list_users():
 ######################################################################
 @app.route('/api/v1/portfolios/<user>', methods=['GET'])
 def list_assets():
-    # YOUR CODE here (remove pass)
-    pass
+    for portfolio in portfolios:
+        if portfolio.user == user:
+            assets_list = [asset for asset in portfolio.assets]
+            # assuming only one portfolio per user
+            return jsonify(assets_list)
+    #The user's portfolio does not exist
+    message = { 'error' : 'User %s does not exist' % user }
+    rc = HTTP_400_BAD_REQUEST
+    return reply(message, rc)
 
 ######################################################################
 # RETRIEVE the quantity and total value of an asset in a portfolio
@@ -145,6 +152,7 @@ def create_user():
 def create_asset():
     # Put the asset id and the eventual quantity in the body
     payload = json.loads(request.data)
+    message = ""
     if is_valid(payload):
         asset_id = int(payload['asset_id'])
         quantity = int(payload['quantity'])
