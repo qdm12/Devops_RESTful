@@ -70,8 +70,7 @@ class Portfolio(object):
         # Asset was not present in portfolio
         asset = Asset(id, Q)
         self.nav += asset.price * Q
-        assets.append(asset)
-        
+        self.assets.append(asset)
         
     def sell(self, id, Q):
         for asset in self.assets:
@@ -104,16 +103,20 @@ def list_users():
 # LIST ALL assets of a user
 ######################################################################
 @app.route('/api/v1/portfolios/<user>', methods=['GET'])
-def list_assets():
+def list_assets(user):
+    """
+    GET request at localhost:5000/api/v1/portfolios/<user>
+    """
     for portfolio in portfolios:
         if portfolio.user == user:
-            assets_list = [asset for asset in portfolio.assets]
             # assuming only one portfolio per user
-            return jsonify(assets_list)
+            response = jsonify({"assets" : [asset.name for asset in portfolio.assets]})
+            response.status_code = HTTP_200_OK
+            return response
     #The user's portfolio does not exist
-    message = { 'error' : 'User %s does not exist' % user }
-    rc = HTTP_400_BAD_REQUEST
-    return reply(message, rc)
+    response = jsonify({ 'error' : 'User %s does not exist' % user })
+    response.status_code = HTTP_400_BAD_REQUEST # Could be 404
+    return response
 
 ######################################################################
 # RETRIEVE the quantity and total value of an asset in a portfolio
@@ -128,49 +131,63 @@ def get_resource(asset_id):
 ######################################################################
 @app.route('/api/v1/portfolios', methods=['POST'])
 def create_user():
-    # Put the asset id and the eventual quantity in the body
-    payload = json.loads(request.data)
-    if is_valid(payload):
+    """
+    POST request at localhost:5000/api/v1/portfolios with this body:
+    {
+        "user": "john"
+    }
+    """
+    try:
+        payload = json.loads(request.data)
+    except ValueError:
+        response = jsonify({ 'error' : 'Data is not valid' })
+        response.status_code = HTTP_400_BAD_REQUEST
+    else:
         user = payload['user']
         for portfolio in portfolios:
             if portfolio.user == user: #user already exists
-                message = { 'error' : 'User %s already exists' % user }
-                rc = HTTP_409_CONFLICT
-                return reply(message, rc)
+                response = jsonify({ 'error' : 'User %s already exists' % user })
+                response.status_code = HTTP_409_CONFLICT
+                return response
         #User does not exist yet
         portfolios.append(Portfolio(user))
-        rc = HTTP_201_CREATED
-    else:
-        message = { 'error' : 'Data is not valid' }
-        rc = HTTP_400_BAD_REQUEST
-    return reply(message, rc)
+        response = jsonify()
+        response.status_code = HTTP_201_CREATED
+    return response
 
 ######################################################################
 # ADD A NEW asset
 ######################################################################
 @app.route('/api/v1/portfolios/<user>', methods=['POST'])
-def create_asset():
-    # Put the asset id and the eventual quantity in the body
-    payload = json.loads(request.data)
-    message = ""
-    if is_valid(payload):
+def create_asset(user):
+    """
+    POST request at localhost:5000/api/v1/portfolios/<user> with this body:
+    {
+        "asset_id": 2,
+        "quantity": 10
+    }
+    """
+    try:
+        payload = json.loads(request.data)
+    except ValueError:
+        response = jsonify({ 'error' : 'Data is not valid' })
+        response.status_code = HTTP_400_BAD_REQUEST
+    else:
         asset_id = int(payload['asset_id'])
         quantity = int(payload['quantity'])
         if asset_id not in database: #asset_id exists and is associated
-            message = { 'error' : 'Asset id does not exist in database' }
-            rc = HTTP_400_BAD_REQUEST
+            response = jsonify({ 'error' : 'Asset id does not exist in database' })
+            response.status_code = HTTP_400_BAD_REQUEST #Or couold be 404
         else:
             for portfolio in portfolios:
                 if portfolio.user == user:
                     portfolio.buy(asset_id, quantity)
-                    rc = HTTP_201_CREATED
-                    return reply(message, rc)
-            message = { 'error' : 'User not found' }
-            rc = HTTP_400_BAD_REQUEST
-    else:
-        message = { 'error' : 'Data is not valid' }
-        rc = HTTP_400_BAD_REQUEST
-    return reply(message, rc)
+                    response = jsonify()
+                    response.status_code = HTTP_201_CREATED
+                    return response
+            response = jsonify({ 'error' : 'User not found' })
+            response.status_code = HTTP_400_BAD_REQUEST
+    return response
 
 ######################################################################
 # UPDATE AN EXISTING resource
