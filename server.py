@@ -82,6 +82,14 @@ class Portfolio(object):
                 return
         raise Error("The asset could not be found in the portfolio.")
         
+    def serialize(self, url_root):
+        return {
+            "user" : self.user,
+            "numberOfAssets" : len(self.assets),
+            "netAssetValue" : self.nav,
+            "links" : create_links_for_portfolio(self, url_root)
+        }
+        
 portfolios = []
 
 ######################################################################
@@ -92,12 +100,30 @@ def index():
     return jsonify(name='My REST API Service', version='1.0', url='/resources'), HTTP_200_OK
 
 ######################################################################
-# LIST ALL users
+# LIST ALL porfolios
 ######################################################################
 @app.route('/api/v1/portfolios', methods=['GET'])
-def list_users():
-    # YOUR CODE here (remove pass)
-    pass
+def list_portfolios():
+    """
+    GET request at /api/v1/portfolios
+    
+    Returns all portfolios with form
+    {
+        "portfolios" : [
+            "user" : <user>
+            "numberOfAssets" : <number of assets>
+            "netAssetValue : <nav>
+            "links" : [
+                "rel" : "self"
+                "href" : <fully-fledged url to list_assets(<user>)>
+            ]
+        ]...
+    }
+    """
+    
+    response = jsonify({"portfolios" : [p.serialize(request.url_root) for p in portfolios]})
+    response.status_code = HTTP_200_OK
+    return response
 
 ######################################################################
 # LIST ALL assets of a user
@@ -213,6 +239,18 @@ def delete_asset(id):
 def delete_user(user):
     # YOUR CODE here (remove pass)
     pass
+
+
+######################################################################
+# UTILITY FUNCTIONS
+######################################################################
+def create_links_for_portfolio(portfolio, url_root):
+    return [
+        {
+            "rel" : "self",
+            "href" : url_root + "api/v1/portfolios/" + portfolio.user
+        }
+    ]
 
 
 ######################################################################
