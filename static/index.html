@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>DevOps Restful-project</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="static/stylesheets/style.css">
+</head>
+<body>
+  <table>
+    <tr>
+      <td>
+          <h1 id = "message">This is a demo for Devops project</h1>
+          <p class='description'>
+          GET <a href="/api/v1/portfolios">/api/v1/portfolios</a> to view the portfolios
+          <br><br>
+          GET <a href="/api/v1/portfolios/<user>">/api/v1/portfolios/<user></a> to view the portfolios for a User. {Replace the username in URL}
+          <br><br>
+          POST /api/v1/portfolios - to add new user portfolio. Example Body = {"user": "john"}
+          <br><br>
+          POST /api/v1/portfolios/<user> - to add new asset. Example Body = {"asset_id": 2,"quantity": 10}
+          <br><br>
+      </td>
+  </table>
+</body>
+</html>

@@ -97,7 +97,7 @@ portfolios = []
 ######################################################################
 @app.route('/')
 def index():
-    return jsonify(name='My REST API Service', version='1.0', url='/resources'), HTTP_200_OK
+    return app.send_static_file('index.html')
 
 ######################################################################
 # LIST ALL porfolios
