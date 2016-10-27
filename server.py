@@ -141,9 +141,18 @@ def list_assets(user):
 # RETRIEVE the quantity and total value of an asset in a portfolio
 ######################################################################
 @app.route('/api/v1/portfolios/<user>/<asset_id>', methods=['GET'])
-def get_resource(asset_id):
-    # YOUR CODE here (remove pass)
-    pass
+def get_asset(user, asset_id):
+    """
+    GET request at localhost:5000/api/v1/portfolios/<user>/<asset_id>
+    """
+    for portfolio in portfolios:
+        if portfolio.user == user:
+            for asset in portfolio.assets:
+                print asset.id
+                if asset.id == int(asset_id):
+                    return reply({"quantity" : asset.quantity, "value" : asset.nav}, HTTP_200_OK)
+            return reply({'error' : 'Asset with id %s does not exist in this portfolio' % asset_id }, HTTP_404_NOT_FOUND)
+    return reply({'error' : 'User %s does not exist' % user }, HTTP_404_NOT_FOUND)
 
 ######################################################################
 # ADD A NEW user portfolio
