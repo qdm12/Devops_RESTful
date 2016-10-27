@@ -58,35 +58,45 @@ class Asset(object):
             raise NegativeAssetException()
         self.quantity -= Q
         self.nav = self.quantity * self.price
+        
+    def serialize():
+        pass
+        
+    
+    @staticmethod
+    def deserialize():
+        pass
 
 
 class Portfolio(object):
-    def __init__(self, user): #constructor
-        self.user = user
-        self.assets = []
+    def __init__(self): #constructor
+        self.assets = dict()
         self.nav = 0
        
     def buy(self, id, Q): #This also creates new asset in the portfolio
-        for asset in self.assets:
-            if asset.id == id:
-                # Asset was present in portfolio
-                asset.buy(Q)
-                self.nav += asset.price * Q
-                return
-        # Asset was not present in portfolio
-        asset = Asset(id, Q)
-        self.nav += asset.price * Q
-        self.assets.append(asset)
+        if Q == 0:
+            return
+        try:
+            asset = self.assets[id]
+        except KeyError: # Asset was not present in portfolio
+            asset = Asset(id, Q)
+            self.assets[id] = asset
+        else: # Asset was present in portfolio
+            self.assets[id].buy(Q)
+        self.nav += self.assets[id].price * Q 
         
     def sell(self, id, Q):
-        for asset in self.assets:
-            if asset.id == id:
-                asset.sell(Q) #should catch the error somewhere if negative
-                self.nav -= asset.price * Q
-                if asset.quantity == 0:
-                    self.assets.remove(asset)
-                return
-        raise AssetNotFoundException()
+        if Q == 0:
+            return
+        try:
+            asset = self.assets[id]
+        except KeyError: # Asset was not present in portfolio
+            raise AssetNotFoundException()
+        else:
+            self.assets[id].sell(Q) #raises an error if q becomes negative
+            self.nav -= self.assets[id].price * Q
+            if self.assets[id].quantity == 0:
+                del self.assets[id]
         
     def buy_sell(self, id, Q):
         if Q < 0:
@@ -95,19 +105,25 @@ class Portfolio(object):
             self.buy(id, Q)
         
     def remove_asset(self, id):
-        for asset in self.assets:
-            if asset.id == id:
-                self.assets.remove(asset)
+        del self.assets[id]
         
-    def serialize(self, url_root):
+    def json_serialize(self, url_root):
         return {
-            "user" : self.user,
+            #"user" : self.user,
             "numberOfAssets" : len(self.assets),
             "netAssetValue" : self.nav,
             "links" : create_links_for_portfolio(self, url_root)
         }
         
-portfolios = []
+    def serialize():
+        pass
+        
+    
+    @staticmethod
+    def deserialize():
+        pass
+        
+portfolios = dict()
 
 
 ######################################################################
@@ -138,7 +154,8 @@ def list_portfolios():
         ]...
     }
     """
-    return reply({"portfolios" : [p.serialize(request.url_root) for p in portfolios]}, HTTP_200_OK)
+    pass
+    #return reply({"portfolios" : [p.json_serialize(request.url_root) for p in portfolios]}, HTTP_200_OK) #XXXX to change
 
 ######################################################################
 # LIST ALL assets of a user
@@ -148,14 +165,12 @@ def list_assets(user):
     """
     GET request at localhost:5000/api/v1/portfolios/<user>
     """
-    for portfolio in portfolios:
-        if portfolio.user == user:
-            # assuming only one portfolio per user
-            return reply({"assets" : [asset.name for asset in portfolio.assets]}, HTTP_200_OK)
-    #The user's portfolio does not exist
-    return reply({ 'error' : 'User %s does not exist' % user }, HTTP_404_NOT_FOUND)
-
-
+    try:
+        portfolio = portfolios[user]
+    except KeyError:
+        return reply({'error' : 'User {0} not found'.format(user)}, HTTP_404_NOT_FOUND)
+    return reply({'assets' : [asset.name for asset in portfolios[user].assets.itervalues()]}, HTTP_200_OK)
+    
 ######################################################################
 # RETRIEVE the quantity and total value of an asset in a portfolio
 ######################################################################
@@ -164,14 +179,16 @@ def get_asset(user, asset_id):
     """
     GET request at localhost:5000/api/v1/portfolios/<user>/<asset_id>
     """
-    for portfolio in portfolios:
-        if portfolio.user == user:
-            for asset in portfolio.assets:
-                print asset.id
-                if asset.id == int(asset_id):
-                    return reply({"quantity" : asset.quantity, "value" : asset.nav}, HTTP_200_OK)
-            return reply({'error' : 'Asset with id %s does not exist in this portfolio' % asset_id }, HTTP_404_NOT_FOUND)
-    return reply({'error' : 'User %s does not exist' % user }, HTTP_404_NOT_FOUND)
+    try:
+        portfolio = portfolios[user]
+    except KeyError:
+        return reply({'error' : 'User {0} not found'.format(user)}, HTTP_404_NOT_FOUND)
+    try:
+        asset = portfolio.assets[asset_id]
+    except KeyError:
+        return reply({'error' : 'Asset with id %s does not exist in this portfolio' % asset_id }, HTTP_404_NOT_FOUND)
+    return reply({'quantity' : asset.quantity, 'value' : asset.nav}, HTTP_200_OK)
+        
 
 ######################################################################
 # RETRIEVE the NAV of a portfolio
@@ -181,11 +198,12 @@ def get_nav(user):
     """
     GET request at localhost:5000/api/v1/portfolios/<user>/nav
     """
-    for portfolio in portfolios:
-        if portfolio.user == user:
-            return reply({"nav" : portfolio.nav}, HTTP_200_OK)
-    return reply({'error' : 'User %s does not exist' % user }, HTTP_404_NOT_FOUND)
-    
+    try:
+        portfolio = portfolios[user]
+    except KeyError:
+        return reply({'error' : 'User {0} not found'.format(user)}, HTTP_404_NOT_FOUND)
+    return reply({"nav" : portfolio.nav}, HTTP_200_OK)
+
 ######################################################################
 # ADD A NEW user portfolio
 ######################################################################
@@ -204,12 +222,12 @@ def create_user():
     if not is_valid(payload, ['user']):
         return reply({'error' : 'Payload %s is not valid' % payload}, HTTP_400_BAD_REQUEST)
     user = payload['user']
-    for portfolio in portfolios:
-        if portfolio.user == user: #user already exists
-            return reply({'error' : 'User %s already exists' % user }, HTTP_409_CONFLICT)
-    #User does not exist yet
-    portfolios.append(Portfolio(user))
-    return reply("",HTTP_201_CREATED)
+    try:
+        portfolio = portfolios[user]
+    except KeyError:
+        portfolios[user] = Portfolio()
+        return reply("",HTTP_201_CREATED)
+    return reply({'error' : 'User {0} already exists'.format(user)}, HTTP_409_CONFLICT)
 
 ######################################################################
 # ADD A NEW asset
@@ -233,12 +251,12 @@ def create_asset(user):
     quantity = int(payload['quantity'])
     if asset_id not in database: #asset_id exists and is associated
         return reply({'error' : 'Asset id %s does not exist in database' % asset_id}, HTTP_400_BAD_REQUEST)
-    else:
-        for portfolio in portfolios:
-            if portfolio.user == user:
-                portfolio.buy(asset_id, quantity) #That would act as a PUT in some cases, is this fine ?
-                return reply("", HTTP_201_CREATED)
-        return reply({'error' : 'User %s not found' % user}, HTTP_404_NOT_FOUND)
+    try:
+        portfolio = portfolios[user]
+    except KeyError:
+        return reply({'error' : 'User {0} not found'.format(user)}, HTTP_404_NOT_FOUND)
+    portfolios[user].buy(asset_id, quantity) #That would act as a PUT in some cases, is this fine ? XXX should be error 409 ?
+    return reply("", HTTP_201_CREATED)
 
 ######################################################################
 # UPDATE AN EXISTING resource
@@ -253,38 +271,40 @@ def update_asset(user, asset_id):
         return reply({'error' : 'Payload %s is not valid' % payload}, HTTP_400_BAD_REQUEST)
     asset_id = int(asset_id)
     quantity = int(payload['quantity'])
-    for portfolio in portfolios:
-        if portfolio.user == user:
-            try:
-                portfolio.buy_sell(asset_id, quantity)
-            except AssetNotFoundException:
-                return reply({'error' : 'Asset with id {0} was not found in the portfolio of {1}.'.format(asset_id, user)}, HTTP_404_NOT_FOUND)
-            except NegativeAssetException:
-                return reply({'error' : 'Selling {0} units of the asset with id {1} in the portfolio of {2} would result in a negative quantity. The operation was aborted.'.format(-quantity, asset_id, user)}, HTTP_400_BAD_REQUEST)
-            else:
-                return reply("", HTTP_200_OK)
-    return reply({'error' : 'User {0} not found'.format(user)}, HTTP_404_NOT_FOUND)
+    try:
+        portfolio = portfolios[user]
+    except KeyError:
+        return reply({'error' : 'User {0} not found'.format(user)}, HTTP_404_NOT_FOUND)
+    try:
+        portfolios[user].buy_sell(asset_id, quantity)
+    except AssetNotFoundException:
+        return reply({'error' : 'Asset with id {0} was not found in the portfolio of {1}.'.format(asset_id, user)}, HTTP_404_NOT_FOUND)
+    except NegativeAssetException:
+        return reply({'error' : 'Selling {0} units of the asset with id {1} in the portfolio of {2} would result in a negative quantity. The operation was aborted.'.format(-quantity, asset_id, user)}, HTTP_400_BAD_REQUEST)
+    return reply("", HTTP_200_OK)
 
 ######################################################################
 # DELETE an asset from a user's portfolio
 ######################################################################
 @app.route('/api/v1/portfolios/<user>/<asset_id>', methods=['DELETE'])
 def delete_asset(user, asset_id):
-    for portfolio in portfolios:
-        if portfolio.user == user:
-            portfolio.remove_asset(int(asset_id)) #removes or does nothing if no asset
-            return reply("", HTTP_204_NO_CONTENT)
-    return reply({'error' : 'User %s does not exist' % user }, HTTP_404_NOT_FOUND)
+    try:
+        portfolio = portfolios[user]
+    except KeyError:
+        return reply("", HTTP_204_NO_CONTENT)
+    portfolios[user].remove_asset(int(asset_id)) #removes or does nothing if no asset
+    return reply("", HTTP_204_NO_CONTENT)
 
 ######################################################################
 # DELETE a user (or its portfolio)
 ######################################################################
 @app.route('/api/v1/portfolios/<user>', methods=['DELETE'])
 def delete_user(user):
-    for portfolio in portfolios:
-        if portfolio.user == user:
-            portfolios.remove(portfolio)
-            break
+    try:
+        portfolio = portfolios[user]
+    except KeyError:
+        return reply("", HTTP_204_NO_CONTENT)
+    portfolios.remove(portfolio)
     return reply("", HTTP_204_NO_CONTENT)
 
 
