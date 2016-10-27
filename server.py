@@ -43,9 +43,9 @@ class AssetNotFoundException(Exception):
 class Asset(object):
     def __init__(self, id, quantity = 0):
         self.id = int(id)
-        self.asset_class = database[id][0]
-        self.name = database[id][1]
-        self.price = database[id][2]
+        self.asset_class = database[self.id][0]
+        self.name = database[self.id][1]
+        self.price = database[self.id][2]
         self.quantity = quantity
         self.nav = self.quantity * self.price
         
@@ -59,17 +59,26 @@ class Asset(object):
         self.quantity -= Q
         self.nav = self.quantity * self.price
         
-    def serialize():
-        pass
-        
+    def serialize(id):
+        #This generates a string from the Asset object (id, quantity parameters)
+        id_hex = str(id).encode("hex")
+        q_hex = str(self.quantity).encode("hex")
+        serialized_data = id_hex + ";" + q_hex
+        return serialized_data
     
     @staticmethod
-    def deserialize():
-        pass
+    def deserialize(serialized_data):
+        #This takes the string generated from serialize and returns an Asset object
+        serialized_data = serialized_data.split(";")
+        id = serialized_data[0].decode("hex")
+        q = serialized_data[1].decode("hex")
+        return Asset(id, q)
+        
 
 
 class Portfolio(object):
-    def __init__(self): #constructor
+    def __init__(self, user): #constructor
+        self.user = str(user) #only used to serialize and deserialize
         self.assets = dict()
         self.nav = 0
        
@@ -107,24 +116,36 @@ class Portfolio(object):
     def remove_asset(self, id):
         del self.assets[id]
         
-    def json_serialize(self, url_root):
+    def json_serialize(self, user, url_root):
         return {
-            #"user" : self.user,
+            "user" : user,
             "numberOfAssets" : len(self.assets),
             "netAssetValue" : self.nav,
             "links" : create_links_for_portfolio(self, url_root)
         }
         
     def serialize():
-        pass
-        
+        #This generates a string from the Portfolio object (user, and assets parameters)
+        user_hex = self.user.encode("hex")
+        assets = "#".join([a.serialize(a_id) for a_id, a in assets.iteritems()])
+        assets_hex = assets.encode("hex")        
+        serialized_data = user_hex + ";" + assets_hex
+        return serialized_data
     
     @staticmethod
-    def deserialize():
-        pass
+    def deserialize(serialized_data):
+        #This takes the string generated from serialize and returns a Portfolio object
+        serialized_data = serialized_data.split(";")
+        user = serialized_data[0].decode("hex")
+        p = Portfolio(user)
+        assets_str = serialized_data[1].decode("hex").split("#")
+        assets_lst = [deserialize(asset_str) for asset_str in assets_str]
+        for asset in assets_lst:
+            p.assets[asset.id] = asset
+            p.nav += asset.quantity * asset.price
+        return p
         
 portfolios = dict()
-
 
 ######################################################################
 # GET INDEX
@@ -154,8 +175,11 @@ def list_portfolios():
         ]...
     }
     """
-    pass
-    #return reply({"portfolios" : [p.json_serialize(request.url_root) for p in portfolios]}, HTTP_200_OK) #XXXX to change
+    portfolios_array = []
+    for user, portfolio in portfolios.iteritems():
+        json_data = p.json_serialize(user, request.url_root)
+        portfolios_array.append(json_data)
+    return reply({"portfolios" : portfolios_array}, HTTP_200_OK)
 
 ######################################################################
 # LIST ALL assets of a user
@@ -225,7 +249,7 @@ def create_user():
     try:
         portfolio = portfolios[user]
     except KeyError:
-        portfolios[user] = Portfolio()
+        portfolios[user] = Portfolio(user)
         return reply("",HTTP_201_CREATED)
     return reply({'error' : 'User {0} already exists'.format(user)}, HTTP_409_CONFLICT)
 
