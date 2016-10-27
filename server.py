@@ -168,6 +168,19 @@ def get_asset(user, asset_id):
     return reply({'error' : 'User %s does not exist' % user }, HTTP_404_NOT_FOUND)
 
 ######################################################################
+# RETRIEVE the NAV of a portfolio
+######################################################################
+@app.route('/api/v1/portfolios/<user>/nav', methods=['GET'])
+def get_nav(user):
+    """
+    GET request at localhost:5000/api/v1/portfolios/<user>/nav
+    """
+    for portfolio in portfolios:
+        if portfolio.user == user:
+            return reply({"nav" : portfolio.nav}, HTTP_200_OK)
+    return reply({'error' : 'User %s does not exist' % user }, HTTP_404_NOT_FOUND)
+    
+######################################################################
 # ADD A NEW user portfolio
 ######################################################################
 @app.route('/api/v1/portfolios', methods=['POST'])
