@@ -101,6 +101,8 @@ class Portfolio(object):
             "netAssetValue" : self.nav,
             "links" : create_links_for_portfolio(self, url_root)
         }
+		
+portfolios = []
 
 
 ######################################################################
