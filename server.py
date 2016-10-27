@@ -33,10 +33,16 @@ database = {
             2 : ["commodity", "brent crude oil", 51.45],
             3 : ["fixed income", "US 10Y T-Note", 130.77]
             }
+            
+class NegativeAssetException(Exception):
+    pass
+    
+class AssetNotFoundException(Exception):
+    pass
 
 class Asset(object):
     def __init__(self, id, quantity = 0):
-        self.id = id
+        self.id = int(id)
         self.asset_class = database[id][0]
         self.name = database[id][1]
         self.price = database[id][2]
@@ -49,7 +55,7 @@ class Asset(object):
         
     def sell(self, Q):
         if self.quantity - Q < 0:
-            raise Error("The quantity of the asset would then be negative")
+            raise NegativeAssetException()
         self.quantity -= Q
         self.nav = self.quantity * self.price
 
@@ -75,12 +81,21 @@ class Portfolio(object):
     def sell(self, id, Q):
         for asset in self.assets:
             if asset.id == id:
+                print "asset found"
                 asset.sell(Q) #should catch the error somewhere if negative
                 self.nav -= asset.price * Q
                 if asset.quantity == 0:
                     self.assets.remove(asset)
+                    print "asset removed"
                 return
-        raise Error("The asset could not be found in the portfolio.")
+        print "asset not found"
+        raise AssetNotFoundException()
+        
+    def buy_sell(self, id, Q):
+        if Q < 0:
+            self.sell(id, -Q)
+        else:
+            self.buy(id, Q)
         
     def serialize(self, url_root):
         return {
@@ -91,6 +106,11 @@ class Portfolio(object):
         }
         
 portfolios = []
+portfolios.append(Portfolio("john"))
+for p in portfolios:
+    if p.user == "john":
+        p.buy(2, 20)
+
 
 ######################################################################
 # GET INDEX
@@ -100,7 +120,7 @@ def index():
     return app.send_static_file('index.html')
 
 ######################################################################
-# LIST ALL porfolios
+# LIST ALL portfolios
 ######################################################################
 @app.route('/api/v1/portfolios', methods=['GET'])
 def list_portfolios():
@@ -135,7 +155,7 @@ def list_assets(user):
             # assuming only one portfolio per user
             return reply({"assets" : [asset.name for asset in portfolio.assets]}, HTTP_200_OK)
     #The user's portfolio does not exist
-    return reply({ 'error' : 'User %s does not exist' % user }, HTTP_400_BAD_REQUEST)
+    return reply({'error' : 'User %s does not exist' % user }, HTTP_400_BAD_REQUEST)
 
 ######################################################################
 # RETRIEVE the quantity and total value of an asset in a portfolio
@@ -159,13 +179,13 @@ def create_user():
     try:
         payload = json.loads(request.data)
     except ValueError:
-        return reply({ 'error' : 'Data %s is not valid' % request.data}, HTTP_400_BAD_REQUEST)
+        return reply({'error' : 'Data %s is not valid' % request.data}, HTTP_400_BAD_REQUEST)
     if not is_valid(payload, ['user']):
-        return reply({ 'error' : 'Payload %s is not valid' % payload}, HTTP_400_BAD_REQUEST)
+        return reply({'error' : 'Payload %s is not valid' % payload}, HTTP_400_BAD_REQUEST)
     user = payload['user']
     for portfolio in portfolios:
         if portfolio.user == user: #user already exists
-            return reply({ 'error' : 'User %s already exists' % user }, HTTP_409_CONFLICT)
+            return reply({'error' : 'User %s already exists' % user }, HTTP_409_CONFLICT)
     #User does not exist yet
     portfolios.append(Portfolio(user))
     return reply("",HTTP_201_CREATED)
@@ -185,28 +205,44 @@ def create_asset(user):
     try:
         payload = json.loads(request.data)
     except ValueError:
-        return reply({ 'error' : 'Data %s is not valid' % request.data}, HTTP_400_BAD_REQUEST)
+        return reply({'error' : 'Data %s is not valid' % request.data}, HTTP_400_BAD_REQUEST)
     if not is_valid(payload, ['asset_id','quantity']):
-        return reply({ 'error' : 'Payload %s is not valid' % payload}, HTTP_400_BAD_REQUEST)
+        return reply({'error' : 'Payload %s is not valid' % payload}, HTTP_400_BAD_REQUEST)
     asset_id = int(payload['asset_id'])
     quantity = int(payload['quantity'])
     if asset_id not in database: #asset_id exists and is associated
-        return reply({ 'error' : 'Asset id %s does not exist in database' % asset_id}, HTTP_400_BAD_REQUEST)
+        return reply({'error' : 'Asset id %s does not exist in database' % asset_id}, HTTP_400_BAD_REQUEST)
     else:
         for portfolio in portfolios:
             if portfolio.user == user:
                 portfolio.buy(asset_id, quantity) #That would act as a PUT in some cases, is this fine ?
                 return reply("", HTTP_201_CREATED)
-        return reply({ 'error' : 'User %s not found' % user}, HTTP_404_NOT_FOUND)
+        return reply({'error' : 'User %s not found' % user}, HTTP_404_NOT_FOUND)
 
 ######################################################################
 # UPDATE AN EXISTING resource
 ######################################################################
 @app.route('/api/v1/portfolios/<user>/<asset_id>', methods=['PUT'])
-def update_resource():
-    # Put the add/sell and quantity in the body
-    # YOUR CODE here (remove pass)
-    pass
+def update_asset(user, asset_id):
+    try:
+        payload = json.loads(request.data)
+    except ValueError:
+        return reply({'error' : 'Data %s is not valid' % request.data}, HTTP_400_BAD_REQUEST)
+    if not is_valid(payload, ['quantity']):
+        return reply({'error' : 'Payload %s is not valid' % payload}, HTTP_400_BAD_REQUEST)
+    asset_id = int(asset_id)
+    quantity = int(payload['quantity'])
+    for portfolio in portfolios:
+        if portfolio.user == user:
+            try:
+                portfolio.buy_sell(asset_id, quantity)
+            except AssetNotFoundException:
+                return reply({'error' : 'Asset with id {0} was not found in the portfolio of {1}.'.format(asset_id, user)}, HTTP_404_NOT_FOUND)
+            except NegativeAssetException:
+                return reply({'error' : 'Selling {0} units of the asset with id {1} in the portfolio of {2} would result in a negative quantity. The operation was aborted.'.format(-quantity, asset_id, user)}, HTTP_400_BAD_REQUEST)
+            else:
+                return reply("", HTTP_200_OK)
+    return reply({'error' : 'User {0} not found'.format(user)}, HTTP_404_NOT_FOUND)
 
 ######################################################################
 # DELETE an asset from a user's portfolio
