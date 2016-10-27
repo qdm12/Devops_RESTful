@@ -81,14 +81,11 @@ class Portfolio(object):
     def sell(self, id, Q):
         for asset in self.assets:
             if asset.id == id:
-                print "asset found"
                 asset.sell(Q) #should catch the error somewhere if negative
                 self.nav -= asset.price * Q
                 if asset.quantity == 0:
                     self.assets.remove(asset)
-                    print "asset removed"
                 return
-        print "asset not found"
         raise AssetNotFoundException()
         
     def buy_sell(self, id, Q):
@@ -104,12 +101,6 @@ class Portfolio(object):
             "netAssetValue" : self.nav,
             "links" : create_links_for_portfolio(self, url_root)
         }
-        
-portfolios = []
-portfolios.append(Portfolio("john"))
-for p in portfolios:
-    if p.user == "john":
-        p.buy(2, 20)
 
 
 ######################################################################
