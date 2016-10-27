@@ -94,6 +94,11 @@ class Portfolio(object):
         else:
             self.buy(id, Q)
         
+    def remove_asset(self, id):
+        for asset in self.assets:
+            if asset.id == id:
+                self.assets.remove(asset)
+        
     def serialize(self, url_root):
         return {
             "user" : self.user,
@@ -148,7 +153,8 @@ def list_assets(user):
             # assuming only one portfolio per user
             return reply({"assets" : [asset.name for asset in portfolio.assets]}, HTTP_200_OK)
     #The user's portfolio does not exist
-    return reply({'error' : 'User %s does not exist' % user }, HTTP_400_BAD_REQUEST)
+    return reply({ 'error' : 'User %s does not exist' % user }, HTTP_404_NOT_FOUND)
+
 
 ######################################################################
 # RETRIEVE the quantity and total value of an asset in a portfolio
@@ -263,9 +269,12 @@ def update_asset(user, asset_id):
 # DELETE an asset from a user's portfolio
 ######################################################################
 @app.route('/api/v1/portfolios/<user>/<asset_id>', methods=['DELETE'])
-def delete_asset(id):
-    # YOUR CODE here (remove pass)
-    pass
+def delete_asset(user, asset_id):
+    for portfolio in portfolios:
+        if portfolio.user == user:
+            portfolio.remove_asset(int(asset_id)) #removes or does nothing if no asset
+            return reply("", HTTP_204_NO_CONTENT)
+    return reply({'error' : 'User %s does not exist' % user }, HTTP_404_NOT_FOUND)
 
 ######################################################################
 # DELETE a user (or its portfolio)
