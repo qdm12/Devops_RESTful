@@ -120,10 +120,7 @@ def list_portfolios():
         ]...
     }
     """
-    
-    response = jsonify({"portfolios" : [p.serialize(request.url_root) for p in portfolios]})
-    response.status_code = HTTP_200_OK
-    return response
+    return reply({"portfolios" : [p.serialize(request.url_root) for p in portfolios]}, HTTP_200_OK)
 
 ######################################################################
 # LIST ALL assets of a user
@@ -136,13 +133,9 @@ def list_assets(user):
     for portfolio in portfolios:
         if portfolio.user == user:
             # assuming only one portfolio per user
-            response = jsonify({"assets" : [asset.name for asset in portfolio.assets]})
-            response.status_code = HTTP_200_OK
-            return response
+            return reply({"assets" : [asset.name for asset in portfolio.assets]}, HTTP_200_OK)
     #The user's portfolio does not exist
-    response = jsonify({ 'error' : 'User %s does not exist' % user })
-    response.status_code = HTTP_400_BAD_REQUEST # Could be 404
-    return response
+    return reply({ 'error' : 'User %s does not exist' % user }, HTTP_400_BAD_REQUEST)
 
 ######################################################################
 # RETRIEVE the quantity and total value of an asset in a portfolio
@@ -166,20 +159,16 @@ def create_user():
     try:
         payload = json.loads(request.data)
     except ValueError:
-        response = jsonify({ 'error' : 'Data is not valid' })
-        response.status_code = HTTP_400_BAD_REQUEST
-    else:
-        user = payload['user']
-        for portfolio in portfolios:
-            if portfolio.user == user: #user already exists
-                response = jsonify({ 'error' : 'User %s already exists' % user })
-                response.status_code = HTTP_409_CONFLICT
-                return response
-        #User does not exist yet
-        portfolios.append(Portfolio(user))
-        response = jsonify()
-        response.status_code = HTTP_201_CREATED
-    return response
+        return reply({ 'error' : 'Data %s is not valid' % request.data}, HTTP_400_BAD_REQUEST)
+    if not is_valid(payload, ['user']):
+        return reply({ 'error' : 'Payload %s is not valid' % payload}, HTTP_400_BAD_REQUEST)
+    user = payload['user']
+    for portfolio in portfolios:
+        if portfolio.user == user: #user already exists
+            return reply({ 'error' : 'User %s already exists' % user }, HTTP_409_CONFLICT)
+    #User does not exist yet
+    portfolios.append(Portfolio(user))
+    return reply("",HTTP_201_CREATED)
 
 ######################################################################
 # ADD A NEW asset
@@ -196,24 +185,19 @@ def create_asset(user):
     try:
         payload = json.loads(request.data)
     except ValueError:
-        response = jsonify({ 'error' : 'Data is not valid' })
-        response.status_code = HTTP_400_BAD_REQUEST
+        return reply({ 'error' : 'Data %s is not valid' % request.data}, HTTP_400_BAD_REQUEST)
+    if not is_valid(payload, ['asset_id','quantity']):
+        return reply({ 'error' : 'Payload %s is not valid' % payload}, HTTP_400_BAD_REQUEST)
+    asset_id = int(payload['asset_id'])
+    quantity = int(payload['quantity'])
+    if asset_id not in database: #asset_id exists and is associated
+        return reply({ 'error' : 'Asset id %s does not exist in database' % asset_id}, HTTP_400_BAD_REQUEST)
     else:
-        asset_id = int(payload['asset_id'])
-        quantity = int(payload['quantity'])
-        if asset_id not in database: #asset_id exists and is associated
-            response = jsonify({ 'error' : 'Asset id does not exist in database' })
-            response.status_code = HTTP_400_BAD_REQUEST #Or couold be 404
-        else:
-            for portfolio in portfolios:
-                if portfolio.user == user:
-                    portfolio.buy(asset_id, quantity)
-                    response = jsonify()
-                    response.status_code = HTTP_201_CREATED
-                    return response
-            response = jsonify({ 'error' : 'User not found' })
-            response.status_code = HTTP_400_BAD_REQUEST
-    return response
+        for portfolio in portfolios:
+            if portfolio.user == user:
+                portfolio.buy(asset_id, quantity) #That would act as a PUT in some cases, is this fine ?
+                return reply("", HTTP_201_CREATED)
+        return reply({ 'error' : 'User %s not found' % user}, HTTP_404_NOT_FOUND)
 
 ######################################################################
 # UPDATE AN EXISTING resource
@@ -251,6 +235,22 @@ def create_links_for_portfolio(portfolio, url_root):
             "href" : url_root + "api/v1/portfolios/" + portfolio.user
         }
     ]
+    
+def reply(message, rc):
+    response = jsonify(message) #or jsonify?
+    response.headers['Content-Type'] = 'application/json'
+    response.status_code = rc
+    return response
+    
+def is_valid(data, keys=[]):
+    valid = False
+    try:
+        for k in keys:
+            _temp = data[k]
+        valid = True
+    except KeyError as e:
+        app.logger.error('Missing value error: %s', e)
+    return valid
 
 
 ######################################################################
