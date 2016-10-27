@@ -221,8 +221,11 @@ def delete_asset(id):
 ######################################################################
 @app.route('/api/v1/portfolios/<user>', methods=['DELETE'])
 def delete_user(user):
-    # YOUR CODE here (remove pass)
-    pass
+    for portfolio in portfolios:
+        if portfolio.user == user:
+            portfolios.remove(portfolio)
+            break
+    return reply("", HTTP_204_NO_CONTENT)
 
 
 ######################################################################
