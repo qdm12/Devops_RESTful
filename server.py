@@ -177,7 +177,7 @@ def list_portfolios():
     """
     portfolios_array = []
     for user, portfolio in portfolios.iteritems():
-        json_data = p.json_serialize(user, request.url_root)
+        json_data = portfolio.json_serialize(user, request.url_root)
         portfolios_array.append(json_data)
     return reply({"portfolios" : portfolios_array}, HTTP_200_OK)
 
