@@ -145,8 +145,6 @@ class Portfolio(object):
             p.nav += float(asset.quantity) * float(asset.price)
         return p
         
-portfolios = dict()
-
 ######################################################################
 # GET INDEX
 ######################################################################
