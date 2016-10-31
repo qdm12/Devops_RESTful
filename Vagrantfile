@@ -61,8 +61,20 @@ Vagrant.configure(2) do |config|
   # documentation for more information about their specific syntax and use.
   config.vm.provision "shell", inline: <<-SHELL
     sudo apt-get update
-    sudo apt-get install -y git python-pip python-dev build-essential
+    sudo apt-get install -y git python-pip python-dev build-essential zip
     sudo apt-get -y autoremove
+    # Install the Cloud Foundry CLI
+    wget -O cf-cli-installer_6.22.1_x86-64.deb 'https://cli.run.pivotal.io/stable?release=debian64&version=6.22.1&source=github-rel'
+    sudo dpkg -i cf-cli-installer_6.22.1_x86-64.deb
+    rm cf-cli-installer_6.22.1_x86-64.deb
+    # Install the Bluemix CLI
+    wget http://public.dhe.ibm.com/cloud/bluemix/cli/bluemix-cli/Bluemix_CLI_0.4.2_amd64.tar.gz
+    tar -xvf Bluemix_CLI_0.4.2_amd64.tar.gz
+    cd Bluemix_CLI/
+    sudo ./install_bluemix_cli
+    cd ..
+    rm -fr Bluemix_CLI/
+    rm Bluemix_CLI_0.4.2_amd64.tar.gz
     # Install app dependencies
     cd /vagrant
     sudo pip install -r requirements.txt
