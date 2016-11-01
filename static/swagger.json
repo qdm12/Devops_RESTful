@@ -5,11 +5,11 @@
         "description": "This is a demo for the DevOps Resftul Project",
         "version": "1.0.0"
     },
-    "host": "localhost:5000",
+    "host": "portfoliomgmt.mybluemix.net",
     "schemes": [
         "https"
     ],
-    "basePath": "api/v1",
+    "basePath": "/api/v1",
     "produces": [
         "application/json"
     ],

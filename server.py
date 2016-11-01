@@ -413,13 +413,11 @@ def init_redis(hostname, port, password):
         print '*** FATAL ERROR: Could not conect to the Redis Service'
         exit(1)
     ## Initialize Asset types
-    asset_type = int(redis_server.llen('assetTypes'))
-    if asset_type is None:
-        redis_server.hmset("asset_type0",{"id": 0,"name":"gold","value":1286.59,"type":"commodity"})
-        redis_server.hmset("asset_type1",{"id": 1,"name":"NYC real estate index","value":16255.18,"type":"real-estate"})
-        redis_server.hmset("asset_type2",{"id": 2,"name":"brent crude oil","value":51.45,"type":"commodity"})
-        redis_server.hmset("asset_type3",{"id": 3,"name":"US 10Y T-Note","value":130.77,"type":"fixed income"})
-        redis_server.sadd("assetTypes",{"asset_type0","asset_type1","asset_type2","asset_type3"})
+    redis_server.hmset("asset_type0",{"id": 0,"name":"gold","value":1286.59,"type":"commodity"})
+    redis_server.hmset("asset_type1",{"id": 1,"name":"NYC real estate index","value":16255.18,"type":"real-estate"})
+    redis_server.hmset("asset_type2",{"id": 2,"name":"brent crude oil","value":51.45,"type":"commodity"})
+    redis_server.hmset("asset_type3",{"id": 3,"name":"US 10Y T-Note","value":130.77,"type":"fixed income"})
+    redis_server.sadd("assetTypes",{"asset_type0","asset_type1","asset_type2","asset_type3"})
 
 ######################################################################
 #   M A I N
