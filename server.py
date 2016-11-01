@@ -150,7 +150,20 @@ class Portfolio(object):
 ######################################################################
 @app.route('/')
 def index():
-    return app.send_static_file('index.html')
+    return app.send_static_file('swagger/index.html')
+    
+    
+@app.route('/js/<path:path>')
+def send_js(path):
+    return app.send_static_file('swagger/js/' + path)
+    
+@app.route('/images/<path:path>')
+def send_img(path):
+    return app.send_static_file('swagger/images/' + path)
+    
+@app.route('/css/<path:path>')
+def send_css(path):
+    return app.send_static_file('swagger/css/' + path)
 
 ######################################################################
 # LIST ALL portfolios
