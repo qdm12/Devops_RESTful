@@ -27,13 +27,7 @@ HTTP_409_CONFLICT = 409
 # Create Flask application
 app = Flask(__name__)
 
-database = {
-            0 : ["commodity", "gold", 1286.59],
-            1 : ["real-estate", "NYC real estate index", 16255.18],
-            2 : ["commodity", "brent crude oil", 51.45],
-            3 : ["fixed income", "US 10Y T-Note", 130.77]
-            }
-            
+           
 class NegativeAssetException(Exception):
     pass
     
@@ -43,9 +37,9 @@ class AssetNotFoundException(Exception):
 class Asset(object):
     def __init__(self, id, quantity = 0):
         self.id = int(id)
-        self.asset_class = database[self.id][0]
-        self.name = database[self.id][1]
-        self.price = database[self.id][2]
+        self.asset_class = redis_server.hget("asset_type"+str(self.id),"type")
+        self.name = redis_server.hget("asset_type"+str(self.id),"name") 
+        self.price = float(redis_server.hget("asset_type"+str(self.id),"value")) 
         self.quantity = int(quantity)
         self.nav = float(self.quantity) * float(self.price)
         
@@ -291,7 +285,8 @@ def create_asset(user):
         return reply({'error' : 'Payload %s is not valid' % payload}, HTTP_400_BAD_REQUEST)
     asset_id = int(payload['asset_id'])
     quantity = int(payload['quantity'])
-    if asset_id not in database: #asset_id exists and is associated
+    id = redis_server.hget("asset_type"+str(asset_id),"id")
+    if id is None: #asset_id exists and is associated
         return reply({'error' : 'Asset id %s does not exist in database' % asset_id}, HTTP_400_BAD_REQUEST)
     
     username = redis_server.hget(user,"name")
@@ -403,6 +398,14 @@ def init_redis(hostname, port, password):
     if not redis_server:
         print '*** FATAL ERROR: Could not conect to the Redis Service'
         exit(1)
+    ## Initialize Asset types
+    asset_type = int(redis_server.llen('assetTypes'))
+    if asset_type is None:
+    	redis_server.hmset("asset_type0",{"id": 0,"name":"gold","value":1286.59,"type":"commodity"})
+    	redis_server.hmset("asset_type1",{"id": 1,"name":"NYC real estate index","value":16255.18,"type":"real-estate"})
+    	redis_server.hmset("asset_type2",{"id": 2,"name":"brent crude oil","value":51.45,"type":"commodity"})
+    	redis_server.hmset("asset_type3",{"id": 3,"name":"US 10Y T-Note","value":130.77,"type":"fixed income"})
+    	redis_server.sadd("assetTypes",{"asset_type0","asset_type1","asset_type2","asset_type3"})
 
 ######################################################################
 #   M A I N
