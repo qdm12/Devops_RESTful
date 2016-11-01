@@ -327,7 +327,10 @@ def update_asset(user, asset_id):
         return reply({'error' : 'Data %s is not valid' % request.data}, HTTP_400_BAD_REQUEST)
     if not is_valid(payload, ['quantity']):
         return reply({'error' : 'Payload %s is not valid' % payload}, HTTP_400_BAD_REQUEST)
-    asset_id = int(asset_id)
+    try:
+        asset_id = int(asset_id)
+    except ValueError:
+        return reply({'error' : 'The asset_id %s is not an integer' % asset_id}, HTTP_400_BAD_REQUEST)
     quantity = int(payload['quantity'])
     username = redis_server.hget(user,"name")
     if username is None:
@@ -352,15 +355,13 @@ def update_asset(user, asset_id):
 @app.route('/api/v1/portfolios/<user>/<asset_id>', methods=['DELETE'])
 def delete_asset(user, asset_id):
     username = redis_server.hget(user,"name")
-    if username is None:
-        return reply("", HTTP_204_NO_CONTENT)
-    data = redis_server.hget(user,"data")
-    if data is None:
-        return reply("", HTTP_204_NO_CONTENT)
-    portfolio = Portfolio.deserialize(data)
-    portfolio.remove_asset(int(asset_id)) #removes or does nothing if no asset
-    data = portfolio.serialize()
-    redis_server.hmset(user,{'data': data})
+    if username is not None:
+        data = redis_server.hget(user,"data")
+        if data is not None:
+            portfolio = Portfolio.deserialize(data)
+            portfolio.remove_asset(int(asset_id)) #removes or does nothing if no asset
+            data = portfolio.serialize()
+            redis_server.hmset(user,{'data': data})
     return reply("", HTTP_204_NO_CONTENT)
 
 ######################################################################
@@ -369,11 +370,10 @@ def delete_asset(user, asset_id):
 @app.route('/api/v1/portfolios/<user>', methods=['DELETE'])
 def delete_user(user):
     username = redis_server.hget(user,"name")
-    if username is None:
-        return reply("", HTTP_204_NO_CONTENT)
-    redis_server.hdel(username, {"name","data"})
-    redis_server.delete(username)
-    redis_server.srem('userlist', user)
+    if username is not None:
+        redis_server.hdel(username, {"name","data"})
+        redis_server.delete(username)
+        redis_server.srem('userlist', user)
     return reply("", HTTP_204_NO_CONTENT)
 
 
@@ -389,7 +389,7 @@ def create_links_for_portfolio(portfolio, url_root):
     ]
     
 def reply(message, rc):
-    response = jsonify(message) #or jsonify?
+    response = jsonify(message)
     response.headers['Content-Type'] = 'application/json'
     response.status_code = rc
     return response
