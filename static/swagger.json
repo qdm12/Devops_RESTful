@@ -67,10 +67,10 @@
                 }
             }
         },
-        "/portfolios/{user}": {
+        "/portfolios/{user}/assets": {
             "get": {
-                "summary": "Get a portfolio",
-                "description": "Returns the portfolio that is owned by the specified user.",
+                "summary": "Get the assets of the portfolio of a user",
+                "description": "Returns a list of the assets of the portfolio owned by the specified user.",
                 "parameters": [
                     {
                         "name": "user",
@@ -170,7 +170,7 @@
                 }
             }
         },
-        "/portfolios/{user}/{asset_id}": {
+        "/portfolios/{user}/assets/{asset_id}": {
             "get": {
                 "summary": "Get the quantity and total value of an asset in a portfolio",
                 "description": "Given a user and an asset, find out how much of that asset is in the user's porfolio, and the total value.",

@@ -197,7 +197,7 @@ def list_portfolios():
 ######################################################################
 # LIST ALL assets of a user
 ######################################################################
-@app.route('/api/v1/portfolios/<user>', methods=['GET'])
+@app.route('/api/v1/portfolios/<user>/assets', methods=['GET'])
 def list_assets(user):
     """
     GET request at localhost:5000/api/v1/portfolios/<user>
@@ -214,7 +214,7 @@ def list_assets(user):
 ######################################################################
 # RETRIEVE the quantity and total value of an asset in a portfolio
 ######################################################################
-@app.route('/api/v1/portfolios/<user>/<asset_id>', methods=['GET'])
+@app.route('/api/v1/portfolios/<user>/assets/<asset_id>', methods=['GET'])
 def get_asset(user, asset_id):
     """
     GET request at localhost:5000/api/v1/portfolios/<user>/<asset_id>
@@ -282,7 +282,7 @@ def create_user():
 ######################################################################
 # ADD A NEW asset
 ######################################################################
-@app.route('/api/v1/portfolios/<user>', methods=['POST'])
+@app.route('/api/v1/portfolios/<user>/assets', methods=['POST'])
 def create_asset(user):
     """
     POST request at localhost:5000/api/v1/portfolios/<user> with this body:
@@ -319,7 +319,7 @@ def create_asset(user):
 ######################################################################
 # UPDATE AN EXISTING resource
 ######################################################################
-@app.route('/api/v1/portfolios/<user>/<asset_id>', methods=['PUT'])
+@app.route('/api/v1/portfolios/<user>/assets/<asset_id>', methods=['PUT'])
 def update_asset(user, asset_id):
     try:
         payload = json.loads(request.data)
@@ -352,7 +352,7 @@ def update_asset(user, asset_id):
 ######################################################################
 # DELETE an asset from a user's portfolio
 ######################################################################
-@app.route('/api/v1/portfolios/<user>/<asset_id>', methods=['DELETE'])
+@app.route('/api/v1/portfolios/<user>/assets/<asset_id>', methods=['DELETE'])
 def delete_asset(user, asset_id):
     username = redis_server.hget(user,"name")
     if username is not None:
