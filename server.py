@@ -367,7 +367,7 @@ def delete_asset(user, asset_id):
 ######################################################################
 # DELETE a user (or its portfolio)
 ######################################################################
-@app.route('/api/v1/portfolios/<user>', methods=['DELETE'])
+@app.route('/api/v1/portfolios/<user>/assets', methods=['DELETE'])
 def delete_user(user):
     username = redis_server.hget(user,"name")
     if username is not None:
