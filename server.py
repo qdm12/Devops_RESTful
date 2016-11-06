@@ -116,8 +116,8 @@ class Portfolio(object):
             "user" : user,
             "numberOfAssets" : len(self.assets),
             "netAssetValue" : self.nav,
-            "links" : create_links_for_portfolio(self, url_root)
-        }
+            "links" : [{"rel" : "self", "href" : url_root + "api/v1/portfolios/" + user}]
+            }
         
     def serialize(self):
         #This generates a string from the Portfolio object (user, and assets parameters)
@@ -147,7 +147,6 @@ class Portfolio(object):
 def index():
     return app.send_static_file('swagger/index.html')
     
-    
 @app.route('/js/<path:path>')
 def send_js(path):
     return app.send_static_file('swagger/js/' + path)
@@ -167,23 +166,10 @@ def send_css(path):
 def list_portfolios():
     """
     GET request at /api/v1/portfolios
-    
-    Returns all portfolios with form
-    {
-        "portfolios" : [
-            "user" : <user>
-            "numberOfAssets" : <number of assets>
-            "netAssetValue : <nav>
-            "links" : [
-                "rel" : "self"
-                "href" : <fully-fledged url to list_assets(<user>)>
-            ]
-        ]...
-    }
     """
     portfolios_array = []
-    portfolio_list = redis_server.smembers('userlist')
-    for i, user in enumerate(portfolio_list):
+    portfolio_dict = redis_server.smembers('userlist')
+    for user in portfolio_dict:
         username = redis_server.hget(user,"name")
         if username is not None:
             data = redis_server.hget(user,"data")
@@ -197,10 +183,10 @@ def list_portfolios():
 ######################################################################
 # LIST ALL assets of a user
 ######################################################################
-@app.route('/api/v1/portfolios/<user>', methods=['GET'])
+@app.route('/api/v1/portfolios/<user>/assets', methods=['GET'])
 def list_assets(user):
     """
-    GET request at localhost:5000/api/v1/portfolios/<user>
+    GET request at localhost:5000/api/v1/portfolios/<user>/assets
     """
     username = redis_server.hget(user,"name")
     if username is None:
@@ -209,15 +195,15 @@ def list_assets(user):
     portfolio = Portfolio(user)
     if data is not None:
         portfolio = Portfolio.deserialize(data)
-    return reply({'assets' : [asset.name for asset in portfolio.assets.itervalues()]}, HTTP_200_OK)
+    return reply({'assets' : [{'id' : asset.id, 'name' : asset.name} for asset in portfolio.assets.itervalues()]}, HTTP_200_OK)
         
 ######################################################################
 # RETRIEVE the quantity and total value of an asset in a portfolio
 ######################################################################
-@app.route('/api/v1/portfolios/<user>/<asset_id>', methods=['GET'])
+@app.route('/api/v1/portfolios/<user>/assets/<asset_id>', methods=['GET'])
 def get_asset(user, asset_id):
     """
-    GET request at localhost:5000/api/v1/portfolios/<user>/<asset_id>
+    GET request at localhost:5000/api/v1/portfolios/<user>/assets/<asset_id>
     """
     username = redis_server.hget(user,"name")
     if username is None:
@@ -230,7 +216,7 @@ def get_asset(user, asset_id):
         asset = portfolio.assets[int(asset_id)]
     except KeyError:
         return reply({'error' : 'Asset with id %s does not exist in this portfolio' % asset_id }, HTTP_404_NOT_FOUND)
-    return reply({'quantity' : asset.quantity, 'value' : asset.nav}, HTTP_200_OK)
+    return reply({'name' : asset.name, 'quantity' : asset.quantity, 'value' : asset.nav}, HTTP_200_OK)
         
 
 ######################################################################
@@ -264,9 +250,9 @@ def create_user():
     try:
         payload = json.loads(request.data)
     except ValueError:
-        return reply({'error' : 'Data %s is not valid' % request.data}, HTTP_400_BAD_REQUEST)
+        return reply({'error' : 'Data {0} is not valid'.format(request.data)}, HTTP_400_BAD_REQUEST)
     if not is_valid(payload, ['user']):
-        return reply({'error' : 'Payload %s is not valid' % payload}, HTTP_400_BAD_REQUEST)
+        return reply({'error' : 'Payload %s is not valid'.format(payload)}, HTTP_400_BAD_REQUEST)
     user = payload['user']
     username = redis_server.hget(user,"name")
     if username is None:
@@ -282,7 +268,7 @@ def create_user():
 ######################################################################
 # ADD A NEW asset
 ######################################################################
-@app.route('/api/v1/portfolios/<user>', methods=['POST'])
+@app.route('/api/v1/portfolios/<user>/assets', methods=['POST'])
 def create_asset(user):
     """
     POST request at localhost:5000/api/v1/portfolios/<user> with this body:
@@ -319,7 +305,7 @@ def create_asset(user):
 ######################################################################
 # UPDATE AN EXISTING resource
 ######################################################################
-@app.route('/api/v1/portfolios/<user>/<asset_id>', methods=['PUT'])
+@app.route('/api/v1/portfolios/<user>/assets/<asset_id>', methods=['PUT'])
 def update_asset(user, asset_id):
     try:
         payload = json.loads(request.data)
@@ -352,7 +338,7 @@ def update_asset(user, asset_id):
 ######################################################################
 # DELETE an asset from a user's portfolio
 ######################################################################
-@app.route('/api/v1/portfolios/<user>/<asset_id>', methods=['DELETE'])
+@app.route('/api/v1/portfolios/<user>/assets/<asset_id>', methods=['DELETE'])
 def delete_asset(user, asset_id):
     username = redis_server.hget(user,"name")
     if username is not None:
@@ -367,7 +353,7 @@ def delete_asset(user, asset_id):
 ######################################################################
 # DELETE a user (or its portfolio)
 ######################################################################
-@app.route('/api/v1/portfolios/<user>', methods=['DELETE'])
+@app.route('/api/v1/portfolios/<user>/assets', methods=['DELETE'])
 def delete_user(user):
     username = redis_server.hget(user,"name")
     if username is not None:
@@ -379,15 +365,7 @@ def delete_user(user):
 
 ######################################################################
 # UTILITY FUNCTIONS
-######################################################################
-def create_links_for_portfolio(portfolio, url_root):
-    return [
-        {
-            "rel" : "self",
-            "href" : url_root + "api/v1/portfolios/" + portfolio.user
-        }
-    ]
-    
+######################################################################   
 def reply(message, rc):
     response = jsonify(message)
     response.headers['Content-Type'] = 'application/json'

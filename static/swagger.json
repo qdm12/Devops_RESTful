@@ -2,14 +2,14 @@
     "swagger": "2.0",
     "info": {
         "title": "DevOps RESTful Project",
-        "description": "This is a demo for the DevOps Resftul Project",
-        "version": "1.0.0"
+        "description": "API for portfolio management, implemented for the NYU DevOps course",
+        "version": "1.0"
     },
     "host": "portfoliomgmt.mybluemix.net",
     "schemes": [
         "https"
     ],
-    "basePath": "/api/v1",
+    "basePath": "/v1",
     "produces": [
         "application/json"
     ],
@@ -35,7 +35,7 @@
             },
             "post": {
                 "summary": "Create a new user portfolio",
-                "description": "Creates a portfolio for the new user",
+                "description": "Create a new user portfolio",
                 "parameters": [
                     {
                         "name": "user",
@@ -55,13 +55,13 @@
                     "400": {
                         "description": "The query is not well formed (more details in error message)",
                         "schema": {
-                            "$ref": "#/definitions/error"
+                            "$ref": "#/definitions/error_data"
                         }
                     },
                     "409": {
                         "description": "A portfolio for the user already exists",
                         "schema": {
-                            "$ref": "#/definitions/error"
+                            "$ref": "#/definitions/error_userexists"
                         }
                     }
                 }
@@ -325,11 +325,11 @@
                     "type": "string",
                     "description": "The username of the user who owns this portfolio"
                 },
-                "number-of-assets": {
+                "numberOfAssets": {
                     "type": "integer",
                     "description": "The number of assets held within the portfolio"
                 },
-                "nav": {
+                "netAssetValue": {
                     "type": "number",
                     "description": "The net asset value of all the assets within the portfolio"
                 },
@@ -406,15 +406,43 @@
                 }
             }
         },
+        "error_data": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "description": "Highlights that the data can't be loaded in JSON",
+                    "default": "Data <request.data> is not valid"
+                }
+            }
+        },
+        "error_payload": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "description": "Highlights that the JSON payload is not valid for the request",
+                    "default": "Payload <payload> is not valid"
+                }
+            }
+        },
+        "error_userexists": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "description": "The user already exists in the database",
+                    "default": "User <user> already exists"
+                }
+            }
+        },
         "error": {
             "type": "object",
             "properties": {
-                "code": {
-                    "type": "integer",
-                    "format": "int32"
-                },
-                "message": {
-                    "type": "string"
+                "error": {
+                    "type": "string",
+                    "description": "Error",
+                    "default": "MyERror"
                 }
             }
         }
