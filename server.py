@@ -286,7 +286,7 @@ def create_asset(user):
     asset_id = int(payload['asset_id'])
     quantity = int(payload['quantity'])
     id = redis_server.hget("asset_type"+str(asset_id),"id")
-    if id is None: #asset_id exists and is associated
+    if id is None: #asset_id does not exist
         return reply({'error' : 'Asset id %s does not exist in database' % asset_id}, HTTP_400_BAD_REQUEST)
     username = redis_server.hget(user,"name")
     if username is None:
@@ -353,7 +353,7 @@ def delete_asset(user, asset_id):
 ######################################################################
 # DELETE a user (or its portfolio)
 ######################################################################
-@app.route('/api/v1/portfolios/<user>/assets', methods=['DELETE'])
+@app.route('/api/v1/portfolios/<user>', methods=['DELETE'])
 def delete_user(user):
     username = redis_server.hget(user,"name")
     if username is not None:
