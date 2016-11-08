@@ -1,0 +1,440 @@
+var swagger_api_portfolios = 
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "DevOps RESTful Project",
+        "description": "API for portfolio management, implemented for the NYU DevOps course",
+        "version": "1.0"
+    },
+    "host": "portfoliomgmt.mybluemix.net",
+    "schemes": [
+        "https"
+    ],
+    "basePath": "/api/v1",
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/portfolios": {
+            "get": {
+                "summary": "All portfolios",
+                "description": "The portfolios endpoint returns all portfolios stored on the system. The response includes the user who owns the portfolio, the number of assets in the portfolio and the net asset value of the portfolio. In addition, a link is provided for each portfolio to its full object.",
+                "tags": [
+                    "Portfolios"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "An array of portfolios",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/portfolio"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Create a new user portfolio",
+                "description": "Create a new user portfolio",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "query",
+                        "description": "New user for which a portfolio should be created",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "tags": [
+                    "Portfolios"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Portfolio successfully created"
+                    },
+                    "400": {
+                        "description": "The query is not well formed (more details in error message)",
+                        "schema": {
+                            "$ref": "#/definitions/error_data"
+                        }
+                    },
+                    "409": {
+                        "description": "A portfolio for the user already exists",
+                        "schema": {
+                            "$ref": "#/definitions/error_userexists"
+                        }
+                    }
+                }
+            }
+        },
+        "/portfolios/{user}": {
+            "delete": {
+                "summary": "Delete a user",
+                "description": "Removes a user from the database.",
+                "tags": [
+                    "Portfolios"
+                ],
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "Username of portfolio owner",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "The user has been deleted or does not exist"
+                    }
+                }
+            }
+        },
+        "/portfolios/{user}/assets": {
+            "get": {
+                "summary": "Get the assets of the portfolio of a user",
+                "description": "Returns the asset ID and the asset name of each assets present in the portfolio owned by the specified user.",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "Username of portfolio owner",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "tags": [
+                    "Portfolios"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "An array of assets",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/asset_description"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "$ref": "#/definitions/error_userdoesnotexist"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Add new asset",
+                "description": "Adds an amount of a new asset to the user's portfolio. If this asset exists already, this will raise an error.",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "Username of portfolio owner",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "asset_id",
+                        "in": "query",
+                        "description": "The unique asset id of the asset being added to the portfolio",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "quantity",
+                        "in": "query",
+                        "description": "The quantity of the asset being added to the portfolio",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "tags": [
+                    "Portfolios"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "The asset was added to the portfolio"
+                    },
+                    "400": {
+                        "description": "Query is not well formed or the asset id does not exist",
+                        "schema": {
+                            "$ref": "#/definitions/error_data"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found or there is no data associated with user",
+                        "schema": {
+                            "$ref": "#/definitions/error_userdoesnotexist"
+                        }
+                    },
+                    "409": {
+                        "description": "Asset with this asset ID already exist in the portfolio",
+                        "schema": {
+                            "$ref": "#/definitions/error_assetexists"
+                        }
+                    }
+                }
+            }
+        },
+        "/portfolios/{user}/assets/{asset_id}": {
+            "get": {
+                "summary": "Get the quantity and total value (NAV) of an asset in a portfolio",
+                "description": "Given a user and an asset, returns the quantity and net asset value of the asset in the user's porfolio.",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "Username of portfolio owner",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "asset_id",
+                        "in": "path",
+                        "description": "The asset id of the asset",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "tags": [
+                    "Portfolios"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "An object containing the quantity and net asset value of the asset",
+                        "schema": {
+                            "$ref": "#/definitions/asset_numbers"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found or asset not found in portfolio",
+                        "schema": {
+                            "$ref": "#/definitions/error_userdoesnotexist"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "summary": "Update an existing asset",
+                "description": "Updates the quantity of an asset held in the portfolio of a user",
+                "tags": [
+                    "Portfolios"
+                ],
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "Username of portfolio owner",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "asset_id",
+                        "in": "path",
+                        "description": "The asset id of the asset to update",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "quantity",
+                        "in": "query",
+                        "description": "The quantity to add or subtract from the current quantity of this asset in the portfolio",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The quantity has been updated successfully"
+                    },
+                    "400": {
+                        "description": "Query is not well formed (more information in the error message) or the quantity to subtract will yield a negative quantity result (not allowed here).",
+                        "schema": {
+                            "$ref": "#/definitions/error_data"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found, or user data is empty or the asset ID not found in the user portfolio.",
+                        "schema": {
+                            "$ref": "#/definitions/error_userdoesnotexist"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete an asset from a user's portfolio",
+                "description": "Will delete an asset from the user's portfolio. If the asset does not exist in the user's portfolio, operation will treat that like a successful delete.",
+                "tags": [
+                    "Portfolios"
+                ],
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "Username of portfolio owner",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "asset_id",
+                        "in": "path",
+                        "description": "The asset id to delete",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Deleted successfully"
+                    }
+                }
+            }
+        },
+        "/portfolios/{user}/nav": {
+            "get": {
+                "summary": "Get the net asset value (NAV) of the portfolio",
+                "description": "Given a username, find the net asset value of the portfolio belonging to the user",
+                "tags": [
+                    "Portfolios"
+                ],
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "Username of portfolio owner",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "An object containing the net asset value of the portfolio",
+                        "schema": {
+                            "$ref": "#/definitions/nav"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "$ref": "#/definitions/error_userdoesnotexist"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "portfolio": {
+            "type": "object",
+            "properties": {
+                "user": {
+                    "type": "string",
+                    "description": "The username of the user who owns this portfolio"
+                },
+                "numberOfAssets": {
+                    "type": "integer",
+                    "description": "The number of assets held within the portfolio"
+                },
+                "netAssetValue": {
+                    "type": "number",
+                    "description": "The net asset value of all the assets within the portfolio"
+                },
+                "links": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/link"
+                    },
+                    "description": "An array of links related to the portfolio"
+                }
+            }
+        },
+        "link": {
+            "type": "object",
+            "properties": {
+                "rel": {
+                    "type": "string",
+                    "description": "The relationship of the link to the object"
+                },
+                "href": {
+                    "type": "string",
+                    "description": "the url to the link"
+                }
+            }
+        },
+        "asset_description": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "description": "The unique id of the asset"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "The name of the asset"
+                }
+            }
+        },
+        "asset_numbers": {
+            "type": "object",
+            "properties": {
+                "quantity": {
+                    "type": "integer",
+                    "description": "The quantity of the asset in the user portfolio"
+                },
+                "nav": {
+                    "type": "number",
+                    "description": "The net asset value of this asset (quantity * price)"
+                }
+            }
+        },
+        "nav": {
+            "type": "object",
+            "properties": {
+                "nav": {
+                    "type": "number",
+                    "description": "A net asset value of a portfolio"
+                }
+            }
+        },
+        "error_data": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "description": "Highlights that the data is not JSON or does not have the necessary required information."
+                }
+            }
+        },
+        "error_userexists": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "description": "The user already exists in the database"
+                }
+            }
+        },
+        "error_userdoesnotexist": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "description": "The user does not exist in the database"
+                }
+            }
+        },
+        "error_assetexists": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "description": "Asset with id x already exists in portfolio"
+                }
+            }
+        }
+    }
+}
+;
