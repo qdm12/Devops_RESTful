@@ -411,7 +411,7 @@ if __name__ == "__main__":
         redis_port = int(redis_creds['port'])
         redis_password = redis_creds['password']
     else:
-        redis_hostname = '127.0.0.1'
+        redis_hostname = 'redis'
         redis_port = 6379
         redis_password = None
     
