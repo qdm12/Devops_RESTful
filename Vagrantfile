@@ -84,8 +84,8 @@ Vagrant.configure(2) do |config|
     # Make vi look nice
     echo "colorscheme desert" > ~/.vimrc
   SHELL
-    #provision git
-    config.vm.provision "file", source: "~/.gitconfig", destination: "~/.gitconfig"
+  #provision git
+  config.vm.provision "file", source: "~/.gitconfig", destination: "~/.gitconfig"
 
   # Add Redis docker container
   config.vm.provision "docker" do |d|
