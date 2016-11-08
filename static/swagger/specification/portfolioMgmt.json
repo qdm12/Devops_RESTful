@@ -1,4 +1,3 @@
-var swagger_api_portfolios = 
 {
     "swagger": "2.0",
     "info": {
@@ -437,4 +436,3 @@ var swagger_api_portfolios =
         }
     }
 }
-;
