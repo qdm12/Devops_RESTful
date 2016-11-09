@@ -1,11 +1,13 @@
 # Portfolio Management RESTful API
 *The project was developed for the DevOps course of New York University (CSCI-GA.3033-014).*
 
+## What is it?
 - It is a RESTful API for a portfolio management.
 - It uses many technologies: Python, Flask, Vagrant, Swagger, Redis, Docker, ...
 - It can be run locally on a virtual machine with Vagrant or on Bluemix (IBM) remotely.
 - The Redis database is stored on IBM Bluemix
 
+## Access the API
 - Access the root URL of the API on Bluemix at [https://portfoliomgmt.mybluemix.net](https://portfoliomgmt.mybluemix.net)
 - Access it on your virtual Vagrant machine at [localhost:5000](localhost:5000)
 - The root URL uses **Swagger** to show a descriptive list of all available RESTful calls such as `POST`, `DELETE`, `PUT` and `GET`.
@@ -32,4 +34,5 @@
 - PART 3: Add an automated CI/CD DevOps Pipeline
 
 ## To contribute
-Send me an email at quentin.mcgaw @ gmail . com with your Github username and a reason.
+- Send me an email at quentin.mcgaw @ gmail . com with your Github username and a reason.
+- To update the Swagger documentation, please refer to the readme.md in the static folder [here](https://github.com/qdm12/Devops_RESTful/tree/master/static)
