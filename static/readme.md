@@ -15,10 +15,12 @@
 ## Test it on Vagrant
 - Enter `vagrant up && vagrant ssh`
 - Enter `python /vagrant/server.py`
-- Open your browser and go to [localhost:5000](localhost:5000)
-- *Try it out!* will only work if you change the `"host": "portfoliomgmt.mybluemix.net",` line to `"host": "localhost:5000",` in the *static/swagger/specification/portfolioMgmt.js` file.
+- Open your browser and go to [localhost:5000](http://localhost:5000)
+- *Try it out!* will only work if you change the `"host": "portfoliomgmt.mybluemix.net",` line to `"host": "localhost:5000",` in the `static/swagger/specification/portfolioMgmt.js` file.
 
 ## Test it on Bluemix
-- If not installed, please install the cf cli available for download [here](https://github.com/cloudfoundry/cli)
-- Login to Bluemix with `cf login https://api.ng.bluemix.net -u bluemixUserId -o bluemixOrg -s "AppName"`
+- If not installed, please install the cf cli from [github.com/cloudfoundry/cli](https://github.com/cloudfoundry/cli)
+- Login to Bluemix with `cf login https://api.ng.bluemix.net -u bluemixUserId -o bluemixOrg -s "AppName"`and enter your password.
 - Enter `cf push AppName` where *AppName* is **PortfolioMgmt** in this project.
+- Open your browser and go to [https://portfoliomgmt.mybluemix.net/](https://portfoliomgmt.mybluemix.net/)
+- *Note: 'Try it out' will only work if the `https` scheme is used.*
