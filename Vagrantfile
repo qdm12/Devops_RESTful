@@ -93,5 +93,12 @@ Vagrant.configure(2) do |config|
     d.run "redis:alpine",
       args: "--restart=always -d --name redis -h redis -p 6379:6379 -v /var/lib/redis/data:/data"
   end
-
+  #Install docker compose after docker engine
+  config.vm.provision "shell", inline: <<-SHELL
+    sudo pip install docker-compose
+    # Install the IBM Container plugin
+    cf plugins
+    echo Y | cf install-plugin https://static-ice.ng.bluemix.net/ibm-containers-linux_x64
+    cf plugins
+  SHELL
 end
