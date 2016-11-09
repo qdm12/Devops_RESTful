@@ -2,7 +2,7 @@
 FROM alpine:latest
 
 # Document who is responsible for this image
-MAINTAINER John Rofrano "rofrano@us.ibm.com"
+MAINTAINER Bhavesh Vasandani "bhavesh@nyu.edu"
 
 # Install just the Python runtime (no dev)
 RUN apk add --update \
@@ -20,6 +20,8 @@ ADD requirements.txt /app
 RUN pip install -r requirements.txt
 
 # Add the code as the last Docker layer because it changes the most
+COPY static/ /app/static/
+RUN ls -lart /app/static/swagger/specification
 ADD server.py /app
 
 # Run the service
