@@ -147,9 +147,13 @@ class Portfolio(object):
 def index():
     return app.send_static_file('swagger/index.html')
     
-@app.route('/js/<path:path>')
+@app.route('/lib/<path:path>')
 def send_js(path):
-    return app.send_static_file('swagger/js/' + path)
+    return app.send_static_file('swagger/lib/' + path)
+    
+@app.route('/specification/<path:path>') #this is for the PortfolioMgmt Swagger api
+def send_spec(path):
+    return app.send_static_file('swagger/specification/' + path)
     
 @app.route('/images/<path:path>')
 def send_img(path):
@@ -158,6 +162,10 @@ def send_img(path):
 @app.route('/css/<path:path>')
 def send_css(path):
     return app.send_static_file('swagger/css/' + path)
+    
+@app.route('/fonts/<path:path>')
+def send_fonts(path):
+    return app.send_static_file('swagger/fonts/' + path)
 
 ######################################################################
 # LIST ALL portfolios
