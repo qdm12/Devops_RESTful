@@ -13,7 +13,7 @@ The root URL uses **Swagger** to show a descriptive list of all available RESTfu
 
 - Install Vagrant from this [page](https://www.vagrantup.com/downloads.html)
 - Git clone the repository or download the ZIP file and extract it.
-- Open a terminal (`cmd.exe` for Windows)
+- Open a terminal (You will need Github desktop App to run Git Shell for Windows)
 - cd to the Devops_RESTFUL directory you just cloned
 - Enter `vagrant up && vagrant ssh` (this will install the box, docker etc.)
 - Enter `python /vagrant/server.py`
