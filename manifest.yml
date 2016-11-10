@@ -1,4 +1,4 @@
-pplications:
+applications:
 - path: .
   memory: 128M
   instances: 1
@@ -7,6 +7,5 @@ pplications:
   host: PortfolioMgmt
   disk_quota: 1024M
   services:
-  - Redis Cloud
-  - availability-monitoring-auto
+  - rediscloud
   buildpack: python_buildpack

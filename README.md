@@ -23,6 +23,7 @@
     - Open a terminal and enter `git clone https://github.com/qdm12/Devops_RESTful.git`
 - Go to the project directory with a terminal with `cd Devops_RESTFUL`
 - Enter `vagrant up && vagrant ssh` (this will install the box, docker etc.)
+- **TEMPORARY** In `server.py`, replace *redis_hostname = 'redis'* by *redis_hostname = '127.0.0.1'*
 - Enter `python /vagrant/server.py` (in the virtual machine you just logged in)
 - Access the Python Flask server with your browser at [localhost:5000](localhost:5000).
 - You can use the Chrome extension `Postman` for example to send RESTful requests such as `POST`. Install it [here](https://chrome.google.com/webstore/detail/postman/fhbjgbiflinjbdggehcddcbncdddomop?hl=en).
