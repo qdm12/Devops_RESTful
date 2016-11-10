@@ -22,11 +22,12 @@
     - Install git if you don't have it from [git-scm.com](https://git-scm.com/downloads) or use `apt-get install git`.
     - Open a terminal and enter `git clone https://github.com/qdm12/Devops_RESTful.git`
 - Go to the project directory with a terminal with `cd Devops_RESTFUL`
+- **TEMPORARY** In `server.py`, change `VAGRANT = False` to `VAGRANT = True`
 - Enter `vagrant up && vagrant ssh` (this will install the box, docker etc.)
-- **TEMPORARY** In `server.py`, replace *redis_hostname = 'redis'* by *redis_hostname = '127.0.0.1'*
 - Enter `python /vagrant/server.py` (in the virtual machine you just logged in)
 - Access the Python Flask server with your browser at [localhost:5000](localhost:5000).
 - You can use the Chrome extension `Postman` for example to send RESTful requests such as `POST`. Install it [here](https://chrome.google.com/webstore/detail/postman/fhbjgbiflinjbdggehcddcbncdddomop?hl=en).
+- To user Swagger API calls, simply change the `"host":"portfolioMgmt.bluemix.net"` to `"host":"localhost:5000"` in the `static/swagger/specification/portfoliomgmt.js` file. **Don't forget to put it back before PUSHING on github!** (refer to the readme.md in `static/` for more information)
 
 ## For ongoing work, please refer to this page:
 [https://github.com/rofrano/nyu-homework-2](https://github.com/rofrano/nyu-homework-2)
