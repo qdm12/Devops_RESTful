@@ -381,8 +381,8 @@ def init_redis(hostname, port, password):
     if not redis_server:
         print '*** FATAL ERROR: Could not connect to the Redis Service'
         exit(1)
-    remove_old_database_assets()
-    fill_database_assets()
+    remove_old_database_assets() # to remove once you ran it once on your Vagrant
+    fill_database_assets() # to remove once you ran it once on your Vagrant
 
 def remove_old_database_assets():
     redis_server.hdel("asset_type0", {"id", "name", "value", "type"})
