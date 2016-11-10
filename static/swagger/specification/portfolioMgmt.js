@@ -8,7 +8,8 @@ var spec =
     },
     "host": "portfoliomgmt.mybluemix.net",
     "schemes": [
-        "https"
+        "https",
+        "http"
     ],
     "basePath": "/api/v1",
     "produces": [
@@ -39,11 +40,17 @@ var spec =
                 "description": "Create a new user portfolio",
                 "parameters": [
                     {
-                        "name": "user",
-                        "in": "query",
+                        "name": "body",
+                        "in": "body",
                         "description": "New user for which a portfolio should be created",
                         "required": true,
-                        "type": "string"
+                        "schema": {
+                            "properties": {
+                                "user": {
+                                    "type": "string"
+                                }
+                            }
+                        }
                     }
                 ],
                 "tags": [
@@ -54,7 +61,7 @@ var spec =
                         "description": "Portfolio successfully created"
                     },
                     "400": {
-                        "description": "The query is not well formed (more details in error message)",
+                        "description": "Body is not well formed (more details in error message)",
                         "schema": {
                             "$ref": "#/definitions/error_data"
                         }
@@ -137,18 +144,20 @@ var spec =
                         "type": "string"
                     },
                     {
-                        "name": "asset_id",
-                        "in": "query",
+                        "name": "body",
+                        "in": "body",
                         "description": "The unique asset id of the asset being added to the portfolio",
                         "required": true,
-                        "type": "integer"
-                    },
-                    {
-                        "name": "quantity",
-                        "in": "query",
-                        "description": "The quantity of the asset being added to the portfolio",
-                        "required": true,
-                        "type": "integer"
+                        "schema": {
+                            "properties": {
+                                "asset_id": {
+                                    "type": "integer"
+                                },
+                                "quantity": {
+                                    "type": "integer"
+                                }
+                            }
+                        }
                     }
                 ],
                 "tags": [
@@ -159,7 +168,7 @@ var spec =
                         "description": "The asset was added to the portfolio"
                     },
                     "400": {
-                        "description": "Query is not well formed or the asset id does not exist",
+                        "description": "Body is not well formed or the asset id does not exist",
                         "schema": {
                             "$ref": "#/definitions/error_data"
                         }
@@ -239,11 +248,17 @@ var spec =
                         "type": "integer"
                     },
                     {
-                        "name": "quantity",
-                        "in": "query",
+                        "name": "body",
+                        "in": "body",
                         "description": "The quantity to add or subtract from the current quantity of this asset in the portfolio",
                         "required": true,
-                        "type": "integer"
+                        "schema": {
+                            "properties": {
+                                "quantity": {
+                                    "type": "integer"
+                                }
+                            }
+                        }
                     }
                 ],
                 "responses": {
@@ -251,7 +266,7 @@ var spec =
                         "description": "The quantity has been updated successfully"
                     },
                     "400": {
-                        "description": "Query is not well formed (more information in the error message) or the quantity to subtract will yield a negative quantity result (not allowed here).",
+                        "description": "Body is not well formed (more information in the error message) or the quantity to subtract will yield a negative quantity result (not allowed here).",
                         "schema": {
                             "$ref": "#/definitions/error_data"
                         }
