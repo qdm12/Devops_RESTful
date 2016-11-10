@@ -16,11 +16,8 @@
 - Enter `vagrant up && vagrant ssh`
 - Enter `python /vagrant/server.py`
 - Open your browser and go to [localhost:5000](http://localhost:5000)
-- For *Try it out!* to work, in the `static/swagger/specification/portfolioMgmt.js` file:
-    - Change the line `"host": "portfoliomgmt.mybluemix.net",` to `"host": "localhost:5000",`.
-    - Change the line `"https"` to `"http"`
-- **IMPORTANT**: In order not to go crazy, you should close your browser and restart it so that it actually reloads the updated *js* file.
-Simply refreshing the page will re-use the same *js* specification file and you will not see updated information.
+- For *Try it out!* to work, change the line `"host": "portfoliomgmt.mybluemix.net",` to `"host": "localhost:5000",` in the `static/swagger/specification/portfolioMgmt.js` file.
+- **IMPORTANT**: Your browser caches *js* files so you will have to clean the cache each time you modify Swagger.
 
 ## Test it on Bluemix
 - If not installed, please install the cf cli from [github.com/cloudfoundry/cli](https://github.com/cloudfoundry/cli)
