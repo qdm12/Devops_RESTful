@@ -1,20 +1,6 @@
-# Copyright 2016 John J. Rofrano. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# https://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 import os
-import redis
-from flask import Flask, Response, jsonify, request, json
+from redis import Redis
+from flask import Flask, jsonify, request, json
 
 # Status Codes
 HTTP_200_OK = 200
@@ -26,7 +12,7 @@ HTTP_409_CONFLICT = 409
 
 # Create Flask application
 app = Flask(__name__)
-
+VAGRANT = False
            
 class NegativeAssetException(Exception):
     pass
@@ -35,11 +21,11 @@ class AssetNotFoundException(Exception):
     pass
 
 class Asset(object):
-    def __init__(self, id, quantity = 0):
-        self.id = int(id)
-        self.asset_class = redis_server.hget("asset_type"+str(self.id),"type")
-        self.name = redis_server.hget("asset_type"+str(self.id),"name")
-        self.price = float(redis_server.hget("asset_type"+str(self.id),"value")) 
+    def __init__(self, ID, quantity = 0):
+        self.id = int(ID)
+        self.asset_class = redis_server.hget("asset_id_"+str(self.id), "type")
+        self.name = redis_server.hget("asset_id_"+str(self.id), "name")
+        self.price = float(redis_server.hget("asset_id_"+str(self.id), "value")) 
         self.quantity = int(quantity)
         self.nav = float(self.quantity) * float(self.price)
         
@@ -53,9 +39,9 @@ class Asset(object):
         self.quantity -= Q
         self.nav = self.quantity * self.price
         
-    def serialize(self,id):
-        #This generates a string from the Asset object (id, quantity parameters)
-        id_hex = str(id).encode("hex")
+    def serialize(self, ID):
+        #This generates a string from the Asset object (ID, quantity parameters)
+        id_hex = str(ID).encode("hex")
         q_hex = str(self.quantity).encode("hex")
         serialized_data = id_hex + ";" + q_hex
         return serialized_data
@@ -65,9 +51,9 @@ class Asset(object):
         if serialized_data is None:
             return
         serialized_data = serialized_data.split(";")
-        id = serialized_data[0].decode("hex")
+        ID = serialized_data[0].decode("hex")
         q = serialized_data[1].decode("hex")
-        return Asset(id, q)
+        return Asset(ID, q)
         
 
 
@@ -77,39 +63,39 @@ class Portfolio(object):
         self.assets = dict()
         self.nav = 0
        
-    def buy(self, id, Q): #This also creates new asset in the portfolio
+    def buy(self, ID, Q): #This also creates new asset in the portfolio
         if Q == 0:
             return
         try:
-            asset = self.assets[id]
+            asset = self.assets[ID]
         except KeyError: # Asset was not present in portfolio
-            asset = Asset(id, Q)
-            self.assets[id] = asset
+            asset = Asset(ID, Q)
+            self.assets[ID] = asset
         else: # Asset was present in portfolio
-            self.assets[id].buy(Q)
-        self.nav += self.assets[id].price * Q 
+            self.assets[ID].buy(Q)
+        self.nav += self.assets[ID].price * Q 
         
-    def sell(self, id, Q):
+    def sell(self, ID, Q):
         if Q == 0:
             return
         try:
-            asset = self.assets[id]
+            _ = self.assets[ID]
         except KeyError: # Asset was not present in portfolio
             raise AssetNotFoundException()
         else:
-            self.assets[id].sell(Q) #raises an error if q becomes negative
-            self.nav -= self.assets[id].price * Q
-            if self.assets[id].quantity == 0:
-                del self.assets[id]
+            self.assets[ID].sell(Q) #raises an error if q becomes negative
+            self.nav -= self.assets[ID].price * Q
+            if self.assets[ID].quantity == 0:
+                del self.assets[ID]
         
-    def buy_sell(self, id, Q):
+    def buy_sell(self, ID, Q):
         if Q < 0:
-            self.sell(id, -Q)
+            self.sell(ID, -Q)
         else:
-            self.buy(id, Q)
+            self.buy(ID, Q)
         
-    def remove_asset(self, id):
-        del self.assets[id]
+    def remove_asset(self, ID):
+        del self.assets[ID]
         
     def json_serialize(self, user, url_root):
         return {
@@ -130,6 +116,8 @@ class Portfolio(object):
     @staticmethod
     def deserialize(serialized_data):
         #This takes the string generated from serialize and returns a Portfolio object
+        if serialized_data is None:
+            return None
         serialized_data = serialized_data.split(";")
         user = serialized_data[0].decode("hex")
         p = Portfolio(user)
@@ -176,12 +164,11 @@ def list_portfolios():
     GET request at /api/v1/portfolios
     """
     portfolios_array = []
-    portfolio_dict = redis_server.smembers('userlist')
-    for user in portfolio_dict:
-        username = redis_server.hget(user,"name")
+    for user in redis_server.smembers('list_users'):
+        username = redis_server.hget("user_"+user, "name")
         if username is not None:
-            data = redis_server.hget(user,"data")
-            portfolio = Portfolio(user)
+            data = redis_server.hget("user_"+user, "data")
+            portfolio = Portfolio(user) # in case there is no data, but portfolio still exists
             if data is not None:
                 portfolio = Portfolio.deserialize(data)
             json_data = portfolio.json_serialize(user, request.url_root)
@@ -196,10 +183,10 @@ def list_assets(user):
     """
     GET request at localhost:5000/api/v1/portfolios/<user>/assets
     """
-    username = redis_server.hget(user,"name")
+    username = redis_server.hget("user_"+user,"name")
     if username is None:
         return reply({'error' : 'User {0} not found'.format(user)}, HTTP_404_NOT_FOUND)
-    data = redis_server.hget(user,"data")
+    data = redis_server.hget("user_"+user,"data")
     portfolio = Portfolio(user)
     if data is not None:
         portfolio = Portfolio.deserialize(data)
@@ -213,17 +200,18 @@ def get_asset(user, asset_id):
     """
     GET request at localhost:5000/api/v1/portfolios/<user>/assets/<asset_id>
     """
-    username = redis_server.hget(user,"name")
+    username = redis_server.hget("user_"+user,"name")
     if username is None:
         return reply({'error' : 'User {0} not found'.format(user)}, HTTP_404_NOT_FOUND)
-    data = redis_server.hget(user,"data")
-    portfolio = Portfolio(user)
-    if data is not None:
-        portfolio = Portfolio.deserialize(data)
+    data = redis_server.hget("user_"+user,"data")
+    print "DATA:", data
+    if data is None:
+        return reply({'error' : 'The portfolio of user {0} has no assets'.format(user)}, HTTP_404_NOT_FOUND)
+    portfolio = Portfolio.deserialize(data)
     try:
         asset = portfolio.assets[int(asset_id)]
     except KeyError:
-        return reply({'error' : 'Asset with id %s does not exist in this portfolio' % asset_id }, HTTP_404_NOT_FOUND)
+        return reply({'error' : 'Asset with id {0} does not exist in this portfolio'.format(asset_id)}, HTTP_404_NOT_FOUND)
     return reply({'name' : asset.name, 'quantity' : asset.quantity, 'value' : asset.nav}, HTTP_200_OK)
         
 
@@ -235,10 +223,10 @@ def get_nav(user):
     """
     GET request at localhost:5000/api/v1/portfolios/<user>/nav
     """
-    username = redis_server.hget(user,"name")
+    username = redis_server.hget("user_"+user,"name")
     if username is None:
         return reply({'error' : 'User {0} not found'.format(user)}, HTTP_404_NOT_FOUND)
-    data = redis_server.hget(user,"data")
+    data = redis_server.hget("user_"+user,"data")
     portfolio = Portfolio(user)
     if data is not None:
         portfolio = Portfolio.deserialize(data)
@@ -260,16 +248,12 @@ def create_user():
     except ValueError:
         return reply({'error' : 'Data {0} is not valid'.format(request.data)}, HTTP_400_BAD_REQUEST)
     if not is_valid(payload, ['user']):
-        return reply({'error' : 'Payload %s is not valid'.format(payload)}, HTTP_400_BAD_REQUEST)
+        return reply({'error' : 'Payload {0} is not valid'.format(payload)}, HTTP_400_BAD_REQUEST)
     user = payload['user']
-    username = redis_server.hget(user,"name")
+    username = redis_server.hget("user_"+user,"name")
     if username is None:
-        ##Set of users
-        redis_server.sadd('userlist',user)
-        
-        ##Create a portfolio and save
-        portfolio = Portfolio(user)
-        redis_server.hmset(user,{'name': user})
+        redis_server.sadd('list_users', user) # Set of users
+        redis_server.hmset("user_"+user, {"name": user})
         return reply("",HTTP_201_CREATED)
     return reply({'error' : 'User {0} already exists'.format(user)}, HTTP_409_CONFLICT)
 
@@ -288,26 +272,27 @@ def create_asset(user):
     try:
         payload = json.loads(request.data)
     except ValueError:
-        return reply({'error' : 'Data %s is not valid' % request.data}, HTTP_400_BAD_REQUEST)
+        return reply({'error' : 'Data {0} is not valid'.format(request.data)}, HTTP_400_BAD_REQUEST)
     if not is_valid(payload, ['asset_id','quantity']):
-        return reply({'error' : 'Payload %s is not valid' % payload}, HTTP_400_BAD_REQUEST)
+        return reply({'error' : 'Payload {0} is not valid'.format(payload)}, HTTP_400_BAD_REQUEST)
     asset_id = int(payload['asset_id'])
     quantity = int(payload['quantity'])
-    id = redis_server.hget("asset_type"+str(asset_id),"id")
-    if id is None: #asset_id does not exist
-        return reply({'error' : 'Asset id %s does not exist in database' % asset_id}, HTTP_400_BAD_REQUEST)
-    username = redis_server.hget(user,"name")
+    ID = redis_server.hget("asset_id_"+str(asset_id),"id")
+    if ID is None: #asset_id does not exist
+        return reply({'error' : 'Asset id {0} does not exist in database'.format(asset_id)}, HTTP_400_BAD_REQUEST)
+    username = redis_server.hget("user_"+user,"name")
     if username is None:
         return reply({'error' : 'User {0} not found'.format(user)}, HTTP_404_NOT_FOUND)
-    data = redis_server.hget(user,"data")
+    data = redis_server.hget("user_"+user, "data")
     if data is None:
-        return reply({'error' : 'No data associated to user {0}'.format(user)}, HTTP_404_NOT_FOUND)
-    portfolio = Portfolio.deserialize(data)
+        portfolio = Portfolio(user)
+    else:
+        portfolio = Portfolio.deserialize(data)
     if asset_id in portfolio.assets:
         return reply({'error' : 'Asset with id {0} already exists in portfolio.'.format(asset_id)}, HTTP_409_CONFLICT)
     portfolio.buy(asset_id, quantity)
     data = portfolio.serialize()
-    redis_server.hmset(user,{'data': data})
+    redis_server.hmset("user_"+user, {"data": data})
     return reply("", HTTP_201_CREATED)
 
 ######################################################################
@@ -318,18 +303,18 @@ def update_asset(user, asset_id):
     try:
         payload = json.loads(request.data)
     except ValueError:
-        return reply({'error' : 'Data %s is not valid' % request.data}, HTTP_400_BAD_REQUEST)
+        return reply({'error' : 'Data {0} is not valid'.format(request.data)}, HTTP_400_BAD_REQUEST)
     if not is_valid(payload, ['quantity']):
-        return reply({'error' : 'Payload %s is not valid' % payload}, HTTP_400_BAD_REQUEST)
+        return reply({'error' : 'Payload {0} is not valid'.format(payload)}, HTTP_400_BAD_REQUEST)
     try:
         asset_id = int(asset_id)
     except ValueError:
-        return reply({'error' : 'The asset_id %s is not an integer' % asset_id}, HTTP_400_BAD_REQUEST)
+        return reply({'error' : 'The asset_id {0} is not an integer'.format(asset_id)}, HTTP_400_BAD_REQUEST)
     quantity = int(payload['quantity'])
-    username = redis_server.hget(user,"name")
+    username = redis_server.hget("user_"+user,"name")
     if username is None:
         return reply({'error' : 'User {0} not found'.format(user)}, HTTP_404_NOT_FOUND)
-    data = redis_server.hget(user,"data")
+    data = redis_server.hget("user_"+user,"data")
     if data is None:
         return reply({'error' : 'No data associated with user {0}'.format(user)}, HTTP_404_NOT_FOUND)
     portfolio = Portfolio.deserialize(data)
@@ -340,7 +325,7 @@ def update_asset(user, asset_id):
     except NegativeAssetException:
         return reply({'error' : 'Selling {0} units of the asset with id {1} in the portfolio of {2} would result in a negative quantity. The operation was aborted.'.format(-quantity, asset_id, user)}, HTTP_400_BAD_REQUEST)
     data = portfolio.serialize()
-    redis_server.hmset(user,{'data': data})
+    redis_server.hmset("user_"+user,{"data": data})
     return reply("", HTTP_200_OK)
 
 ######################################################################
@@ -348,14 +333,14 @@ def update_asset(user, asset_id):
 ######################################################################
 @app.route('/api/v1/portfolios/<user>/assets/<asset_id>', methods=['DELETE'])
 def delete_asset(user, asset_id):
-    username = redis_server.hget(user,"name")
+    username = redis_server.hget("user_"+user,"name")
     if username is not None:
-        data = redis_server.hget(user,"data")
+        data = redis_server.hget("user_"+user,"data")
         if data is not None:
             portfolio = Portfolio.deserialize(data)
             portfolio.remove_asset(int(asset_id)) #removes or does nothing if no asset
             data = portfolio.serialize()
-            redis_server.hmset(user,{'data': data})
+            redis_server.hmset("user_"+user,{"data": data})
     return reply("", HTTP_204_NO_CONTENT)
 
 ######################################################################
@@ -363,11 +348,11 @@ def delete_asset(user, asset_id):
 ######################################################################
 @app.route('/api/v1/portfolios/<user>', methods=['DELETE'])
 def delete_user(user):
-    username = redis_server.hget(user,"name")
+    username = redis_server.hget("user_"+user,"name")
     if username is not None:
-        redis_server.hdel(username, {"name","data"})
-        redis_server.delete(username)
-        redis_server.srem('userlist', user)
+        redis_server.hdel("user_"+username, {"name","data"})
+        redis_server.delete("user_"+username)
+        redis_server.srem('list_users', user)
     return reply("", HTTP_204_NO_CONTENT)
 
 
@@ -390,39 +375,55 @@ def is_valid(data, keys=[]):
         app.logger.error('Missing value error: %s', e)
     return valid
 
-# Initialize Redis
 def init_redis(hostname, port, password):
-    # Connect to Redis Server
     global redis_server
-    redis_server = redis.Redis(host=hostname, port=port, password=password)
+    redis_server = Redis(host=hostname, port=port, password=password)
     if not redis_server:
-        print '*** FATAL ERROR: Could not conect to the Redis Service'
+        print '*** FATAL ERROR: Could not connect to the Redis Service'
         exit(1)
-    ## Initialize Asset types
-    redis_server.hmset("asset_type0",{"id": 0,"name":"gold","value":1286.59,"type":"commodity"})
-    redis_server.hmset("asset_type1",{"id": 1,"name":"NYC real estate index","value":16255.18,"type":"real-estate"})
-    redis_server.hmset("asset_type2",{"id": 2,"name":"brent crude oil","value":51.45,"type":"commodity"})
-    redis_server.hmset("asset_type3",{"id": 3,"name":"US 10Y T-Note","value":130.77,"type":"fixed income"})
-    redis_server.sadd("assetTypes",{"asset_type0","asset_type1","asset_type2","asset_type3"})
+    remove_old_database_assets()
+    fill_database_assets()
+
+def remove_old_database_assets():
+    redis_server.hdel("asset_type0", {"id", "name", "value", "type"})
+    redis_server.hdel("asset_type1", {"id", "name", "value", "type"})
+    redis_server.hdel("asset_type2", {"id", "name", "value", "type"})
+    redis_server.hdel("asset_type3", {"id", "name", "value", "type"})
+    redis_server.srem("assetTypes",{"asset_type0","asset_type1","asset_type2","asset_type3"})
+
+def fill_database_assets():
+    redis_server.hmset("asset_id_0", {"id": 0,"name":"gold","value":1286.59,"type":"commodity"})
+    redis_server.hmset("asset_id_1", {"id": 1,"name":"NYC real estate index","value":16255.18,"type":"real-estate"})
+    redis_server.hmset("asset_id_2", {"id": 2,"name":"brent crude oil","value":51.45,"type":"commodity"})
+    redis_server.hmset("asset_id_3", {"id": 3,"name":"US 10Y T-Note","value":130.77,"type":"fixed income"})
+    
+def fill_database_fakeusers():
+    redis_server.hmset("user_john", {"name": "john","data":""})
+    redis_server.hmset("user_jeremy", {"name": "jeremy","data":""})    
+        
 
 ######################################################################
 #   M A I N
 ######################################################################
 if __name__ == "__main__":
-    # Get the crdentials from the Bluemix environment
+    # Default credentials
+    redis_hostname = 'redis'
+    if VAGRANT:
+        redis_hostname = '127.0.0.1'
+    redis_port = 6379
+    redis_password = None
+    # Credentials from the Bluemix environment
     if 'VCAP_SERVICES' in os.environ:
-        VCAP_SERVICES = os.environ['VCAP_SERVICES']
-        services = json.loads(VCAP_SERVICES)
+        services = json.loads(os.environ['VCAP_SERVICES'])
         redis_creds = services['rediscloud'][0]['credentials']
-        # pull out the fields we need
         redis_hostname = redis_creds['hostname']
         redis_port = int(redis_creds['port'])
         redis_password = redis_creds['password']
-    else:
-        redis_hostname = 'redis'
-        redis_port = 6379
-        redis_password = None
-    
     init_redis(redis_hostname, redis_port, redis_password)
     port = os.getenv('PORT', '5000')
     app.run(host='0.0.0.0', port=int(port), debug=True)
+
+
+
+
+
