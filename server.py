@@ -111,6 +111,7 @@ class Portfolio(object):
         assets = "#".join([a.serialize(a_id) for a_id, a in self.assets.iteritems()])
         assets_hex = assets.encode("hex")        
         serialized_data = user_hex + ";" + assets_hex
+        print "DATA: ", serialized_data
         return serialized_data
     
     @staticmethod
@@ -378,9 +379,6 @@ def is_valid(data, keys=[]):
 def init_redis(hostname, port, password):
     global redis_server
     redis_server = Redis(host=hostname, port=port, password=password)
-    if not redis_server:
-        print '*** FATAL ERROR: Could not connect to the Redis Service'
-        exit(1)
     remove_old_database_assets() # to remove once you ran it once on your Vagrant
     fill_database_assets() # to remove once you ran it once on your Vagrant
 
