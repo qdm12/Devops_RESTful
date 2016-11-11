@@ -410,13 +410,13 @@ def determine_credentials():
                                redis_creds['hostname'],
                                int(redis_creds['port']),
                                redis_creds['password'],
-                               "https://portfoliocontainer.mybluemix.net")
+                               "portfoliocontainer.mybluemix.net")
         else: # Bluemix only
             return Credentials("Bluemix",
                                redis_creds['hostname'],
                                int(redis_creds['port']),
                                redis_creds['password'],
-                               "https://portfoliomgmt.mybluemix.net")
+                               "portfoliomgmt.mybluemix.net")
     else: # Vagrant
         if os.path.isfile("/.dockerenv"):
             return Credentials("Docker running in Vagrant", "redis", 6379, None, "localhost:5000")
