@@ -12,6 +12,7 @@ HTTP_409_CONFLICT = 409
 
 # Create Flask application
 app = Flask(__name__)
+redis_server = None
 VAGRANT = False
            
 class NegativeAssetException(Exception):
@@ -21,19 +22,25 @@ class AssetNotFoundException(Exception):
     pass
 
 class Asset(object):
-    def __init__(self, ID, quantity = 0):
+    def __init__(self, ID, Q = 0):
         self.id = int(ID)
-        self.asset_class = redis_server.hget("asset_id_"+str(self.id), "type")
+        self.asset_class = redis_server.hget("asset_id_"+str(self.id), "class")
         self.name = redis_server.hget("asset_id_"+str(self.id), "name")
-        self.price = float(redis_server.hget("asset_id_"+str(self.id), "value")) 
-        self.quantity = int(quantity)
-        self.nav = float(self.quantity) * float(self.price)
+        self.price = float(redis_server.hget("asset_id_"+str(self.id), "price")) 
+        self.quantity = float(Q)
+        if self.quantity <= 0:
+            raise Exception("Asset object can only be created with a strictly positive a quantity Q.")
+        self.nav = float(self.quantity) * self.price
         
     def buy(self, Q):
-        self.quantity += int(Q)
-        self.nav = self.quantity * self.price
+        """ Q is a positive float or int 
+        """
+        self.quantity += Q
+        self.nav += Q * self.price
         
     def sell(self, Q):
+        """ Q is a positive float or int 
+        """
         if self.quantity - Q < 0:
             raise NegativeAssetException()
         self.quantity -= Q
@@ -53,7 +60,7 @@ class Asset(object):
         serialized_data = serialized_data.split(";")
         ID = serialized_data[0].decode("hex")
         q = serialized_data[1].decode("hex")
-        return Asset(ID, q)
+        return Asset(ID, float(q))
         
 
 
@@ -64,31 +71,39 @@ class Portfolio(object):
         self.nav = 0
        
     def buy(self, ID, Q): #This also creates new asset in the portfolio
+        """ ID is an int or a string converting to an int ("1" for example)
+            Q is a positive float or int
+        """
         if Q == 0:
             return
+        if Q < 0:
+            raise Exception("Buy operation do not accept negative quantities. Use sell instead.")
         try:
-            asset = self.assets[ID]
-        except KeyError: # Asset was not present in portfolio
-            asset = Asset(ID, Q)
-            self.assets[ID] = asset
-        else: # Asset was present in portfolio
+            _ = self.assets[ID]
+        except KeyError: # asset was not present in portfolio
+            self.assets[ID] = Asset(ID, Q)
+        else: # asset was present in portfolio
             self.assets[ID].buy(Q)
         self.nav += self.assets[ID].price * Q 
         
     def sell(self, ID, Q):
         if Q == 0:
             return
+        if Q < 0:
+            raise Exception("Sell operation do not accept negative quantities. Use buy instead.")
         try:
             _ = self.assets[ID]
-        except KeyError: # Asset was not present in portfolio
+        except KeyError: # asset was not present in portfolio
             raise AssetNotFoundException()
         else:
-            self.assets[ID].sell(Q) #raises an error if q becomes negative
+            self.assets[ID].sell(Q) # raises an exception if q becomes negative
             self.nav -= self.assets[ID].price * Q
             if self.assets[ID].quantity == 0:
                 del self.assets[ID]
         
     def buy_sell(self, ID, Q):
+        if Q == 0:
+            return
         if Q < 0:
             self.sell(ID, -Q)
         else:
@@ -377,7 +392,6 @@ def is_valid(data, keys=[]):
     return valid
 
 def init_redis(hostname, port, password):
-    global redis_server
     redis_server = Redis(host=hostname, port=port, password=password)
     remove_old_database_assets() # to remove once you ran it once on your Vagrant
     fill_database_assets() # to remove once you ran it once on your Vagrant
@@ -390,10 +404,10 @@ def remove_old_database_assets():
     redis_server.srem("assetTypes",{"asset_type0","asset_type1","asset_type2","asset_type3"})
 
 def fill_database_assets():
-    redis_server.hmset("asset_id_0", {"id": 0,"name":"gold","value":1286.59,"type":"commodity"})
-    redis_server.hmset("asset_id_1", {"id": 1,"name":"NYC real estate index","value":16255.18,"type":"real-estate"})
-    redis_server.hmset("asset_id_2", {"id": 2,"name":"brent crude oil","value":51.45,"type":"commodity"})
-    redis_server.hmset("asset_id_3", {"id": 3,"name":"US 10Y T-Note","value":130.77,"type":"fixed income"})
+    redis_server.hmset("asset_id_0", {"id": 0,"name":"gold","price":1286.59,"class":"commodity"})
+    redis_server.hmset("asset_id_1", {"id": 1,"name":"NYC real estate index","price":16255.18,"class":"real-estate"})
+    redis_server.hmset("asset_id_2", {"id": 2,"name":"brent crude oil","price":51.45,"class":"commodity"})
+    redis_server.hmset("asset_id_3", {"id": 3,"name":"US 10Y T-Note","price":130.77,"class":"fixed income"})
     
 def fill_database_fakeusers():
     redis_server.hmset("user_john", {"name": "john","data":""})
