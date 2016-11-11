@@ -136,6 +136,7 @@ class Portfolio(object):
 ######################################################################
 @app.route('/')
 def index():
+    print "Sending root static file..."
     return app.send_static_file('swagger/index.html')
     
 @app.route('/lib/<path:path>')

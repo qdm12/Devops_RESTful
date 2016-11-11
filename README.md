@@ -47,7 +47,8 @@
 ### A) Build and run it on Vagrant
 1. Make sure to follow the steps of **III - Obtain the source code and minimum requirements**. 
 2. Enter `vagrant up && vagrant ssh` (this will install the box, docker etc.)
-3. Enter `cd /vagrant && docker build -t docker-portfoliomgmt .` (in the virtual machine you just logged in)
+3. Enter `cd /vagrant` (in the virtual machine you just logged in)
+4. Enter `docker build -t docker-portfoliomgmt .`
   - **Don't forget the '.' !**
   - This builds a Docker image `docker-portfoliomgmt` from the `Dockerfile` description file.
   - You can list your local Docker images with `docker images` to make sure it was created.
@@ -66,9 +67,9 @@
   - Enter your password
   - **TEMPORARY**: Enter `echo Y | cf install-plugin https://static-ice.ng.bluemix.net/ibm-containers-linux_x64` to install *cf ic*.
   - `cf ic login`
-4. Create your namespace with `cf ic namespace set portfoliocontainer`
+4. If not done already, create your namespace with `cf ic namespace set portfoliocontainer`
 5. Tag the Docker image with the remote container name `registry.ng.bluemix.net/portfoliocontainer/docker-portfoliomgmt` with the following command: `docker tag docker-portfoliomgmt registry.ng.bluemix.net/mynamespace/docker-portfoliomgmt`
-6. Push it with `cf ic push registry.ng.bluemix.net/portfoliocontainer/docker-portfoliomgmt`
+6. Push it with `docker push registry.ng.bluemix.net/portfoliocontainer/docker-portfoliomgmt` or with `docker push` **DOES NOT WORK FOR NOW**
 7. The Docker image should be on the Bluemix webpage. Click on it to create a container.
 8. Access the URL showing as *Routes* under *Group details* to access the running container. YOu can access it at [http://portfoliocontainer.mybluemix.net/](http://portfoliocontainer.mybluemix.net/)
 
