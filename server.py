@@ -12,7 +12,6 @@ HTTP_409_CONFLICT = 409
 
 # Create Flask application
 app = Flask(__name__)
-redis_server = None
 VAGRANT = False
            
 class NegativeAssetException(Exception):
@@ -110,7 +109,10 @@ class Portfolio(object):
             self.buy(ID, Q)
         
     def remove_asset(self, ID):
-        del self.assets[ID]
+        try:
+            del self.assets[ID]
+        except KeyError:
+            return
         
     def json_serialize(self, user, url_root):
         return {
@@ -220,7 +222,6 @@ def get_asset(user, asset_id):
     if username is None:
         return reply({'error' : 'User {0} not found'.format(user)}, HTTP_404_NOT_FOUND)
     data = redis_server.hget("user_"+user,"data")
-    print "DATA:", data
     if data is None:
         return reply({'error' : 'The portfolio of user {0} has no assets'.format(user)}, HTTP_404_NOT_FOUND)
     portfolio = Portfolio.deserialize(data)
@@ -300,9 +301,8 @@ def create_asset(user):
     if username is None:
         return reply({'error' : 'User {0} not found'.format(user)}, HTTP_404_NOT_FOUND)
     data = redis_server.hget("user_"+user, "data")
-    if data is None:
-        portfolio = Portfolio(user)
-    else:
+    portfolio = Portfolio(user)
+    if data is not None:
         portfolio = Portfolio.deserialize(data)
     if asset_id in portfolio.assets:
         return reply({'error' : 'Asset with id {0} already exists in portfolio.'.format(asset_id)}, HTTP_409_CONFLICT)
@@ -392,6 +392,7 @@ def is_valid(data, keys=[]):
     return valid
 
 def init_redis(hostname, port, password):
+    global redis_server
     redis_server = Redis(host=hostname, port=port, password=password)
     remove_old_database_assets() # to remove once you ran it once on your Vagrant
     fill_database_assets() # to remove once you ran it once on your Vagrant

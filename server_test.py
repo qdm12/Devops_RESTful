@@ -146,9 +146,192 @@ class Asset(unittest.TestCase):
         self.assertEquals(asset.nav, 89403.49, "Asset net value does not match expected result")
         
 class Portfolio(unittest.TestCase):
-    pass
+    class FakeAsset(object):
+        def __init__(self, ID, Q):
+            self.quantity = Q
+            pass
         
+        def buy(self, Q):
+            pass
+
+        def sell(self, Q):
+            pass        
         
+    assets = {0: FakeAsset(0,10), 1: FakeAsset(1,10)}
+    
+    def test_init(self):
+        user = "john"
+        portfolio = server.Portfolio(user)
+        self.assertEquals(portfolio.user, user, "Asset price does not match expected result")
+        self.assertEquals(portfolio.assets, {}, "Portfolio assets does not match expected result (empty dictionary)")
+        self.assertEquals(portfolio.nav, 0, "Portfolio NAV does not match expected result (0)")    
+      
+    def test_buy_zero(self):
+        pass
+    
+    def test_buy_asset_present(self):
+        pass
+    
+    def test_buy_asset_not_present(self):
+        pass
+    
+    def test_sell_zero(self):
+        pass
+    
+    def test_sell_asset_present(self):
+        pass
+    
+    def test_sell_asset_not_present(self):
+        pass
+    
+    def test_sell_asset_negative_quantity(self):
+        pass
+    
+    def test_buy_sell_negative(self):
+        pass
+    
+    def test_buy_sell_positive(self):
+        pass
+    
+    def test_remove_asset_present(self):
+        pass
+    
+    def test_remove_asset_not_present(self):
+        pass
+    
+    def test_json_serialize(self):
+        pass
+    
+    def test_serialize(self):
+        pass
+    
+    def test_deserialize(self):
+        pass
+    
+    def test_deserialize_None(self):
+        pass
+    
+class Static(unittest.TestCase):
+    def test_index(self):
+        pass
+    
+    def test_send_js(self):
+        pass
+    
+    def test_send_spec(self):
+        pass
+    
+    def test_send_img(self):
+        pass
+    
+    def test_send_css(self):
+        pass
+    
+    def test_send_fonts(self):
+        pass
+    
+class GET(unittest.TestCase):
+    def test_list_portfolios(self):
+        pass
+    
+    def test_list_assets(self):
+        pass
+    
+    def test_list_assets_no_username(self):
+        pass
+    
+    def test_get_asset(self):
+        pass
+    
+    def test_get_asset_no_username(self):
+        pass
+    
+    def test_get_asset_no_data(self):
+        pass
+    
+    def test_get_asset_no_assetid(self):
+        pass
+    
+    def test_get_nav(self):
+        pass
+    
+    def test_get_nav_no_username(self):
+        pass
+    
+class POST(unittest.TestCase):
+    def test_create_user(self):
+        pass
+    
+    def test_create_user_data_not_valid(self):
+        pass
+    
+    def test_create_user_payload_not_valid(self):
+        pass
+    
+    def test_create_user_no_username(self):
+        pass
+    
+    def test_create_asset(self):
+        pass
+    
+    def test_create_asset_data_not_valid(self):
+        pass
+    
+    def test_create_asset_payload_not_valid(self):
+        pass
+    
+    def test_create_asset_no_assetid(self):
+        pass
+    
+    def test_create_asset_no_username(self):
+        pass
+    
+    def test_create_asset_already_exists(self):
+        pass
+    
+class PUT(unittest.TestCase):
+    def test_update_asset(self):
+        pass
+    
+    def test_update_asset_data_not_valid(self):
+        pass
+    
+    def test_update_asset_payload_not_valid(self):
+        pass
+    
+    def test_update_asset_assetid_not_integer(self):
+        pass
+    
+    def test_update_asset_no_username(self):
+        pass
+    
+    def test_update_asset_no_data(self):
+        pass
+    
+    def test_update_asset_asset_not_found(self):
+        pass
+    
+    def test_update_asset_negative(self):
+        pass
+    
+class DELETE(unittest.TestCase):
+    def test_delete_asset(self):
+        pass
+    
+    def test_delete_user(self):
+        pass
+    
+class Utility(unittest.TestCase):
+    def test_reply(self):
+        pass
+    
+    def test_is_valid_true(self):
+        pass
+    
+    def test_is_valid_false(self):
+        pass
+    
+            
 
 
 ######################################################################
