@@ -1,6 +1,7 @@
 import os
-from redis import Redis
+from redis import Redis, ConnectionError
 from flask import Flask, jsonify, request, json
+import fileinput
 
 # Status Codes
 HTTP_200_OK = 200
@@ -12,12 +13,14 @@ HTTP_409_CONFLICT = 409
 
 # Create Flask application
 app = Flask(__name__)
-VAGRANT = False
            
 class NegativeAssetException(Exception):
     pass
     
 class AssetNotFoundException(Exception):
+    pass
+
+class RedisConnectionException(Exception):
     pass
 
 class Asset(object):
@@ -133,6 +136,7 @@ class Portfolio(object):
 ######################################################################
 @app.route('/')
 def index():
+    print "Sending root static file..."
     return app.send_static_file('swagger/index.html')
     
 @app.route('/lib/<path:path>')
@@ -379,10 +383,53 @@ def init_redis(hostname, port, password):
     global redis_server
     redis_server = Redis(host=hostname, port=port, password=password)
     if not redis_server:
-        print '*** FATAL ERROR: Could not connect to the Redis Service'
+        raise RedisConnectionException()
+    try:
+        redis_server.ping()
+    except ConnectionError:
+        raise RedisConnectionException()
+    except Exception as e:
+        print "\n\n*** FATAL ERROR: The redis server connection failed because: "+str(e)+"\n"
         exit(1)
     remove_old_database_assets() # to remove once you ran it once on your Vagrant
     fill_database_assets() # to remove once you ran it once on your Vagrant
+    
+class Credentials(object):
+    def __init__(self, environment, host, port, password, swagger_host):
+        self.environment = environment
+        self.host = host
+        self.port = port
+        self.password = password
+        self.swagger_host = swagger_host
+    
+def determine_credentials():
+    if 'VCAP_SERVICES' in os.environ:
+        services = json.loads(os.environ['VCAP_SERVICES'])
+        redis_creds = services['rediscloud'][0]['credentials']
+        if os.path.isfile("/.dockerenv"):
+            return Credentials("Docker running in Bluemix",
+                               redis_creds['hostname'],
+                               int(redis_creds['port']),
+                               redis_creds['password'],
+                               "portfoliocontainer.mybluemix.net")
+        else: # Bluemix only
+            return Credentials("Bluemix",
+                               redis_creds['hostname'],
+                               int(redis_creds['port']),
+                               redis_creds['password'],
+                               "portfoliomgmt.mybluemix.net")
+    else: # Vagrant
+        if os.path.isfile("/.dockerenv"):
+            return Credentials("Docker running in Vagrant", "redis", 6379, None, "localhost:5000")
+        else: # Vagrant only
+            return Credentials("Vagrant", "127.0.0.1", 6379, None, "localhost:5000")
+        
+def update_swagger_specification(swagger_host):
+    for line in fileinput.input("static/swagger/specification/portfolioMgmt.js", inplace=True):
+        if '"host"' in line and fileinput.filelineno() < 20:
+            pos = line.find('"host"')
+            line = line[:pos+6] + ': "'+swagger_host+'",\n'
+        print line,
 
 def remove_old_database_assets():
     redis_server.hdel("asset_type0", {"id", "name", "value", "type"})
@@ -392,6 +439,7 @@ def remove_old_database_assets():
     redis_server.srem("assetTypes",{"asset_type0","asset_type1","asset_type2","asset_type3"})
 
 def fill_database_assets():
+    # Note: hmset overwrites if the key is already present
     redis_server.hmset("asset_id_0", {"id": 0,"name":"gold","value":1286.59,"type":"commodity"})
     redis_server.hmset("asset_id_1", {"id": 1,"name":"NYC real estate index","value":16255.18,"type":"real-estate"})
     redis_server.hmset("asset_id_2", {"id": 2,"name":"brent crude oil","value":51.45,"type":"commodity"})
@@ -406,20 +454,10 @@ def fill_database_fakeusers():
 #   M A I N
 ######################################################################
 if __name__ == "__main__":
-    # Default credentials
-    redis_hostname = 'redis'
-    if VAGRANT:
-        redis_hostname = '127.0.0.1'
-    redis_port = 6379
-    redis_password = None
-    # Credentials from the Bluemix environment
-    if 'VCAP_SERVICES' in os.environ:
-        services = json.loads(os.environ['VCAP_SERVICES'])
-        redis_creds = services['rediscloud'][0]['credentials']
-        redis_hostname = redis_creds['hostname']
-        redis_port = int(redis_creds['port'])
-        redis_password = redis_creds['password']
-    init_redis(redis_hostname, redis_port, redis_password)
+    creds = determine_credentials()
+    print " ~ Identified the environment as: "+creds.environment
+    init_redis(creds.host, creds.port, creds.password)
+    update_swagger_specification(creds.swagger_host)
     port = os.getenv('PORT', '5000')
     app.run(host='0.0.0.0', port=int(port), debug=True)
 
