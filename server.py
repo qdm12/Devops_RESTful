@@ -439,7 +439,12 @@ def determine_credentials():
             return Credentials("Vagrant", "127.0.0.1", 6379, None, "localhost:5000")
         
 def update_swagger_specification(swagger_host):
-    for line in fileinput.input("static/swagger/specification/portfolioMgmt.js", inplace=True):
+    spec_path = os.path.dirname(__file__)
+    if len(spec_path) == 0: # Docker container
+        spec_path = "static/swagger/specification/portfolioMgmt.js"
+    else:
+        spec_path += "/static/swagger/specification/portfolioMgmt.js"
+    for line in fileinput.input(spec_path, inplace=True):
         if '"host"' in line and fileinput.filelineno() < 20:
             pos = line.find('"host"')
             line = line[:pos+6] + ': "'+swagger_host+'",\n'
