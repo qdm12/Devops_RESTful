@@ -69,7 +69,7 @@
   - `cf ic login`
 4. If not done already, create your namespace with `cf ic namespace set portfoliocontainer`
 5. Tag the Docker image with the remote container name `registry.ng.bluemix.net/portfoliocontainer/devops-hw2` with the following command: `docker tag docker-portfoliomgmt registry.ng.bluemix.net/portfoliocontainer/devops-hw2`
-6. Push it with `cf ic push registry.ng.bluemix.net/portfoliocontainer/devops-hw2`
+6. Push it with `docker push registry.ng.bluemix.net/portfoliocontainer/devops-hw2`
 7. The Docker image should be on the Bluemix webpage. Click on it to create a container.
 8. Access the URL showing as *Routes* under *Group details* to access the running container. You can access it at [http://portfoliocontainer.mybluemix.net](http://portfoliocontainer.mybluemix.net)
 
