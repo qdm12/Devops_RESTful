@@ -9,6 +9,7 @@
 
 ## Access the API
 - Access the root URL of the API on Bluemix at [https://portfoliomgmt.mybluemix.net](https://portfoliomgmt.mybluemix.net)
+- Access the root URL of the API on the Bluemix container [http://portfoliocontainer.mybluemix.net/](http://portfoliocontainer.mybluemix.net/)
 - Access it on your virtual Vagrant machine at [localhost:5000](localhost:5000)
 - The root URL uses **Swagger** to show a descriptive list of all available RESTful calls such as `POST`, `DELETE`, `PUT` and `GET`.
 
