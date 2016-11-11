@@ -398,9 +398,6 @@ def is_valid(data, keys=[]):
 def init_redis(hostname, port, password):
     global redis_server
     redis_server = Redis(host=hostname, port=port, password=password)
-<<<<<<< HEAD
-    if not redis_server:
-        raise RedisConnectionException()
     try:
         redis_server.ping()
     except ConnectionError:
@@ -408,8 +405,6 @@ def init_redis(hostname, port, password):
     except Exception as e:
         print "\n\n*** FATAL ERROR: The redis server connection failed because: "+str(e)+"\n"
         exit(1)
-=======
->>>>>>> 96560c3e9809d651ef0711a8236367334ee91351
     remove_old_database_assets() # to remove once you ran it once on your Vagrant
     fill_database_assets() # to remove once you ran it once on your Vagrant
     
@@ -458,24 +453,15 @@ def remove_old_database_assets():
     redis_server.srem("assetTypes",{"asset_type0","asset_type1","asset_type2","asset_type3"})
 
 def fill_database_assets():
-<<<<<<< HEAD
-    # Note: hmset overwrites if the key is already present
-    redis_server.hmset("asset_id_0", {"id": 0,"name":"gold","value":1286.59,"type":"commodity"})
-    redis_server.hmset("asset_id_1", {"id": 1,"name":"NYC real estate index","value":16255.18,"type":"real-estate"})
-    redis_server.hmset("asset_id_2", {"id": 2,"name":"brent crude oil","value":51.45,"type":"commodity"})
-    redis_server.hmset("asset_id_3", {"id": 3,"name":"US 10Y T-Note","value":130.77,"type":"fixed income"})
-=======
     redis_server.hmset("asset_id_0", {"id": 0,"name":"gold","price":1286.59,"class":"commodity"})
     redis_server.hmset("asset_id_1", {"id": 1,"name":"NYC real estate index","price":16255.18,"class":"real-estate"})
     redis_server.hmset("asset_id_2", {"id": 2,"name":"brent crude oil","price":51.45,"class":"commodity"})
     redis_server.hmset("asset_id_3", {"id": 3,"name":"US 10Y T-Note","price":130.77,"class":"fixed income"})
->>>>>>> 96560c3e9809d651ef0711a8236367334ee91351
     
 def fill_database_fakeusers():
     redis_server.hmset("user_john", {"name": "john","data":""})
     redis_server.hmset("user_jeremy", {"name": "jeremy","data":""})    
         
-
 ######################################################################
 #   M A I N
 ######################################################################
