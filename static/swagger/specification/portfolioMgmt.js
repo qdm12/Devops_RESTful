@@ -1,12 +1,11 @@
-var spec = 
-{
+var spec = {
     "swagger": "2.0",
     "info": {
         "title": "DevOps RESTful Project",
         "description": "API for portfolio management, implemented for the NYU DevOps course",
         "version": "1.0"
     },
-    "host": "portfoliomgmt.mybluemix.net",
+    "host": "localhost:5000",
     "schemes": [
         "https",
         "http"
@@ -479,5 +478,4 @@ var spec =
             }
         }
     }
-}
-;
+};

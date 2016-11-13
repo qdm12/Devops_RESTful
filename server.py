@@ -429,11 +429,11 @@ def update_swagger_specification(swagger_host):
     spec_dir = os.path.dirname(__file__)
     if len(spec_dir): # Not docker container
         spec_dir += "/"
-    spec_dir += "static/swagger/specification/portfolioMgmt.json"
+    spec_dir += "static/swagger/specification/"
     with open(spec_dir + "portfolioMgmt.json") as f:
         spec_lines = f.readlines()
     with open(spec_dir + "portfolioMgmt.js", 'w') as f:
-        f.write("var spec = \n")
+        f.write("var spec = ")
         for i in range(len(spec_lines)):
             if '"host"' in spec_lines[i] and i < 20:
                 pos = spec_lines[i].find('"host"')
