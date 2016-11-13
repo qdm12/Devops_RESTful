@@ -12,7 +12,7 @@ HTTP_404_NOT_FOUND = 404
 HTTP_409_CONFLICT = 409
 
 class FakeRedisServer(object):
-    def __init__(self, database=None):
+    def __init__(self, database=None, host=None, port=None, password=None):
         """ database is a dict of a dict:
         * key 'asset_id_0' and value {"id": 0,"name":"gold","value":1286.59,"class":"commodity"}
             or
@@ -21,15 +21,6 @@ class FakeRedisServer(object):
         * key 'list_users' and value set("john", ...)
         """
         self.database = database
-        if self.database is None:
-            database = dict()
-            database["asset_id_0"] = {"id": 0,"name":"gold","price":1286.59,"class":"commodity"}
-            database["asset_id_1"] = {"id": 1,"name":"NYC real estate index","price":16255.18,"class":"real-estate"}
-            database["asset_id_2"] = {"id": 2,"name":"brent crude oil","price":51.45,"class":"commodity"}
-            database["asset_id_3"] = {"id": 3,"name":"US 10Y T-Note","price":130.77,"class":"fixed income"}
-            database["user_john"] = {"name":"john", "data":"6a6f686e;33303b3335"}
-            database["user_jeremy"] = {"name":"jeremy", "data":""}
-            database["list_users"] = set(["john", "jeremy"])
         
     def hget(self, key, field):
         """
@@ -42,6 +33,8 @@ class FakeRedisServer(object):
         return self.database[key][field]
     
     def hmset(self, key, dictionary):
+        if key not in self.database:
+            self.database[key] = dict()
         for subkey in dictionary:
             self.database[key][subkey] = dictionary[subkey]
             
@@ -55,6 +48,8 @@ class FakeRedisServer(object):
         return self.database[key]
     
     def sadd(self, key="list_users", user="john"):
+        if key not in self.database:
+            self.database[key] = set()
         self.database[key].add(user)
     
     def srem(self, key="list_users", user="john"):
@@ -63,24 +58,18 @@ class FakeRedisServer(object):
     def delete(self, key):
         del self.database[key]
         
+    def ping(self):
+        raise server.ConnectionError()
 
 class NegativeAssetException(unittest.TestCase):
     def test_exception(self):
-        exception_raised = False
-        try:
+        with self.assertRaises(server.NegativeAssetException):
             raise server.NegativeAssetException()
-        except:
-            exception_raised = True
-        self.assertEquals(exception_raised, True, "NegativeAssetException was not raised")
         
 class AssetNotFoundException(unittest.TestCase):
     def test_exception(self):
-        exception_raised = False
-        try:
+        with self.assertRaises(server.AssetNotFoundException):
             raise server.AssetNotFoundException()
-        except:
-            exception_raised = True
-        self.assertEquals(exception_raised, True, "AssetNotFoundException was not raised")
         
 class Asset(unittest.TestCase):   
     def test_init(self):
@@ -118,22 +107,14 @@ class Asset(unittest.TestCase):
     def test_init_zero_quantity(self):
         ID = "1"
         Q = 0
-        exception_raised = False
-        try:
+        with self.assertRaises(Exception):
             _ = server.Asset(ID, Q)
-        except Exception:
-            exception_raised = True
-        self.assertEquals(exception_raised, True, "Exception was not raised for zero quantity")
         
     def test_init_neg_quantity(self):
         ID = "1"
         Q = -5
-        exception_raised = False
-        try:
+        with self.assertRaises(Exception):
             _ = server.Asset(ID, Q)
-        except:
-            exception_raised = True
-        self.assertEquals(exception_raised, True, "Exception was not raised for negative quantity")
         
     def test_buy(self):
         database = dict()
@@ -162,12 +143,8 @@ class Asset(unittest.TestCase):
         ID = "1"
         Q = 5.5
         asset = server.Asset(ID, Q)
-        exception_raised = False
-        try:
+        with self.assertRaises(server.NegativeAssetException):
             asset.sell(6.2)
-        except server.NegativeAssetException:
-            exception_raised = True
-        self.assertTrue(exception_raised)
         self.assertEquals(asset.quantity, Q)
         
     def test_serialize(self):
@@ -279,12 +256,8 @@ class Portfolio(unittest.TestCase):
         portfolio.assets = assets_before
         asset_id = 2
         Q = -2.5
-        exception_raised = False
-        try:
+        with self.assertRaises(server.AssetNotFoundException):
             portfolio.buy_sell(asset_id, Q)
-        except server.AssetNotFoundException:
-            exception_raised = True
-        self.assertTrue(exception_raised)
         self.assertEquals(portfolio.assets, assets_before)
     
     def test_buy(self):
@@ -331,12 +304,8 @@ class Portfolio(unittest.TestCase):
         portfolio.nav = 2.5 * 5.0
         portfolio_expected = portfolio.copy()
         Q = -5.1
-        exception_raised = False
-        try:
+        with self.assertRaises(server.NegativeAssetException):
             portfolio.buy_sell(asset_id, Q)
-        except server.NegativeAssetException:
-            exception_raised = True
-        self.assertTrue(exception_raised)
         self.assertEquals(portfolio, portfolio_expected)
     
     def test_remove_asset(self):
@@ -397,7 +366,7 @@ class Portfolio(unittest.TestCase):
             _ = str(portfolio)
         except:
             no_exception = False
-        self.assertEquals(no_exception, True)
+        self.assertTrue(no_exception)
         
 class Static(unittest.TestCase):
     def setUp(self):
@@ -469,6 +438,8 @@ class GET(unittest.TestCase):
         database["asset_id_0"] = {"id": 0,"name":"gold","price":1286.59,"class":"commodity"}
         server.redis_server = FakeRedisServer(database)
         response = self.app.get("/api/v1/portfolios/john/assets")
+        parsed_data = json.loads(response.data)
+        self.assertEquals(parsed_data["error"], "User john not found")
         self.assertEquals(response.status_code, HTTP_404_NOT_FOUND)
     
     def test_get_asset(self):
@@ -478,16 +449,18 @@ class GET(unittest.TestCase):
         server.redis_server = FakeRedisServer(database)
         response = self.app.get("/api/v1/portfolios/john/assets/0")
         parsed_data = json.loads(response.data)
-        self.assertEquals(response.status_code, HTTP_200_OK)
         self.assertEquals(parsed_data["name"], "gold")
         self.assertEquals(parsed_data["quantity"], 5.0)
         self.assertEquals(parsed_data["value"], 5.0*1286.59)
+        self.assertEquals(response.status_code, HTTP_200_OK)
     
     def test_get_asset_no_username(self):
         database = dict()
         database["asset_id_0"] = {"id": 0,"name":"gold","price":1286.59,"class":"commodity"}
         server.redis_server = FakeRedisServer(database)
         response = self.app.get("/api/v1/portfolios/john/assets/0")
+        parsed_data = json.loads(response.data)
+        self.assertEquals(parsed_data["error"], "User john not found")
         self.assertEquals(response.status_code, HTTP_404_NOT_FOUND)
     
     def test_get_asset_no_data(self):
@@ -530,67 +503,195 @@ class GET(unittest.TestCase):
         self.assertEquals(response.status_code, HTTP_404_NOT_FOUND)
     
 class POST(unittest.TestCase):
+    def setUp(self):
+        self.app = server.app.test_client()
+    
     def test_create_user(self):
-        pass
+        database = dict()
+        server.redis_server = FakeRedisServer(database)
+        response = self.app.post("/api/v1/portfolios", data='{"user":"john"}')
+        self.assertEquals(response.data, '""\n')
+        self.assertEquals(response.status_code, HTTP_201_CREATED)
     
     def test_create_user_data_not_valid(self):
-        pass
+        response = self.app.post("/api/v1/portfolios", data='notjson')
+        parsed_data = json.loads(response.data)
+        self.assertEquals(parsed_data["error"], "Data notjson is not valid")
+        self.assertEquals(response.status_code, HTTP_400_BAD_REQUEST)
     
     def test_create_user_payload_not_valid(self):
-        pass
+        response = self.app.post("/api/v1/portfolios", data='{"wrong_key":"john"}')
+        parsed_data = json.loads(response.data)
+        self.assertEquals(parsed_data["error"], "Payload {u'wrong_key': u'john'} is not valid")
+        self.assertEquals(response.status_code, HTTP_400_BAD_REQUEST)
     
-    def test_create_user_no_username(self):
-        pass
+    def test_create_user_already_exists(self):
+        database = dict()
+        database["user_john"] = {"name":"john", "data":"6a6f686e;33303b3335"}
+        server.redis_server = FakeRedisServer(database)
+        response = self.app.post("/api/v1/portfolios", data='{"user":"john"}')
+        self.assertEquals(response.status_code, HTTP_409_CONFLICT)
+        parsed_data = json.loads(response.data)
+        self.assertEquals(parsed_data["error"], "User john already exists")
     
     def test_create_asset(self):
-        pass
+        database = dict()
+        database["user_john"] = {"name":"john", "data":"6a6f686e;33303b3335"}
+        database["asset_id_0"] = {"id": 0,"name":"gold","price":1286.59,"class":"commodity"}
+        database["asset_id_1"] = {"id": 1,"name":"NYC real estate index","price":16255.18,"class":"real-estate"}
+        server.redis_server = FakeRedisServer(database)
+        response = self.app.post("/api/v1/portfolios/john/assets", data='{"asset_id":1,"quantity":10}')
+        self.assertEquals(response.data, '""\n')
+        self.assertEquals(response.status_code, HTTP_201_CREATED)
+    
+    def test_create_asset_neg(self):
+        database = dict()
+        database["user_john"] = {"name":"john", "data":"6a6f686e;33303b3335"}
+        database["asset_id_0"] = {"id": 0,"name":"gold","price":1286.59,"class":"commodity"}
+        database["asset_id_1"] = {"id": 1,"name":"NYC real estate index","price":16255.18,"class":"real-estate"}
+        server.redis_server = FakeRedisServer(database)
+        response = self.app.post("/api/v1/portfolios/john/assets", data='{"asset_id":1,"quantity":-10}')
+        parsed_data = json.loads(response.data)
+        self.assertEquals(parsed_data["error"], "Quantity value must be positive")
+        self.assertEquals(response.status_code, HTTP_400_BAD_REQUEST)
     
     def test_create_asset_data_not_valid(self):
-        pass
+        response = self.app.post("/api/v1/portfolios/john/assets", data='notjson')
+        parsed_data = json.loads(response.data)
+        self.assertEquals(parsed_data["error"], "Data notjson is not valid")
+        self.assertEquals(response.status_code, HTTP_400_BAD_REQUEST)
     
     def test_create_asset_payload_not_valid(self):
-        pass
+        response = self.app.post("/api/v1/portfolios/john/assets", data='{"wrong_key":"john"}')
+        parsed_data = json.loads(response.data)
+        self.assertEquals(parsed_data["error"], "Payload {u'wrong_key': u'john'} is not valid")
+        self.assertEquals(response.status_code, HTTP_400_BAD_REQUEST)
     
     def test_create_asset_no_assetid(self):
-        pass
+        database = dict()
+        database["user_john"] = {"name":"john", "data":"6a6f686e;33303b3335"}
+        database["asset_id_0"] = {"id": 0,"name":"gold","price":1286.59,"class":"commodity"}
+        server.redis_server = FakeRedisServer(database)
+        response = self.app.post("/api/v1/portfolios/john/assets", data='{"asset_id":1,"quantity":10}')
+        parsed_data = json.loads(response.data)
+        self.assertEquals(parsed_data["error"], "Asset id 1 does not exist in database")
+        self.assertEquals(response.status_code, HTTP_400_BAD_REQUEST)
     
     def test_create_asset_no_username(self):
-        pass
+        database = dict()
+        database["asset_id_0"] = {"id": 0,"name":"gold","price":1286.59,"class":"commodity"}
+        database["asset_id_1"] = {"id": 1,"name":"NYC real estate index","price":16255.18,"class":"real-estate"}
+        server.redis_server = FakeRedisServer(database)
+        response = self.app.post("/api/v1/portfolios/john/assets", data='{"asset_id":1,"quantity":10}')
+        parsed_data = json.loads(response.data)
+        self.assertEquals(parsed_data["error"], "User john not found")
+        self.assertEquals(response.status_code, HTTP_404_NOT_FOUND)
     
     def test_create_asset_already_exists(self):
-        pass
+        database = dict()
+        database["user_john"] = {"name":"john", "data":"6a6f686e;33303b3335"}
+        database["asset_id_0"] = {"id": 0,"name":"gold","price":1286.59,"class":"commodity"}
+        server.redis_server = FakeRedisServer(database)
+        response = self.app.post("/api/v1/portfolios/john/assets", data='{"asset_id":0,"quantity":10}')
+        parsed_data = json.loads(response.data)
+        self.assertEquals(parsed_data["error"], "Asset with id 0 already exists in portfolio.")
+        self.assertEquals(response.status_code, HTTP_409_CONFLICT)
     
 class PUT(unittest.TestCase):
+    def setUp(self):
+        self.app = server.app.test_client()
+        
     def test_update_asset(self):
-        pass
+        database = dict()
+        database["user_john"] = {"name":"john", "data":"6a6f686e;33303b3335"}
+        database["asset_id_0"] = {"id": 0,"name":"gold","price":1286.59,"class":"commodity"}
+        server.redis_server = FakeRedisServer(database)
+        response = self.app.put("/api/v1/portfolios/john/assets/0", data='{"quantity":10}')
+        self.assertEquals(response.data, '""\n')
+        self.assertEquals(response.status_code, HTTP_200_OK)
     
     def test_update_asset_data_not_valid(self):
-        pass
+        response = self.app.put("/api/v1/portfolios/john/assets/0", data='notjson')
+        parsed_data = json.loads(response.data)
+        self.assertEquals(parsed_data["error"], "Data notjson is not valid")
+        self.assertEquals(response.status_code, HTTP_400_BAD_REQUEST)
+
     
     def test_update_asset_payload_not_valid(self):
-        pass
+        response = self.app.put("/api/v1/portfolios/john/assets/0", data='{"wrong_key":10}')
+        parsed_data = json.loads(response.data)
+        self.assertEquals(parsed_data["error"], "Payload {u'wrong_key': 10} is not valid")
+        self.assertEquals(response.status_code, HTTP_400_BAD_REQUEST)
     
     def test_update_asset_assetid_not_integer(self):
-        pass
+        response = self.app.put("/api/v1/portfolios/john/assets/string", data='{"quantity":10}')
+        parsed_data = json.loads(response.data)
+        self.assertEquals(parsed_data["error"], "The asset_id string is not an integer")
+        self.assertEquals(response.status_code, HTTP_400_BAD_REQUEST)
     
     def test_update_asset_no_username(self):
-        pass
+        database = dict()
+        database["asset_id_0"] = {"id": 0,"name":"gold","price":1286.59,"class":"commodity"}
+        server.redis_server = FakeRedisServer(database)
+        response = self.app.put("/api/v1/portfolios/john/assets/0", data='{"quantity":10}')
+        parsed_data = json.loads(response.data)
+        self.assertEquals(parsed_data["error"], "User john not found")
+        self.assertEquals(response.status_code, HTTP_404_NOT_FOUND)
     
     def test_update_asset_no_data(self):
-        pass
+        database = dict()
+        database["user_john"] = {"name":"john", "data":""}
+        database["asset_id_0"] = {"id": 0,"name":"gold","price":1286.59,"class":"commodity"}
+        server.redis_server = FakeRedisServer(database)
+        response = self.app.put("/api/v1/portfolios/john/assets/0", data='{"quantity":10}')
+        parsed_data = json.loads(response.data)
+        self.assertEquals(parsed_data["error"], "No data associated with user john")
+        self.assertEquals(response.status_code, HTTP_404_NOT_FOUND)
     
     def test_update_asset_asset_not_found(self):
-        pass
+        database = dict()
+        database["user_john"] = {"name":"john", "data":"6a6f686e;33303b3335"}
+        database["asset_id_0"] = {"id": 0,"name":"gold","price":1286.59,"class":"commodity"}
+        database["asset_id_1"] = {"id": 1,"name":"NYC real estate index","price":16255.18,"class":"real-estate"}
+        server.redis_server = FakeRedisServer(database)
+        response = self.app.put("/api/v1/portfolios/john/assets/1", data='{"quantity":10}')
+        parsed_data = json.loads(response.data)
+        self.assertEquals(parsed_data["error"], "Asset with id 1 was not found in the portfolio of john.")
+        self.assertEquals(response.status_code, HTTP_404_NOT_FOUND)
     
     def test_update_asset_negative(self):
-        pass
+        database = dict()
+        database["user_john"] = {"name":"john", "data":"6a6f686e;33303b3335"}
+        database["asset_id_0"] = {"id": 0,"name":"gold","price":1286.59,"class":"commodity"}
+        server.redis_server = FakeRedisServer(database)
+        response = self.app.put("/api/v1/portfolios/john/assets/0", data='{"quantity":-20.7}')
+        parsed_data = json.loads(response.data)
+        self.assertEquals(parsed_data["error"], "Selling 20 units of the asset with id 0 in the portfolio of john would result in a negative quantity. The operation was aborted.")
+        self.assertEquals(response.status_code, HTTP_400_BAD_REQUEST)
     
 class DELETE(unittest.TestCase):
+    def setUp(self):
+        self.app = server.app.test_client()
+
     def test_delete_asset(self):
-        pass
+        database = dict()
+        database["user_john"] = {"name":"john", "data":"6a6f686e;33303b3335"}
+        database["asset_id_0"] = {"id": 0,"name":"gold","price":1286.59,"class":"commodity"}
+        server.redis_server = FakeRedisServer(database)
+        response = self.app.delete("/api/v1/portfolios/john/assets/0")
+        self.assertEquals(response.data, '')
+        self.assertEquals(response.status_code, HTTP_204_NO_CONTENT)
     
     def test_delete_user(self):
-        pass
+        database = dict()
+        database["user_john"] = {"name":"john", "data":"6a6f686e;33303b3335"}
+        database["asset_id_0"] = {"id": 0,"name":"gold","price":1286.59,"class":"commodity"}
+        database["list_users"] = set()
+        database["list_users"].add("john")
+        server.redis_server = FakeRedisServer(database)
+        response = self.app.delete("/api/v1/portfolios/john")
+        self.assertEquals(response.data, '')
+        self.assertEquals(response.status_code, HTTP_204_NO_CONTENT)
     
 class Utility(unittest.TestCase):
     def setUp(self):
@@ -599,21 +700,33 @@ class Utility(unittest.TestCase):
     def test_reply(self):
         message = "message message message"
         rc = 404
-        #with self.app.app_context():
-        #    response = server.reply(message, rc)
+        #response = server.reply(message, rc)
         #self.assertEquals(response, "") XXX
-        pass
     
     def test_is_valid_true(self):
         data = {"key1":2312, "key2":434}
         valid = server.is_valid(data, ["key1", "key2"])
         self.assertTrue(valid)
+    
+    def test_is_valid_false(self):
         data = {"key1":2312}
         valid = server.is_valid(data, ["key2"])
         self.assertFalse(valid)
-    
-    def test_is_valid_false(self):
-        pass
+        
+    def test_init_redis_connection(self):
+        server.redis_server = FakeRedisServer()
+        with self.assertRaises(server.RedisConnectionException):
+            server.init_redis("localhost:5000", 5000, None)
+            
+class Credentials(unittest.TestCase):
+    def test_init(self):
+        no_exception = True
+        try:
+            _ = server.Credentials("linux", "localhost", 6000, "password", "localhost")
+        except:
+            no_exception = False
+        self.assertTrue(no_exception)
+        
     
             
 

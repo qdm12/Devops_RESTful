@@ -72,11 +72,13 @@ class Portfolio(object):
         self.assets = dict()
         self.nav = 0
        
-    def buy_sell(self, ID, Q):
+    def buy_sell(self, ID, Q, can_be_created=True):
         if Q == 0:
             return
         if Q > 0:
             if ID not in self.assets: # asset was not present in portfolio
+                if not can_be_created:
+                    raise AssetNotFoundException()
                 self.assets[ID] = Asset(ID, Q)
             else: # asset was present in portfolio
                 self.assets[ID].buy(Q)
@@ -264,7 +266,7 @@ def create_user():
     if not username:
         redis_server.sadd('list_users', user) # Set of users
         redis_server.hmset("user_"+user, {"name": user})
-        return reply("",HTTP_201_CREATED)
+        return reply("", HTTP_201_CREATED)
     return reply({'error' : 'User {0} already exists'.format(user)}, HTTP_409_CONFLICT)
 
 ######################################################################
@@ -285,10 +287,12 @@ def create_asset(user):
         return reply({'error' : 'Data {0} is not valid'.format(request.data)}, HTTP_400_BAD_REQUEST)
     if not is_valid(payload, ['asset_id','quantity']):
         return reply({'error' : 'Payload {0} is not valid'.format(payload)}, HTTP_400_BAD_REQUEST)
+    quantity = float(payload['quantity'])
+    if quantity < 0:
+        return reply({'error' : 'Quantity value must be positive'}, HTTP_400_BAD_REQUEST)
     asset_id = int(payload['asset_id'])
-    quantity = int(payload['quantity'])
     ID = redis_server.hget("asset_id_"+str(asset_id),"id")
-    if not ID:
+    if ID != 0 and not ID:
         return reply({'error' : 'Asset id {0} does not exist in database'.format(asset_id)}, HTTP_400_BAD_REQUEST)
     username = redis_server.hget("user_"+user,"name")
     if not username:
@@ -299,7 +303,7 @@ def create_asset(user):
         portfolio = Portfolio.deserialize(data)
     if asset_id in portfolio.assets:
         return reply({'error' : 'Asset with id {0} already exists in portfolio.'.format(asset_id)}, HTTP_409_CONFLICT)
-    portfolio.buy(asset_id, quantity)
+    portfolio.buy_sell(asset_id, quantity)
     data = portfolio.serialize()
     redis_server.hmset("user_"+user, {"data": data})
     return reply("", HTTP_201_CREATED)
@@ -328,7 +332,7 @@ def update_asset(user, asset_id):
         return reply({'error' : 'No data associated with user {0}'.format(user)}, HTTP_404_NOT_FOUND)
     portfolio = Portfolio.deserialize(data)
     try:
-        portfolio.buy_sell(asset_id, quantity)
+        portfolio.buy_sell(asset_id, quantity, can_be_created=False)
     except AssetNotFoundException:
         return reply({'error' : 'Asset with id {0} was not found in the portfolio of {1}.'.format(asset_id, user)}, HTTP_404_NOT_FOUND)
     except NegativeAssetException:
@@ -388,11 +392,8 @@ def init_redis(hostname, port, password):
         redis_server.ping()
     except ConnectionError:
         raise RedisConnectionException()
-    except Exception as e:
-        print "\n\n*** FATAL ERROR: The redis server connection failed because: "+str(e)+"\n"
-        exit(1)
-    remove_old_database_assets() # to remove once you ran it once on your Vagrant
-    fill_database_assets() # to remove once you ran it once on your Vagrant
+    #remove_old_database_assets() # to remove once you ran it once on your Vagrant
+    #fill_database_assets() # to remove once you ran it once on your Vagrant
     
 class Credentials(object):
     def __init__(self, environment, host, port, password, swagger_host):
@@ -436,6 +437,7 @@ def update_swagger_specification(swagger_host):
             line = line[:pos+6] + ': "'+swagger_host+'",\n'
         print line,
 
+"""
 def remove_old_database_assets():
     redis_server.hdel("asset_type0", {"id", "name", "value", "type"})
     redis_server.hdel("asset_type1", {"id", "name", "value", "type"})
@@ -452,7 +454,8 @@ def fill_database_assets():
 def fill_database_fakeusers():
     redis_server.hmset("user_john", {"name": "john","data":""})
     redis_server.hmset("user_jeremy", {"name": "jeremy","data":""})    
-        
+"""
+
 ######################################################################
 #   M A I N
 ######################################################################
