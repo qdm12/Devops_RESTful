@@ -40,6 +40,7 @@ paths:
             properties:
               user:
                 type: string
+                default: "john"
       tags:
         - Portfolios
       responses:
@@ -63,6 +64,7 @@ paths:
           description: Username of portfolio owner
           required: true
           type: string
+          default: "john"
       responses:
         204:
           description: The user has been deleted or does not exist
@@ -76,6 +78,7 @@ paths:
           description: Username of portfolio owner
           required: true
           type: string
+          default: "john"
       tags:
         - Portfolios
       responses:
@@ -97,6 +100,7 @@ paths:
           description: Username of portfolio owner
           required: true
           type: string
+          default: "john"
         - name: body
           in: body
           description: The unique asset id of the asset being added to the portfolio
@@ -105,8 +109,10 @@ paths:
             properties:
               asset_id:
                 type: integer
+                default: 0
               quantity:
                 type: integer
+                default: 10
       tags:
         - Portfolios
       responses:
@@ -131,11 +137,13 @@ paths:
           description: Username of portfolio owner
           required: true
           type: string
+          default: "john"
         - name: asset_id
           in: path
           description: The asset id of the asset
           required: true
           type: string
+          default: "0"
       tags:
         - Portfolios
       responses:
@@ -157,11 +165,13 @@ paths:
           description: Username of portfolio owner
           required: true
           type: string
+          default: "john"
         - name: asset_id
           in: path
           description: The asset id of the asset to update
           required: true
-          type: integer
+          type: string
+          default: "0"
         - name: body
           in: body
           description: The quantity to add or subtract from the current quantity of this asset in the portfolio
@@ -170,6 +180,7 @@ paths:
             properties:
               quantity:
                 type: integer
+                default: -3
       responses:
         200:
           description: The quantity has been updated successfully
@@ -190,11 +201,13 @@ paths:
           description: Username of portfolio owner
           required: true
           type: string
+          default: "john"
         - name: asset_id
           in: path
           description: The asset id to delete
           required: true
-          type: integer
+          type: string
+          default: "0"
       responses:
         204:
           description: Deleted successfully
@@ -210,6 +223,7 @@ paths:
           description: Username of portfolio owner
           required: true
           type: string
+          default: "john"
       responses:
         200:
           description: An object containing the net asset value of the portfolio
@@ -227,12 +241,15 @@ definitions:
       user:
         type: string
         description: The username of the user who owns this portfolio
+        default: "john"
       numberOfAssets:
         type: integer
         description: The number of assets held within the portfolio
+        default: 1
       netAssetValue:
         type: number
         description: The net asset value of all the assets within the portfolio
+        default: 125.56
       links:
         type: array
         items: {"$ref": "#/definitions/link"}
@@ -243,33 +260,40 @@ definitions:
       rel:
         type: string
         description: The relationship of the link to the object
+        default: "self"
       href:
         type: string
         description: the url to the link
+        default: "hostname/api/v1/users/john/assets/0"
   asset_description:
     type: object
     properties:
       id:
         type: integer
         description: The unique id of the asset
+        default: 0
       name:
         type: string
         description: The name of the asset
+        default: "gold"
   asset_numbers:
     type: object
     properties:
       quantity:
         type: integer
         description: The quantity of the asset in the user portfolio
+        default: 10
       nav:
         type: number
         description: The net asset value of this asset (quantity * price)
+        default: 125.56
   nav:
     type: object
     properties:
       nav:
         type: number
         description: A net asset value of a portfolio
+        default: 125.56
         
   error_data:
     type: object
@@ -277,6 +301,7 @@ definitions:
       error:
         type: string
         description: Highlights that the data is not JSON or does not have the necessary required information.
+        default: "The data is not valid."
         
   error_userexists:
     type: object
@@ -284,6 +309,7 @@ definitions:
       error:
         type: string
         description: The user already exists in the database
+        default: "The user already exists in the database."
         
   error_userdoesnotexist:
     type: object
@@ -291,6 +317,7 @@ definitions:
       error:
         type: string
         description: The user does not exist in the database
+        default: "The user does not exist in the database."
         
   error_assetexists:
     type: object
@@ -298,3 +325,6 @@ definitions:
       error:
         type: string
         description: Asset with id x already exists in portfolio
+        default: "Asset is already present in the portfolio of the user."
+        
+        

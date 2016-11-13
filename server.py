@@ -426,16 +426,20 @@ def determine_credentials():
             return Credentials("Vagrant", "127.0.0.1", 6379, None, "localhost:5000")
         
 def update_swagger_specification(swagger_host):
-    spec_path = os.path.dirname(__file__)
-    if len(spec_path) == 0: # Docker container
-        spec_path = "static/swagger/specification/portfolioMgmt.js"
-    else:
-        spec_path += "/static/swagger/specification/portfolioMgmt.js"
-    for line in fileinput.input(spec_path, inplace=True):
-        if '"host"' in line and fileinput.filelineno() < 20:
-            pos = line.find('"host"')
-            line = line[:pos+6] + ': "'+swagger_host+'",\n'
-        print line,
+    spec_dir = os.path.dirname(__file__)
+    if len(spec_dir): # Not docker container
+        spec_dir += "/"
+    spec_dir += "static/swagger/specification/portfolioMgmt.json"
+    with open(spec_dir + "portfolioMgmt.json") as f:
+        spec_lines = f.readlines()
+    with open(spec_dir + "portfolioMgmt.js", 'w') as f:
+        f.write("var spec = \n")
+        for i in range(len(spec_lines)):
+            if '"host"' in spec_lines[i] and i < 20:
+                pos = spec_lines[i].find('"host"')
+                spec_lines[i] = spec_lines[i][:pos+6] + ': "'+swagger_host+'",\n'
+            f.write(spec_lines[i])
+        f.write(";")
 
 """
 def remove_old_database_assets():
