@@ -384,16 +384,6 @@ def is_valid(data, keys=[]):
             #app.logger.error('Missing key in data: {0}'.format(k))
             return False
     return True
-
-def init_redis(hostname, port, password):
-    global redis_server
-    redis_server = Redis(host=hostname, port=port, password=password)
-    try:
-        redis_server.ping()
-    except ConnectionError:
-        raise RedisConnectionException()
-    #remove_old_database_assets() # to remove once you ran it once on your Vagrant
-    #fill_database_assets() # to remove once you ran it once on your Vagrant
     
 class Credentials(object):
     def __init__(self, environment, host, port, password, swagger_host):
@@ -436,6 +426,17 @@ def update_swagger_specification(swagger_host):
             pos = line.find('"host"')
             line = line[:pos+6] + ': "'+swagger_host+'",\n'
         print line,
+        
+
+def init_redis(hostname, port, password):
+    global redis_server
+    redis_server = Redis(host=hostname, port=port, password=password)
+    try:
+        redis_server.ping()
+    except ConnectionError:
+        raise RedisConnectionException()
+    #remove_old_database_assets() # to remove once you ran it once on your Vagrant
+    #fill_database_assets() # to remove once you ran it once on your Vagrant
 
 """
 def remove_old_database_assets():
@@ -449,11 +450,16 @@ def fill_database_assets():
     redis_server.hmset("asset_id_0", {"id": 0,"name":"gold","price":1286.59,"class":"commodity"})
     redis_server.hmset("asset_id_1", {"id": 1,"name":"NYC real estate index","price":16255.18,"class":"real-estate"})
     redis_server.hmset("asset_id_2", {"id": 2,"name":"brent crude oil","price":51.45,"class":"commodity"})
-    redis_server.hmset("asset_id_3", {"id": 3,"name":"US 10Y T-Note","price":130.77,"class":"fixed income"})
+    redis_server.hmset("asset_id_3", {"id": 3,"name":"US 10Y T-Note","price":130.77,"class":"fixed income"})   
+        
+def remove_database_all():
+    redis_server.flushdb()
     
 def fill_database_fakeusers():
-    redis_server.hmset("user_john", {"name": "john","data":""})
-    redis_server.hmset("user_jeremy", {"name": "jeremy","data":""})    
+    redis_server.sadd('list_users', "john")
+    redis_server.sadd('list_users', "jeremy")
+    redis_server.hmset("user_john", {"name": "john","data":"6a6f686e;33303b3335"})
+    redis_server.hmset("user_jeremy", {"name": "jeremy","data":"6a6572656d79;33303b3335"})
 """
 
 ######################################################################
