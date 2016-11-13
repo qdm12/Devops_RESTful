@@ -384,16 +384,6 @@ def is_valid(data, keys=[]):
             #app.logger.error('Missing key in data: {0}'.format(k))
             return False
     return True
-
-def init_redis(hostname, port, password):
-    global redis_server
-    redis_server = Redis(host=hostname, port=port, password=password)
-    try:
-        redis_server.ping()
-    except ConnectionError:
-        raise RedisConnectionException()
-    #remove_old_database_assets() # to remove once you ran it once on your Vagrant
-    #fill_database_assets() # to remove once you ran it once on your Vagrant
     
 class Credentials(object):
     def __init__(self, environment, host, port, password, swagger_host):
@@ -441,6 +431,16 @@ def update_swagger_specification(swagger_host):
             f.write(spec_lines[i])
         f.write(";")
 
+def init_redis(hostname, port, password):
+    global redis_server
+    redis_server = Redis(host=hostname, port=port, password=password)
+    try:
+        redis_server.ping()
+    except ConnectionError:
+        raise RedisConnectionException()
+    #remove_old_database_assets() # to remove once you ran it once on your Vagrant
+    #fill_database_assets() # to remove once you ran it once on your Vagrant
+        
 """
 def remove_old_database_assets():
     redis_server.hdel("asset_type0", {"id", "name", "value", "type"})
@@ -455,9 +455,13 @@ def fill_database_assets():
     redis_server.hmset("asset_id_2", {"id": 2,"name":"brent crude oil","price":51.45,"class":"commodity"})
     redis_server.hmset("asset_id_3", {"id": 3,"name":"US 10Y T-Note","price":130.77,"class":"fixed income"})
     
-def fill_database_fakeusers():
+ def fill_database_fakeusers():
     redis_server.hmset("user_john", {"name": "john","data":""})
     redis_server.hmset("user_jeremy", {"name": "jeremy","data":""})    
+    redis_server.sadd('list_users', "john")
+    redis_server.sadd('list_users', "jeremy")
+    redis_server.hmset("user_john", {"name": "john","data":"6a6f686e;33303b3335"})
+    redis_server.hmset("user_jeremy", {"name": "jeremy","data":"6a6572656d79;33303b3335"})
 """
 
 ######################################################################
