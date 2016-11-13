@@ -74,9 +74,9 @@
 8. Access the URL showing as *Routes* under *Group details* to access the running container. You can access it at [http://portfoliocontainer.mybluemix.net](http://portfoliocontainer.mybluemix.net)
 
 ## VII - Test driven development and PyUnit
-1. If not on Vagrant, install **pip** and enter `pip install coverage`
-2. Run the server test with `coverage run server_test.py`
-3. Check the coverage percentage of the code with `coverage report -m --include= server.py`
+1. If not on Vagrant, install **pip** and enter `pip install nose rednose coverage`
+2. Run the server tests and find the test coverage with `nosetests --rednose -v --with-coverage --cover-package=server`
+3. Or you can use `coverage run server_test.py && coverage report -m --include=server.py`
 
 ## For ongoing work, please refer to this page:
 [https://github.com/rofrano/nyu-homework-2](https://github.com/rofrano/nyu-homework-2)

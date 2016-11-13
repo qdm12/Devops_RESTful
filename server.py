@@ -371,7 +371,7 @@ def delete_user(user):
 
 ######################################################################
 # UTILITY FUNCTIONS
-######################################################################   
+######################################################################
 def reply(message, rc):
     response = jsonify(message)
     response.headers['Content-Type'] = 'application/json'
