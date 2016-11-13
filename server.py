@@ -13,6 +13,7 @@ HTTP_409_CONFLICT = 409
 
 # Create Flask application
 app = Flask(__name__)
+url_version = "/api/v1"
            
 class NegativeAssetException(Exception):
     pass
@@ -102,7 +103,7 @@ class Portfolio(object):
             "user" : user,
             "numberOfAssets" : len(self.assets),
             "netAssetValue" : self.nav,
-            "links" : [{"rel" : "self", "href" : url_root + "api/v1/portfolios/" + user}]
+            "links" : [{"rel" : "self", "href" : url_root[:-1] + url_version + "/portfolios/" + user}]
             }
         
     def serialize(self):
@@ -172,7 +173,7 @@ def send_fonts(path):
 ######################################################################
 # LIST ALL portfolios
 ######################################################################
-@app.route('/api/v1/portfolios', methods=['GET'])
+@app.route(url_version+"/portfolios", methods=['GET'])
 def list_portfolios():
     """
     GET request at /api/v1/portfolios
@@ -192,7 +193,7 @@ def list_portfolios():
 ######################################################################
 # LIST ALL assets of a user
 ######################################################################
-@app.route('/api/v1/portfolios/<user>/assets', methods=['GET'])
+@app.route(url_version+"/portfolios/<user>/assets", methods=['GET'])
 def list_assets(user):
     """
     GET request at localhost:5000/api/v1/portfolios/<user>/assets
@@ -209,7 +210,7 @@ def list_assets(user):
 ######################################################################
 # RETRIEVE the quantity and total value of an asset in a portfolio
 ######################################################################
-@app.route('/api/v1/portfolios/<user>/assets/<asset_id>', methods=['GET'])
+@app.route(url_version+"/portfolios/<user>/assets/<asset_id>", methods=['GET'])
 def get_asset(user, asset_id):
     """
     GET request at localhost:5000/api/v1/portfolios/<user>/assets/<asset_id>
@@ -230,7 +231,7 @@ def get_asset(user, asset_id):
 ######################################################################
 # RETRIEVE the NAV of a portfolio
 ######################################################################
-@app.route('/api/v1/portfolios/<user>/nav', methods=['GET'])
+@app.route(url_version+"/portfolios/<user>/nav", methods=['GET'])
 def get_nav(user):
     """
     GET request at localhost:5000/api/v1/portfolios/<user>/nav
@@ -247,7 +248,7 @@ def get_nav(user):
 ######################################################################
 # ADD A NEW user portfolio
 ######################################################################
-@app.route('/api/v1/portfolios', methods=['POST'])
+@app.route(url_version+"/portfolios", methods=['POST'])
 def create_user():
     """
     POST request at localhost:5000/api/v1/portfolios with this body:
@@ -272,7 +273,7 @@ def create_user():
 ######################################################################
 # ADD A NEW asset
 ######################################################################
-@app.route('/api/v1/portfolios/<user>/assets', methods=['POST'])
+@app.route(url_version+"/portfolios/<user>/assets", methods=['POST'])
 def create_asset(user):
     """
     POST request at localhost:5000/api/v1/portfolios/<user> with this body:
@@ -311,7 +312,7 @@ def create_asset(user):
 ######################################################################
 # UPDATE AN EXISTING resource
 ######################################################################
-@app.route('/api/v1/portfolios/<user>/assets/<asset_id>', methods=['PUT'])
+@app.route(url_version+"/portfolios/<user>/assets/<asset_id>", methods=['PUT'])
 def update_asset(user, asset_id):
     try:
         payload = json.loads(request.data)
@@ -344,7 +345,7 @@ def update_asset(user, asset_id):
 ######################################################################
 # DELETE an asset from a user's portfolio
 ######################################################################
-@app.route('/api/v1/portfolios/<user>/assets/<asset_id>', methods=['DELETE'])
+@app.route(url_version+"/portfolios/<user>/assets/<asset_id>", methods=['DELETE'])
 def delete_asset(user, asset_id):
     username = redis_server.hget("user_"+user,"name")
     if username:
@@ -359,7 +360,7 @@ def delete_asset(user, asset_id):
 ######################################################################
 # DELETE a user (or its portfolio)
 ######################################################################
-@app.route('/api/v1/portfolios/<user>', methods=['DELETE'])
+@app.route(url_version+"/portfolios/<user>", methods=['DELETE'])
 def delete_user(user):
     username = redis_server.hget("user_"+user,"name")
     if username:
