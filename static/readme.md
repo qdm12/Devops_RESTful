@@ -24,4 +24,6 @@
 - Login to Bluemix with `cf login https://api.ng.bluemix.net -u bluemixUserId -o bluemixOrg -s "AppName"`and enter your password.
 - Enter `cf push AppName` where *AppName* is **PortfolioMgmt** in this project.
 - Open your browser and go to [https://portfoliomgmt.mybluemix.net/](https://portfoliomgmt.mybluemix.net/)
-- *Note: 'Try it out' will only work if the `https` scheme is used.*
+
+## Test it on a container in Vagrant
+- Similarly, you can test Swagger on a container running in Vagrant or Bluemix, please refer to the root Readme for instance.
