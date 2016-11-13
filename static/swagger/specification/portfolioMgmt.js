@@ -1,12 +1,11 @@
-var spec = 
-{
+var spec = {
     "swagger": "2.0",
     "info": {
         "title": "DevOps RESTful Project",
         "description": "API for portfolio management, implemented for the NYU DevOps course",
         "version": "1.0"
     },
-    "host": "portfoliomgmt.mybluemix.net",
+    "host": "localhost:5000",
     "schemes": [
         "https",
         "http"
@@ -47,7 +46,8 @@ var spec =
                         "schema": {
                             "properties": {
                                 "user": {
-                                    "type": "string"
+                                    "type": "string",
+                                    "default": "john"
                                 }
                             }
                         }
@@ -88,7 +88,8 @@ var spec =
                         "in": "path",
                         "description": "Username of portfolio owner",
                         "required": true,
-                        "type": "string"
+                        "type": "string",
+                        "default": "john"
                     }
                 ],
                 "responses": {
@@ -108,7 +109,8 @@ var spec =
                         "in": "path",
                         "description": "Username of portfolio owner",
                         "required": true,
-                        "type": "string"
+                        "type": "string",
+                        "default": "john"
                     }
                 ],
                 "tags": [
@@ -141,7 +143,8 @@ var spec =
                         "in": "path",
                         "description": "Username of portfolio owner",
                         "required": true,
-                        "type": "string"
+                        "type": "string",
+                        "default": "john"
                     },
                     {
                         "name": "body",
@@ -151,10 +154,12 @@ var spec =
                         "schema": {
                             "properties": {
                                 "asset_id": {
-                                    "type": "integer"
+                                    "type": "integer",
+                                    "default": 0
                                 },
                                 "quantity": {
-                                    "type": "integer"
+                                    "type": "integer",
+                                    "default": 10
                                 }
                             }
                         }
@@ -198,14 +203,16 @@ var spec =
                         "in": "path",
                         "description": "Username of portfolio owner",
                         "required": true,
-                        "type": "string"
+                        "type": "string",
+                        "default": "john"
                     },
                     {
                         "name": "asset_id",
                         "in": "path",
                         "description": "The asset id of the asset",
                         "required": true,
-                        "type": "string"
+                        "type": "string",
+                        "default": "0"
                     }
                 ],
                 "tags": [
@@ -238,14 +245,16 @@ var spec =
                         "in": "path",
                         "description": "Username of portfolio owner",
                         "required": true,
-                        "type": "string"
+                        "type": "string",
+                        "default": "john"
                     },
                     {
                         "name": "asset_id",
                         "in": "path",
                         "description": "The asset id of the asset to update",
                         "required": true,
-                        "type": "integer"
+                        "type": "string",
+                        "default": "0"
                     },
                     {
                         "name": "body",
@@ -255,7 +264,8 @@ var spec =
                         "schema": {
                             "properties": {
                                 "quantity": {
-                                    "type": "integer"
+                                    "type": "integer",
+                                    "default": -3
                                 }
                             }
                         }
@@ -291,14 +301,16 @@ var spec =
                         "in": "path",
                         "description": "Username of portfolio owner",
                         "required": true,
-                        "type": "string"
+                        "type": "string",
+                        "default": "john"
                     },
                     {
                         "name": "asset_id",
                         "in": "path",
                         "description": "The asset id to delete",
                         "required": true,
-                        "type": "integer"
+                        "type": "string",
+                        "default": "0"
                     }
                 ],
                 "responses": {
@@ -321,7 +333,8 @@ var spec =
                         "in": "path",
                         "description": "Username of portfolio owner",
                         "required": true,
-                        "type": "string"
+                        "type": "string",
+                        "default": "john"
                     }
                 ],
                 "responses": {
@@ -347,15 +360,18 @@ var spec =
             "properties": {
                 "user": {
                     "type": "string",
-                    "description": "The username of the user who owns this portfolio"
+                    "description": "The username of the user who owns this portfolio",
+                    "default": "john"
                 },
                 "numberOfAssets": {
                     "type": "integer",
-                    "description": "The number of assets held within the portfolio"
+                    "description": "The number of assets held within the portfolio",
+                    "default": 1
                 },
                 "netAssetValue": {
                     "type": "number",
-                    "description": "The net asset value of all the assets within the portfolio"
+                    "description": "The net asset value of all the assets within the portfolio",
+                    "default": 125.56
                 },
                 "links": {
                     "type": "array",
@@ -371,11 +387,13 @@ var spec =
             "properties": {
                 "rel": {
                     "type": "string",
-                    "description": "The relationship of the link to the object"
+                    "description": "The relationship of the link to the object",
+                    "default": "self"
                 },
                 "href": {
                     "type": "string",
-                    "description": "the url to the link"
+                    "description": "the url to the link",
+                    "default": "hostname/api/v1/users/john/assets/0"
                 }
             }
         },
@@ -384,11 +402,13 @@ var spec =
             "properties": {
                 "id": {
                     "type": "integer",
-                    "description": "The unique id of the asset"
+                    "description": "The unique id of the asset",
+                    "default": 0
                 },
                 "name": {
                     "type": "string",
-                    "description": "The name of the asset"
+                    "description": "The name of the asset",
+                    "default": "gold"
                 }
             }
         },
@@ -397,11 +417,13 @@ var spec =
             "properties": {
                 "quantity": {
                     "type": "integer",
-                    "description": "The quantity of the asset in the user portfolio"
+                    "description": "The quantity of the asset in the user portfolio",
+                    "default": 10
                 },
                 "nav": {
                     "type": "number",
-                    "description": "The net asset value of this asset (quantity * price)"
+                    "description": "The net asset value of this asset (quantity * price)",
+                    "default": 125.56
                 }
             }
         },
@@ -410,7 +432,8 @@ var spec =
             "properties": {
                 "nav": {
                     "type": "number",
-                    "description": "A net asset value of a portfolio"
+                    "description": "A net asset value of a portfolio",
+                    "default": 125.56
                 }
             }
         },
@@ -419,7 +442,8 @@ var spec =
             "properties": {
                 "error": {
                     "type": "string",
-                    "description": "Highlights that the data is not JSON or does not have the necessary required information."
+                    "description": "Highlights that the data is not JSON or does not have the necessary required information.",
+                    "default": "The data is not valid."
                 }
             }
         },
@@ -428,7 +452,8 @@ var spec =
             "properties": {
                 "error": {
                     "type": "string",
-                    "description": "The user already exists in the database"
+                    "description": "The user already exists in the database",
+                    "default": "The user already exists in the database."
                 }
             }
         },
@@ -437,7 +462,8 @@ var spec =
             "properties": {
                 "error": {
                     "type": "string",
-                    "description": "The user does not exist in the database"
+                    "description": "The user does not exist in the database",
+                    "default": "The user does not exist in the database."
                 }
             }
         },
@@ -446,10 +472,10 @@ var spec =
             "properties": {
                 "error": {
                     "type": "string",
-                    "description": "Asset with id x already exists in portfolio"
+                    "description": "Asset with id x already exists in portfolio",
+                    "default": "Asset is already present in the portfolio of the user."
                 }
             }
         }
     }
-}
-;
+};

@@ -6,9 +6,13 @@
 4. When finished, click on **File** and then **Download YAML** and **Download JSON**.
 5. Rename the JSON and YAML files downloaded to *portfolioMgmt.json* and *portfolioMgmt.yaml* respectively.
 6. Overwrite the JSON and YAML files present in `static/swagger/specification` with the two files previously renamed.
-7. Copy the content of `static/swagger/specification/portfolioMgmt.json` and paste it in `static/swagger/specification/portfolioMgmt.js` **between** the first and the last line.
+
+# Testing it
+**IMPORTANT**: Your browser caches *js* files so you will have to clean the cache each time you modify Swagger.
+> *You can use SHIFT+F5 to refresh and clear the browser cache (works on Google Chrome).*
 
 ## Test it locally
+- Run the python server once to generate the javascript code necessary for Swagger: `python server.py`
 - You can then test it simply with your browser by clicking on *static/swagger/index.html*
 - *Try it out!* will not work because there is no Python server running.
 
@@ -16,8 +20,6 @@
 - Enter `vagrant up && vagrant ssh`
 - Enter `python /vagrant/server.py`
 - Open your browser and go to [localhost:5000](http://localhost:5000)
-- For *Try it out!* to work, change the line `"host": "portfoliomgmt.mybluemix.net",` to `"host": "localhost:5000",` in the `static/swagger/specification/portfolioMgmt.js` file.
-- **IMPORTANT**: Your browser caches *js* files so you will have to clean the cache each time you modify Swagger.
 
 ## Test it on Bluemix
 - If not installed, please install the cf cli from [github.com/cloudfoundry/cli](https://github.com/cloudfoundry/cli)

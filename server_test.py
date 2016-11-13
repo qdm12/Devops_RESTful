@@ -373,6 +373,10 @@ class Static(unittest.TestCase):
         self.app = server.app.test_client()
         """ BE WARNED: This checks for local files in static/ """
         
+    def test_static_folder(self):
+        static_exists = os.path.isdir(server.app.static_folder)        
+        self.assertTrue(static_exists)
+        
     def test_index(self):
         response = self.app.get("/")
         self.assertNotEquals(response.status_code, HTTP_404_NOT_FOUND)
