@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>Devops Portfolio Management API by qdm12</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>Devops Portfolio Management API</h1>
+          <h2></h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/qdm12/Devops_RESTful/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/qdm12/Devops_RESTful/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/qdm12/Devops_RESTful" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <h1>
+<a id="portfolio-management-restful-api" class="anchor" href="#portfolio-management-restful-api" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Portfolio Management RESTful API</h1>
+
+<p><em>The project was developed for the DevOps course of New York University (CSCI-GA.3033-014).</em></p>
+
+<h2>
+<a id="i---what-is-it" class="anchor" href="#i---what-is-it" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>I - What is it?</h2>
+
+<ul>
+<li>It is a RESTful API for a portfolio management.</li>
+<li>It uses many technologies: Python, Flask, Vagrant, Swagger, Redis, Docker, ...</li>
+<li>It can be run locally on a virtual machine with Vagrant or on Bluemix (IBM) remotely.</li>
+<li>The Redis database is stored on IBM Bluemix</li>
+</ul>
+
+<h2>
+<a id="ii---access-the-api" class="anchor" href="#ii---access-the-api" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>II - Access the API</h2>
+
+<ul>
+<li>Access the root URL of the API on Bluemix at <a href="https://portfoliomgmt.mybluemix.net">https://portfoliomgmt.mybluemix.net</a>
+</li>
+<li>Access the root URL of the API on the Bluemix container at <a href="http://portfoliocontainer.mybluemix.net/">http://portfoliocontainer.mybluemix.net/</a>
+</li>
+<li>Access it on your virtual Vagrant machine at localhost:5000</li>
+<li>The root URL uses <strong>Swagger</strong> to show a descriptive list of all available RESTful calls such as <code>POST</code>, <code>DELETE</code>, <code>PUT</code> and <code>GET</code>.</li>
+</ul>
+
+<h2>
+<a id="iii---obtain-the-source-code-and-minimum-requirements" class="anchor" href="#iii---obtain-the-source-code-and-minimum-requirements" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>III - Obtain the source code and minimum requirements</h2>
+
+<ol>
+<li>Install Vagrant from <a href="https://www.vagrantup.com/downloads.html">vagrantup.com</a>
+</li>
+<li>Download the project
+
+<ul>
+<li>Without git
+
+<ul>
+<li>Download the ZIP file by clicking <a href="https://github.com/qdm12/Devops_RESTful/archive/master.zip">here</a>.</li>
+<li>Extract the ZIP file.</li>
+</ul>
+</li>
+<li>With git (recommended)
+
+<ul>
+<li>Install git if you don't have it from <a href="https://git-scm.com/downloads">git-scm.com</a> or use <code>apt-get install git</code>.</li>
+<li>Open a terminal and enter <code>git clone https://github.com/qdm12/Devops_RESTful.git</code>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Go to the project directory with a terminal with <code>cd Devops_RESTFUL</code>
+</li>
+</ol>
+
+<h2>
+<a id="iv---run-it-on-your-machine-with-vagrant" class="anchor" href="#iv---run-it-on-your-machine-with-vagrant" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>IV - Run it on your machine with Vagrant</h2>
+
+<ol>
+<li>Make sure to follow the steps of <strong>III - Obtain the source code and minimum requirements</strong>. </li>
+<li>Enter <code>vagrant up &amp;&amp; vagrant ssh</code> (this will install the box, docker etc.)</li>
+<li>Enter <code>python /vagrant/server.py</code> (in the virtual machine you just logged in)</li>
+<li>Access the Python Flask server with your browser at localhost:5000. You can then make API calls with Swagger.</li>
+<li>You can also use the Chrome extension <code>Postman</code> for example to send RESTful requests such as <code>POST</code>. Install it <a href="https://chrome.google.com/webstore/detail/postman/fhbjgbiflinjbdggehcddcbncdddomop?hl=en">here</a>.</li>
+<li>To update Swagger, refer to the information in the <a href="https://github.com/qdm12/Devops_RESTful/tree/master/static">Github <code>static</code> directory</a>.</li>
+</ol>
+
+<h2>
+<a id="v---run-it-on-bluemix" class="anchor" href="#v---run-it-on-bluemix" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>V - Run it on Bluemix</h2>
+
+<ol>
+<li>Make sure to follow the steps of <strong>III - Obtain the source code and minimum requirements</strong> although you don't need Vagrant.</li>
+<li>Login to Bluemix as follows:
+
+<ul>
+<li><code>cf login https://api.ng.bluemix.net -u username -o organization -s "Portfolio Management"</code></li>
+<li>Enter the API endpoint as <code>https://api.ng.bluemix.net</code>
+</li>
+<li>Enter your password</li>
+</ul>
+</li>
+<li>Enter <code>cf push PortfolioMgmt</code>
+</li>
+<li>You can then access it at <a href="https://portfoliomgmt.mybluemix.net">https://portfoliomgmt.mybluemix.net</a>
+</li>
+</ol>
+
+<h2>
+<a id="vi---run-it-on-a-docker-container" class="anchor" href="#vi---run-it-on-a-docker-container" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>VI - Run it on a Docker container</h2>
+
+<h3>
+<a id="a-build-and-run-it-on-vagrant" class="anchor" href="#a-build-and-run-it-on-vagrant" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>A) Build and run it on Vagrant</h3>
+
+<ol>
+<li>Make sure to follow the steps of <strong>III - Obtain the source code and minimum requirements</strong>. </li>
+<li>Enter <code>vagrant up &amp;&amp; vagrant ssh</code> (this will install the box, docker etc.)</li>
+<li>Enter <code>cd /vagrant</code> (in the virtual machine you just logged in)</li>
+<li>Enter <code>docker build -t docker-portfoliomgmt .</code>
+
+<ul>
+<li><strong>Don't forget the '.' !</strong></li>
+<li>This builds a Docker image <code>docker-portfoliomgmt</code> from the <code>Dockerfile</code> description file.</li>
+<li>You can list your local Docker images with <code>docker images</code> to make sure it was created.</li>
+</ul>
+</li>
+<li>Run the Docker image with <code>docker run --rm -p 5000:5000 --link redis docker-portfoliomgmt</code>.
+
+<ul>
+<li>The <code>--rm</code> option automatically removes the container when it exits.</li>
+<li>The <code>-p 5000:5000</code> option publishes the container's 5000 port to the host.</li>
+<li>The <code>--link redis</code> option links the <code>docker-portfoliomgmt</code> to the <code>redis</code> container.</li>
+<li>You can check the container is runnig with <code>docker ps -a</code>.</li>
+</ul>
+</li>
+<li>As for <em>IV</em>, you can access the Python Flask server with your browser at localhost:5000. You can then make API calls with Swagger.</li>
+</ol>
+
+<h3>
+<a id="b-push-and-run-it-on-bluemix" class="anchor" href="#b-push-and-run-it-on-bluemix" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>B) Push and run it on Bluemix</h3>
+
+<ol>
+<li>Make sure you had followed the steps of <em>A) Build and run it on Vagrant</em>.</li>
+<li>In Vagrant (<code>vagrant up &amp;&amp; vagrant ssh</code>), login in the bluemix server as follows:
+
+<ul>
+<li><code>cf login https://api.ng.bluemix.net -u username -o organization -s "Portfolio Management"</code></li>
+<li>Enter the API endpoint as <code>https://api.ng.bluemix.net</code>
+</li>
+<li>Enter your password</li>
+<li>
+<strong>TEMPORARY</strong>: Enter <code>echo Y | cf install-plugin https://static-ice.ng.bluemix.net/ibm-containers-linux_x64</code> to install <em>cf ic</em>.</li>
+<li><code>cf ic login</code></li>
+</ul>
+</li>
+<li>If not done already, create your namespace with <code>cf ic namespace set portfoliocontainer</code>
+</li>
+<li>Tag the Docker image with the remote container name <code>registry.ng.bluemix.net/portfoliocontainer/devops-hw2</code> with the following command: <code>docker tag docker-portfoliomgmt registry.ng.bluemix.net/portfoliocontainer/devops-hw2</code>
+</li>
+<li>Push it with <code>docker push registry.ng.bluemix.net/portfoliocontainer/devops-hw2</code>
+</li>
+<li>The Docker image should be on the Bluemix webpage. Click on it to create a container.</li>
+<li>Access the URL showing as <em>Routes</em> under <em>Group details</em> to access the running container. You can access it at <a href="http://portfoliocontainer.mybluemix.net">http://portfoliocontainer.mybluemix.net</a>
+</li>
+</ol>
+
+<h2>
+<a id="vii---test-driven-development-and-pyunit" class="anchor" href="#vii---test-driven-development-and-pyunit" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>VII - Test driven development and PyUnit</h2>
+
+<ol>
+<li>If not on Vagrant, install <strong>pip</strong> and enter <code>pip install nose rednose coverage</code>
+</li>
+<li>Run the server tests and find the test coverage with <code>nosetests --rednose -v --with-coverage --cover-package=server</code>
+</li>
+<li>Or you can use <code>coverage run server_test.py &amp;&amp; coverage report -m --include=server.py</code>
+</li>
+</ol>
+
+<h2>
+<a id="for-ongoing-work-please-refer-to-this-page" class="anchor" href="#for-ongoing-work-please-refer-to-this-page" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>For ongoing work, please refer to this page:</h2>
+
+<p><a href="https://github.com/rofrano/nyu-homework-2">https://github.com/rofrano/nyu-homework-2</a></p>
+
+<ul>
+<li>PART 1: Deploy the service in Docker Containers on Bluemix (submit URL of service on Bluemix)</li>
+<li>PART 2: BDD and TDD Automated Testing (Good testing coverage required)</li>
+<li>PART 3: Add an automated CI/CD DevOps Pipeline</li>
+</ul>
+
+<h2>
+<a id="to-contribute" class="anchor" href="#to-contribute" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>To contribute</h2>
+
+<ul>
+<li>Send me an email at quentin.mcgaw @ gmail . com with your Github username and a reason.</li>
+<li>To update the Swagger documentation, please refer to the readme.md in the static folder <a href="https://github.com/qdm12/Devops_RESTful/tree/master/static">here</a>
+</li>
+</ul>
+        </section>
+
+        <footer>
+          Devops Portfolio Management API is maintained by <a href="https://github.com/qdm12">qdm12</a><br>
+          This page was generated by <a href="https://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+        
+      </div>
+    </div>
+  </body>
+</html>
