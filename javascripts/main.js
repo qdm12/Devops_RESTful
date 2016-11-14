@@ -1,1 +1,4 @@
-console.log('This would be the main JS file.');
+function openInNewTab(url) {
+  var win = window.open(url, '_blank');
+  win.focus();
+}

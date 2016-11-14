@@ -105,12 +105,12 @@ header h2 {
 a.button {
   display: block;
   float: left;
-  width: 179px;
-  padding: 12px 8px 12px 8px;
-  margin-right: 14px;
-  font-size: 15px;
+  width: 18%;
+  height: 30%;
+  padding: 2% 2% 3% 2%;
+  font-size: 12px;
   font-weight: bold;
-  line-height: 25px;
+  margin-left: 2%;
   color: #303030;
   background: #fdfdfd; /* Old browsers */
   background: -moz-linear-gradient(top,  #fdfdfd 0%, #f2f2f2 100%); /* FF3.6+ */
@@ -163,6 +163,9 @@ a.button span {
 }
 #view-on-github {
   margin-right: 0;
+}
+#swagger-ui span {
+  background: transparent url(../images/swagger.png) 12px 50% no-repeat;
 }
 
 code, pre {
