@@ -11,26 +11,26 @@ Scenario: The server is running
     Then I should not see "404 Not Found"
 
 Scenario: Add a new user portfolio
-    When I add a user "dick"
+    When I add a user "alice"
     Then I should see status "201"
     When I visit "/portfolios"
-    Then I should see "dick"
+    Then I should see "alice"
 
 Scenario: Add a conflict user portfolio
-    Given the following user names
+    Given the following user name
         | name          |
-        | dick          |
-    When I add a user "dick"
+        | alice         |
+    When I add a user "alice"
     Then I should see status "409"
 
 Scenario: List all portfolios
-    Given the following user names
+    Given the following user name
         | name          |
-        | dick          |
+        | alice         |
         | bob           |
         | cathy         |
     When I visit "/portfolios"
-    Then I should see "dick"
+    Then I should see "alice"
     And I should see "bob"
     And I should see "cathy"
 
@@ -39,17 +39,17 @@ Scenario: Retrieve a the NAV of an unknown user portfolio
     Then I should see status "404"
 
 Scenario: Retrieve a the NAV of a user portfolio
-    Given the following user names
+    Given the following user name
         | name          |
-        | dick          |
-    When I visit "/api/v1/dick/nav"
+        | alice         |
+    When I visit "/api/v1/alice/nav"
     Then I should see "0"
 
 Scenario: Remove a user portfolio
-    Given the following user names
+    Given the following user name
         | name          |
-        | dick          |
-    When I remove a user "dick"
+        | alice         |
+    When I remove a user "alice"
     Then I should see status "204"
     When I visit "/portfolios"
-    Then I should not see "dick"
+    Then I should not see "alice"
