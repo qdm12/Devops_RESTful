@@ -28,7 +28,7 @@ def step_impl(context, name):
     new_user = {'user' : name}
     context.resp = context.app.post(url, data=json.dumps(new_user), content_type='application/json')
 
-@given(u'the following user names')
+@given(u'the following user name')
 def step_impl(context):
     url = context.api_url + '/portfolios'
     for row in context.table:
@@ -48,3 +48,18 @@ def step_impl(context, code):
 def step_impl(context, name):
     url = context.api_url + '/portfolios/' + name
     context.resp = context.app.delete(url)
+
+@when(u'I add an asset for "{name}"')
+def step_impl(context, name):
+    url = context.api_url + '/portfolios/' + name + '/assets'
+    for row in context.table:
+        new_asset = {'asset_id': row['asset_id'], 'quantity': row['quantity']}
+        context.resp = context.app.post(url, data=json.dumps(new_asset), content_type='application/json')
+'''
+@given(u'the following user name')
+def step_impl(context):
+    url = context.api_url + '/portfolios'
+    for row in context.table:
+        new_user = {'user': row['name']}
+        context.resp = context.app.post(url, data=json.dumps(new_user), content_type='application/json')
+'''
