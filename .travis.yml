@@ -7,9 +7,8 @@ install: "pip install -r requirements.txt"
 
 # command to run tests
 script:
-  - behave
   - nosetests
-  - coverage run test_server.py
+  - coverage run server_test.py
 
 after_success:
   - codecov
