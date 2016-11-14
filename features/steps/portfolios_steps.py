@@ -49,18 +49,26 @@ def step_impl(context, name):
     url = context.api_url + '/portfolios/' + name
     context.resp = context.app.delete(url)
 
-@when(u'I add an asset for "{name}"')
+@when(u'I add an asset, id: "{id}" and quantity: "{quantity}" for "{name}"')
+def step_impl(context, name, id, quantity):
+    url = context.api_url + '/portfolios/' + name + '/assets'
+    new_asset = {'asset_id': id, 'quantity': quantity}
+    context.resp = context.app.post(url, data=json.dumps(new_asset), content_type='application/json')
+
 @given(u'the following asset for "{name}"')
 def step_impl(context, name):
     url = context.api_url + '/portfolios/' + name + '/assets'
     for row in context.table:
         new_asset = {'asset_id': row['asset_id'], 'quantity': row['quantity']}
         context.resp = context.app.post(url, data=json.dumps(new_asset), content_type='application/json')
-'''
-@given(u'the following asset for "{name}"')
-def step_impl(context, name):
-    url = context.api_url + '/portfolios/' + name + '/assets'
-    for row in context.table:
-        new_asset = {'asset_id': row['asset_id'], 'quantity': row['quantity']}
-        context.resp = context.app.post(url, data=json.dumps(new_asset), content_type='application/json')
-'''
+
+@when(u'I remove an asset, id: "{id}" of "{name}"')
+def step_impl(context, name, id):
+    url = context.api_url + '/portfolios/' + name + '/assets/' + id
+    context.resp = context.app.delete(url)
+
+@when(u'I update the quantity, quantity: "{quantity}", of an asset, id: "{id}", of "{name}"')
+def step_impl(context, name, id, quantity):
+    url = context.api_url + '/portfolios/' + name + '/assets/' + id
+    new_quantity = {'quantity': quantity}
+    context.resp = context.app.put(url, data=json.dumps(new_quantity), content_type='application/json')
