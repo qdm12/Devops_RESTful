@@ -1,6 +1,19 @@
 # Portfolio Management RESTful API
 *The project was developed for the DevOps course of New York University (CSCI-GA.3033-014).*
-- You can access the Github pages at Published gh pages at [https://qdm12.github.io/Devops_RESTful/index.html](https://qdm12.github.io/Devops_RESTful/index.html).
+
+[![Build Status](https://travis-ci.org/qdm12/Devops_RESTful.svg?branch=master)](https://travis-ci.org/qdm12/Devops_RESTful)
+[![codecov](https://codecov.io/gh/qdm12/Devops_RESTful/branch/master/graph/badge.svg)](https://codecov.io/gh/qdm12/Devops_RESTful)
+
+**Bluemix at https://portfoliomgmt.mybluemix.net**
+
+[![Bluemix](https://img.shields.io/website-up-down-green-red/http/shields.io.svg)](https://portfoliomgmt.mybluemix.net)
+
+**Bluemix container at https://portfoliocontainer.mybluemix.net**
+
+[![Bluemix container](https://img.shields.io/website-up-down-green-red/http/shields.io.svg)](https://portfoliocontainer.mybluemix.net)
+
+**Github page and Swagger (Bluemix)**
+Access it at [https://qdm12.github.io/Devops_RESTful/index.html](https://qdm12.github.io/Devops_RESTful/index.html).
 
 ## I - What is it?
 - It is a RESTful API for a portfolio management.
