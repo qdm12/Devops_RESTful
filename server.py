@@ -148,7 +148,6 @@ class Portfolio(object):
 ######################################################################
 @app.route('/')
 def index():
-    print "Sending root static file..."
     return app.send_static_file('swagger/index.html')
 
 @app.route('/lib/<path:path>')
@@ -369,7 +368,7 @@ def delete_asset(user, asset_id):
 def delete_user(user):
     username = redis_server.hget("user_"+user,"name")
     if username:
-        redis_server.hdel("user_"+username, {"name","data"})
+        redis_server.hdel("user_"+username, ["name","data"])
         redis_server.delete("user_"+username)
         redis_server.srem('list_users', user)
     return reply("", HTTP_204_NO_CONTENT)
@@ -451,10 +450,10 @@ def fill_database_assets():
 
 """
 def remove_old_database_assets():
-    redis_server.hdel("asset_type0", {"id", "name", "value", "type"})
-    redis_server.hdel("asset_type1", {"id", "name", "value", "type"})
-    redis_server.hdel("asset_type2", {"id", "name", "value", "type"})
-    redis_server.hdel("asset_type3", {"id", "name", "value", "type"})
+    redis_server.hdel("asset_type0", ["id", "name", "value", "type"])
+    redis_server.hdel("asset_type1", ["id", "name", "value", "type"])
+    redis_server.hdel("asset_type2", ["id", "name", "value", "type"])
+    redis_server.hdel("asset_type3", ["id", "name", "value", "type"])
     redis_server.srem("assetTypes",{"asset_type0","asset_type1","asset_type2","asset_type3"})
 
 def fill_database_assets():
@@ -480,7 +479,7 @@ if __name__ == "__main__":
     try:
         init_redis(creds.host, creds.port, creds.password)
     except RedisConnectionException:
-        print "The server could not connect to Redis. Stopping...\n\n"
+        print("The server could not connect to Redis. Stopping...\n\n")
         exit(1)
     update_swagger_specification(creds.swagger_host)
     port = os.getenv('PORT', '5000')

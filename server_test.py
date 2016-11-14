@@ -357,7 +357,7 @@ class Portfolio(unittest.TestCase):
         p2 = p1.copy()
         self.assertEquals(p1, p2)
         p2.nav = 50
-        self.assertNotEquals(p1, p2)
+        self.assertNotEqual(p1, p2)
         
     def test_repr(self):
         no_exception = True
@@ -375,27 +375,27 @@ class Static(unittest.TestCase):
         
     def test_index(self):
         response = self.app.get("/")
-        self.assertNotEquals(response.status_code, HTTP_404_NOT_FOUND)
+        self.assertNotEqual(response.status_code, HTTP_404_NOT_FOUND)
     
     def test_send_lib(self):
         response = self.app.get("/lib/backbone-min.js")
-        self.assertNotEquals(response.status_code, HTTP_404_NOT_FOUND)
+        self.assertNotEqual(response.status_code, HTTP_404_NOT_FOUND)
     
     def test_send_spec(self):
         response = self.app.get("/specification/portfolioMgmt.js")
-        self.assertNotEquals(response.status_code, HTTP_404_NOT_FOUND)
+        self.assertNotEqual(response.status_code, HTTP_404_NOT_FOUND)
     
     def test_send_img(self):
         response = self.app.get("/images/explorer_icons.png")
-        self.assertNotEquals(response.status_code, HTTP_404_NOT_FOUND)
+        self.assertNotEqual(response.status_code, HTTP_404_NOT_FOUND)
     
     def test_send_css(self):
         response = self.app.get("/css/style.css")
-        self.assertNotEquals(response.status_code, HTTP_404_NOT_FOUND)
+        self.assertNotEqual(response.status_code, HTTP_404_NOT_FOUND)
     
     def test_send_fonts(self):
         response = self.app.get("/fonts/DroidSans.ttf")
-        self.assertNotEquals(response.status_code, HTTP_404_NOT_FOUND)
+        self.assertNotEqual(response.status_code, HTTP_404_NOT_FOUND)
 
 class GET(unittest.TestCase):
     def setUp(self):
@@ -510,7 +510,10 @@ class POST(unittest.TestCase):
         database = dict()
         server.redis_server = FakeRedisServer(database)
         response = self.app.post(url_version+"/portfolios", data='{"user":"john"}')
-        self.assertEquals(response.data, '""\n')
+        data_empty = False
+        if response.data == '{}' or response.data == '""\n':
+            data_empty = True
+        self.assertTrue(data_empty)
         self.assertEquals(response.status_code, HTTP_201_CREATED)
     
     def test_create_user_data_not_valid(self):
@@ -541,7 +544,10 @@ class POST(unittest.TestCase):
         database["asset_id_1"] = {"id": 1,"name":"NYC real estate index","price":16255.18,"class":"real-estate"}
         server.redis_server = FakeRedisServer(database)
         response = self.app.post(url_version+"/portfolios/john/assets", data='{"asset_id":1,"quantity":10}')
-        self.assertEquals(response.data, '""\n')
+        data_empty = False
+        if response.data == '{}' or response.data == '""\n':
+            data_empty = True
+        self.assertTrue(data_empty)
         self.assertEquals(response.status_code, HTTP_201_CREATED)
     
     def test_create_asset_neg(self):
@@ -607,7 +613,10 @@ class PUT(unittest.TestCase):
         database["asset_id_0"] = {"id": 0,"name":"gold","price":1286.59,"class":"commodity"}
         server.redis_server = FakeRedisServer(database)
         response = self.app.put(url_version+"/portfolios/john/assets/0", data='{"quantity":10}')
-        self.assertEquals(response.data, '""\n')
+        data_empty = False
+        if response.data == '{}' or response.data == '""\n':
+            data_empty = True
+        self.assertTrue(data_empty)
         self.assertEquals(response.status_code, HTTP_200_OK)
     
     def test_update_asset_data_not_valid(self):

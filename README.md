@@ -92,6 +92,10 @@ Access it at [https://qdm12.github.io/Devops_RESTful/index.html](https://qdm12.g
 2. Run the server tests and find the test coverage with `nosetests --rednose -v --with-coverage --cover-package=server`
 3. Or you can use `coverage run server_test.py && coverage report -m --include=server.py`
 
+## VIII - Behavior driven development and behave
+1. Turn vagrant on with `vagrant up && vagrant ssh`
+2. Enter `cd /vagrant && behave` and check all the tests pass
+
 ## For ongoing work, please refer to this page:
 [https://github.com/rofrano/nyu-homework-2](https://github.com/rofrano/nyu-homework-2)
 - PART 1: Deploy the service in Docker Containers on Bluemix (submit URL of service on Bluemix)
