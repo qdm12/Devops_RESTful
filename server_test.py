@@ -357,7 +357,7 @@ class Portfolio(unittest.TestCase):
         p2 = p1.copy()
         self.assertEquals(p1, p2)
         p2.nav = 50
-        self.assertNotEquals(p1, p2)
+        self.assertNotEqual(p1, p2)
         
     def test_repr(self):
         no_exception = True
@@ -375,27 +375,27 @@ class Static(unittest.TestCase):
         
     def test_index(self):
         response = self.app.get("/")
-        self.assertNotEquals(response.status_code, HTTP_404_NOT_FOUND)
+        self.assertNotEqual(response.status_code, HTTP_404_NOT_FOUND)
     
     def test_send_lib(self):
         response = self.app.get("/lib/backbone-min.js")
-        self.assertNotEquals(response.status_code, HTTP_404_NOT_FOUND)
+        self.assertNotEqual(response.status_code, HTTP_404_NOT_FOUND)
     
     def test_send_spec(self):
         response = self.app.get("/specification/portfolioMgmt.js")
-        self.assertNotEquals(response.status_code, HTTP_404_NOT_FOUND)
+        self.assertNotEqual(response.status_code, HTTP_404_NOT_FOUND)
     
     def test_send_img(self):
         response = self.app.get("/images/explorer_icons.png")
-        self.assertNotEquals(response.status_code, HTTP_404_NOT_FOUND)
+        self.assertNotEqual(response.status_code, HTTP_404_NOT_FOUND)
     
     def test_send_css(self):
         response = self.app.get("/css/style.css")
-        self.assertNotEquals(response.status_code, HTTP_404_NOT_FOUND)
+        self.assertNotEqual(response.status_code, HTTP_404_NOT_FOUND)
     
     def test_send_fonts(self):
         response = self.app.get("/fonts/DroidSans.ttf")
-        self.assertNotEquals(response.status_code, HTTP_404_NOT_FOUND)
+        self.assertNotEqual(response.status_code, HTTP_404_NOT_FOUND)
 
 class GET(unittest.TestCase):
     def setUp(self):
