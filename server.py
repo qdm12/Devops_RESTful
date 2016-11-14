@@ -14,10 +14,12 @@ HTTP_409_CONFLICT = 409
 # Create Flask application
 app = Flask(__name__)
 url_version = "/api/v1"
-           
+app_name = "Portfolio Management RESTful Service"
+app_version = 1.0
+
 class NegativeAssetException(Exception):
     pass
-    
+
 class AssetNotFoundException(Exception):
     pass
 
@@ -32,27 +34,27 @@ class Asset(object):
             raise Exception("Asset object can only be created with a strictly positive a quantity Q.")
         self.asset_class = redis_server.hget("asset_id_"+str(self.id), "class")
         self.name = redis_server.hget("asset_id_"+str(self.id), "name")
-        self.price = float(redis_server.hget("asset_id_"+str(self.id), "price")) 
+        self.price = float(redis_server.hget("asset_id_"+str(self.id), "price"))
 
     def buy(self, Q):
-        """ Q is a positive float or int 
+        """ Q is a positive float or int
         """
         self.quantity += Q
-        
+
     def sell(self, Q):
-        """ Q is a positive float or int 
+        """ Q is a positive float or int
         """
         if self.quantity - Q < 0:
             raise NegativeAssetException()
         self.quantity -= Q
-        
+
     def serialize(self, ID):
         #This generates a string from the Asset object (ID, quantity parameters)
         id_hex = str(ID).encode("hex")
         q_hex = str(self.quantity).encode("hex")
         serialized_data = id_hex + ";" + q_hex
         return serialized_data
-    
+
     @staticmethod
     def deserialize(serialized_data):
         #This takes the string generated from serialize and returns an Asset object
@@ -60,10 +62,10 @@ class Asset(object):
         ID = serialized_data[0].decode("hex")
         q = serialized_data[1].decode("hex")
         return Asset(ID, float(q))
-    
+
     def __eq__(self, other):
         return self.id == other.id and self.asset_class == other.asset_class and self.name == other.name and self.price == other.price and self.quantity == other.quantity
-    
+
     def __repr__(self):
         return "[id "+str(self.id)+", name "+self.name+", class "+self.asset_class+", quantity "+str(self.quantity)+", price "+str(self.price)+"]"
 
@@ -72,7 +74,7 @@ class Portfolio(object):
         self.user = str(user) #only used to serialize and deserialize
         self.assets = dict()
         self.nav = 0
-       
+
     def buy_sell(self, ID, Q, can_be_created=True):
         if Q == 0:
             return
@@ -92,12 +94,12 @@ class Portfolio(object):
                 self.nav += self.assets[ID].price * Q
                 if self.assets[ID].quantity == 0:
                     del self.assets[ID]
-        
+
     def remove_asset(self, ID):
         if ID in self.assets:
             self.nav -= self.assets[ID].price * self.assets[ID].quantity
             del self.assets[ID]
-        
+
     def json_serialize(self, user, url_root):
         return {
             "user" : user,
@@ -105,15 +107,15 @@ class Portfolio(object):
             "netAssetValue" : self.nav,
             "links" : [{"rel" : "self", "href" : url_root[:-1] + url_version + "/portfolios/" + user}]
             }
-        
+
     def serialize(self):
         #This generates a string from the Portfolio object (user, and assets parameters)
         user_hex = self.user.encode("hex")
         assets = "#".join([a.serialize(a_id) for a_id, a in self.assets.iteritems()])
-        assets_hex = assets.encode("hex")        
+        assets_hex = assets.encode("hex")
         serialized_data = user_hex + ";" + assets_hex
         return serialized_data
-    
+
     @staticmethod
     def deserialize(serialized_data):
         #This takes the string generated from serialize and returns a Portfolio object
@@ -128,20 +130,20 @@ class Portfolio(object):
             p.assets[asset.id] = asset
             p.nav += float(asset.quantity) * float(asset.price)
         return p
-    
+
     def __eq__(self, other):
         return self.user == other.user and self.assets == other.assets and self.nav == other.nav
-    
+
     def __repr__(self):
         return "Portfolio details: \n  user: "+self.user+"\n  NAV: "+str(self.nav)+"\n  assets: "+str(self.assets)+"\n"
-    
+
     def copy(self):
         p = Portfolio(self.user)
         p.assets = self.assets
         p.nav = self.nav
         return p
-        
-        
+
+
 ######################################################################
 # GET INDEX
 ######################################################################
@@ -149,26 +151,30 @@ class Portfolio(object):
 def index():
     print "Sending root static file..."
     return app.send_static_file('swagger/index.html')
-    
+
 @app.route('/lib/<path:path>')
 def send_lib(path):
     return app.send_static_file('swagger/lib/' + path)
-    
+
 @app.route('/specification/<path:path>') #this is for the PortfolioMgmt Swagger api
 def send_specification(path):
     return app.send_static_file('swagger/specification/' + path)
-    
+
 @app.route('/images/<path:path>')
 def send_images(path):
     return app.send_static_file('swagger/images/' + path)
-    
+
 @app.route('/css/<path:path>')
 def send_css(path):
     return app.send_static_file('swagger/css/' + path)
-    
+
 @app.route('/fonts/<path:path>')
 def send_fonts(path):
     return app.send_static_file('swagger/fonts/' + path)
+
+@app.route(url_version)
+def index_api():
+    return jsonify(name=app_name, version=app_version, url='/portfolios'), HTTP_200_OK
 
 ######################################################################
 # LIST ALL portfolios
@@ -206,7 +212,7 @@ def list_assets(user):
     if data:
         portfolio = Portfolio.deserialize(data)
     return reply({'assets' : [{'id' : asset.id, 'name' : asset.name} for asset in portfolio.assets.itervalues()]}, HTTP_200_OK)
-        
+
 ######################################################################
 # RETRIEVE the quantity and total value of an asset in a portfolio
 ######################################################################
@@ -226,7 +232,7 @@ def get_asset(user, asset_id):
     if asset_id not in portfolio.assets:
         return reply({'error' : 'Asset with id {0} does not exist in this portfolio'.format(asset_id)}, HTTP_404_NOT_FOUND)
     return reply({'name' : portfolio.assets[asset_id].name, 'quantity' : portfolio.assets[asset_id].quantity, 'value' : portfolio.assets[asset_id].quantity * portfolio.assets[asset_id].price}, HTTP_200_OK)
-        
+
 
 ######################################################################
 # RETRIEVE the NAV of a portfolio
@@ -378,14 +384,14 @@ def reply(message, rc):
     response.headers['Content-Type'] = 'application/json'
     response.status_code = rc
     return response
-    
+
 def is_valid(data, keys=[]):
     for k in keys:
         if k not in data:
             #app.logger.error('Missing key in data: {0}'.format(k))
             return False
     return True
-    
+
 class Credentials(object):
     def __init__(self, environment, host, port, password, swagger_host):
         self.environment = environment
@@ -393,7 +399,7 @@ class Credentials(object):
         self.port = port
         self.password = password
         self.swagger_host = swagger_host
-    
+
 def determine_credentials():
     if 'VCAP_SERVICES' in os.environ:
         services = json.loads(os.environ['VCAP_SERVICES'])
@@ -415,7 +421,7 @@ def determine_credentials():
             return Credentials("Docker running in Vagrant", "redis", 6379, None, "localhost:5000")
         else: # Vagrant only
             return Credentials("Vagrant", "127.0.0.1", 6379, None, "localhost:5000")
-        
+
 def update_swagger_specification(swagger_host):
     spec_dir = os.path.dirname(__file__)
     if len(spec_dir): # Not docker container
@@ -441,7 +447,7 @@ def init_redis(hostname, port, password):
         raise RedisConnectionException()
     #remove_old_database_assets() # to remove once you ran it once on your Vagrant
     #fill_database_assets() # to remove once you ran it once on your Vagrant
-        
+
 """
 def remove_old_database_assets():
     redis_server.hdel("asset_type0", {"id", "name", "value", "type"})
@@ -455,10 +461,10 @@ def fill_database_assets():
     redis_server.hmset("asset_id_1", {"id": 1,"name":"NYC real estate index","price":16255.18,"class":"real-estate"})
     redis_server.hmset("asset_id_2", {"id": 2,"name":"brent crude oil","price":51.45,"class":"commodity"})
     redis_server.hmset("asset_id_3", {"id": 3,"name":"US 10Y T-Note","price":130.77,"class":"fixed income"})
-    
+
  def fill_database_fakeusers():
     redis_server.hmset("user_john", {"name": "john","data":""})
-    redis_server.hmset("user_jeremy", {"name": "jeremy","data":""})    
+    redis_server.hmset("user_jeremy", {"name": "jeremy","data":""})
     redis_server.sadd('list_users', "john")
     redis_server.sadd('list_users', "jeremy")
     redis_server.hmset("user_john", {"name": "john","data":"6a6f686e;33303b3335"})
@@ -479,8 +485,3 @@ if __name__ == "__main__":
     update_swagger_specification(creds.swagger_host)
     port = os.getenv('PORT', '5000')
     app.run(host='0.0.0.0', port=int(port), debug=True)
-
-
-
-
-
