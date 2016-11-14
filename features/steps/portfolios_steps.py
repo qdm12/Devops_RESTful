@@ -2,14 +2,6 @@ from behave import *
 import server
 import json
 
-@given(u'the server is started')
-def step_impl(context):
-    context.app = server.app.test_client()
-    context.server = server
-    creds = context.server.determine_credentials()
-    context.server.init_redis(creds.host, creds.port, creds.password)
-    context.api_url = context.server.url_version
-
 @when(u'I visit the "home page"')
 def step_impl(context):
     context.resp = context.app.get(context.api_url)
