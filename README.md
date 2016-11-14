@@ -1,5 +1,6 @@
 # Portfolio Management RESTful API
 *The project was developed for the DevOps course of New York University (CSCI-GA.3033-014).*
+- You can access the Github pages at Published gh pages at [https://qdm12.github.io/Devops_RESTful/index.html](https://qdm12.github.io/Devops_RESTful/index.html).
 
 ## I - What is it?
 - It is a RESTful API for a portfolio management.
