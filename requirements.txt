@@ -4,3 +4,4 @@ nose
 rednose
 coverage
 behave==1.2.5
+codecov

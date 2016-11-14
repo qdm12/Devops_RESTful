@@ -12,7 +12,7 @@ HTTP_409_CONFLICT = 409
 url_version = "/api/v1"
 
 class FakeRedisServer(object):
-    def __init__(self, database=None, host=None, port=None, password=None):
+    def __init__(self, database=None):
         """ database is a dict of a dict:
         * key 'asset_id_0' and value {"id": 0,"name":"gold","value":1286.59,"class":"commodity"}
             or
@@ -373,10 +373,6 @@ class Static(unittest.TestCase):
         self.app = server.app.test_client()
         """ BE WARNED: This checks for local files in static/ """
         
-    def test_static_folder(self):
-        static_exists = os.path.isdir(server.app.static_folder)        
-        self.assertTrue(static_exists)
-        
     def test_index(self):
         response = self.app.get("/")
         self.assertNotEquals(response.status_code, HTTP_404_NOT_FOUND)
@@ -726,14 +722,65 @@ class Credentials(unittest.TestCase):
     def test_init(self):
         no_exception = True
         try:
-            _ = server.Credentials("linux", "localhost", 6000, "password", "localhost")
+            _ = server.Credentials("linux", "localhost:5000", 5000, "password", "localhost")
         except:
             no_exception = False
         self.assertTrue(no_exception)
         
+    def test_eq(self):
+        creds = server.Credentials("linux", "localhost:5000", 5000, "abc", "swagger")
+        self.assertTrue(creds.environment == "linux" and creds.host == "localhost:5000" and creds.port == 5000 and creds.password == "abc" and creds.swagger_host == "swagger")
+        
+class FakePath(object):
+    def __init__(self, docker=False):
+        self.docker = docker
     
+    def isfile(self, filename):
+        return self.docker
+    
+class FakeOS(object):
+    def __init__(self, bluemix=False, docker=False):
+        self.environ = dict()
+        self.path = FakePath(docker)
+        if bluemix:
+            data = json.dumps({"rediscloud":[{"credentials":{"hostname":"0.0.0.0","port":"6000","password":"abcde"}}]})
+            self.environ["VCAP_SERVICES"] = data
             
-
+class Other(unittest.TestCase):
+    def test_determine_credentials_bluemix(self):
+        server.os = FakeOS(True, False)
+        creds_expected = server.Credentials("Bluemix", "0.0.0.0", 6000, "abcde", "portfoliomgmt.mybluemix.net")
+        creds = server.determine_credentials()
+        self.assertEquals(creds, creds_expected)
+        
+    def test_determine_credentials_bluemix_container(self):
+        server.os = FakeOS(True, True)
+        creds_expected = server.Credentials("Docker running in Bluemix", "0.0.0.0", 6000, "abcde", "portfoliocontainer.mybluemix.net")
+        creds = server.determine_credentials()
+        self.assertEquals(creds, creds_expected)
+        
+    def test_determine_credentials_vagrant(self):
+        server.os = FakeOS(False, False)
+        creds_expected = server.Credentials("Vagrant", "127.0.0.1", 6379, None, "localhost:5000")
+        creds = server.determine_credentials()
+        self.assertEquals(creds, creds_expected)
+        
+    def test_determine_credentials_vagrant_container(self):
+        server.os = FakeOS(False, True)
+        creds_expected = server.Credentials("Docker running in Vagrant", "redis", 6379, None, "localhost:5000")
+        creds = server.determine_credentials()
+        self.assertEquals(creds, creds_expected)
+        
+    def test_fill_database_assets(self):
+        server.redis_server = FakeRedisServer(dict())
+        exception_raised = False
+        try:
+            server.fill_database_assets()
+        except:
+            exception_raised = True
+        self.assertFalse(exception_raised)
+        
+        
 
 ######################################################################
 #   M A I N
