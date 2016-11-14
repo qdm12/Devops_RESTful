@@ -84,7 +84,7 @@ Scenario: Add an asset to an unknown user portfolio
     Then I should see status "404"
 
 Scenario: List all assets of a user portfolio
-    Given the following user names
+    Given the following user name
         | name          |
         | alice         |
     Given the following asset for "alice"
@@ -93,24 +93,6 @@ Scenario: List all assets of a user portfolio
         | 2             | 2             |
         | 3             | 3             |
     When I visit "/portfolio/alice/assets"
-    Then I should
-
-Scenario: Retrieve a the NAV of an unknown user portfolio
-    When I visit "/portfolios/unknown/nav"
-    Then I should see status "404"
-
-Scenario: Retrieve a the NAV of a user portfolio
-    Given the following user names
-        | name          |
-        | alice         |
-    When I visit "/api/v1/alice/nav"
-    Then I should see "0"
-
-Scenario: Remove a user portfolio
-    Given the following user names
-        | name          |
-        | alice         |
-    When I remove a user "alice"
-    Then I should see status "204"
-    When I visit "/portfolios"
-    Then I should not see "alice"
+    Then I should see "1"
+    AND I should see "2"
+    AND I should see "3"

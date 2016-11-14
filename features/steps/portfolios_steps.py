@@ -50,16 +50,17 @@ def step_impl(context, name):
     context.resp = context.app.delete(url)
 
 @when(u'I add an asset for "{name}"')
+@given(u'the following asset for "{name}"')
 def step_impl(context, name):
     url = context.api_url + '/portfolios/' + name + '/assets'
     for row in context.table:
         new_asset = {'asset_id': row['asset_id'], 'quantity': row['quantity']}
         context.resp = context.app.post(url, data=json.dumps(new_asset), content_type='application/json')
 '''
-@given(u'the following user name')
-def step_impl(context):
-    url = context.api_url + '/portfolios'
+@given(u'the following asset for "{name}"')
+def step_impl(context, name):
+    url = context.api_url + '/portfolios/' + name + '/assets'
     for row in context.table:
-        new_user = {'user': row['name']}
-        context.resp = context.app.post(url, data=json.dumps(new_user), content_type='application/json')
+        new_asset = {'asset_id': row['asset_id'], 'quantity': row['quantity']}
+        context.resp = context.app.post(url, data=json.dumps(new_asset), content_type='application/json')
 '''
