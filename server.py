@@ -1,7 +1,6 @@
 import os
 from redis import Redis, ConnectionError
 from flask import Flask, jsonify, request, json
-import fileinput
 
 # Status Codes
 HTTP_200_OK = 200
@@ -399,28 +398,24 @@ class Credentials(object):
         self.port = port
         self.password = password
         self.swagger_host = swagger_host
+        
+    def __eq__(self, other):
+        return self.environment == other.environment and self.host == other.host and self.port == other.port and self.password == other.password and self.swagger_host == other.swagger_host
 
 def determine_credentials():
     if 'VCAP_SERVICES' in os.environ:
         services = json.loads(os.environ['VCAP_SERVICES'])
         redis_creds = services['rediscloud'][0]['credentials']
+        creds = Credentials("Bluemix", redis_creds['hostname'], int(redis_creds['port']), redis_creds['password'], "portfoliomgmt.mybluemix.net")
         if os.path.isfile("/.dockerenv"):
-            return Credentials("Docker running in Bluemix",
-                               redis_creds['hostname'],
-                               int(redis_creds['port']),
-                               redis_creds['password'],
-                               "portfoliocontainer.mybluemix.net")
-        else: # Bluemix only
-            return Credentials("Bluemix",
-                               redis_creds['hostname'],
-                               int(redis_creds['port']),
-                               redis_creds['password'],
-                               "portfoliomgmt.mybluemix.net")
-    else: # Vagrant
-        if os.path.isfile("/.dockerenv"):
-            return Credentials("Docker running in Vagrant", "redis", 6379, None, "localhost:5000")
-        else: # Vagrant only
-            return Credentials("Vagrant", "127.0.0.1", 6379, None, "localhost:5000")
+            creds.environment = "Docker running in Bluemix"
+            creds.swagger_host = "portfoliocontainer.mybluemix.net"
+        return creds
+    # Vagrant
+    if os.path.isfile("/.dockerenv"):
+        return Credentials("Docker running in Vagrant", "redis", 6379, None, "localhost:5000")
+    # Vagrant only
+    return Credentials("Vagrant", "127.0.0.1", 6379, None, "localhost:5000")
 
 def update_swagger_specification(swagger_host):
     spec_dir = os.path.dirname(__file__)
@@ -482,7 +477,6 @@ def fill_database_assets():
 ######################################################################
 if __name__ == "__main__":
     creds = determine_credentials()
-    print " ~ Identified the environment as: "+creds.environment
     try:
         init_redis(creds.host, creds.port, creds.password)
     except RedisConnectionException:
