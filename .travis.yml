@@ -9,6 +9,7 @@ install: "pip install -r requirements.txt"
 script:
   - nosetests
   - coverage run server_test.py
+  - codeclimate-test-reporter --token 556bde34c1f704485484eff88dd333faeba7a361
 
 after_success:
   - codecov
