@@ -446,7 +446,13 @@ def init_redis(hostname, port, password):
     except ConnectionError:
         raise RedisConnectionException()
     #remove_old_database_assets() # to remove once you ran it once on your Vagrant
-    #fill_database_assets() # to remove once you ran it once on your Vagrant
+    fill_database_assets() # to remove once you ran it once on your Vagrant
+
+def fill_database_assets():
+    redis_server.hmset("asset_id_0", {"id": 0,"name":"gold","price":1286.59,"class":"commodity"})
+    redis_server.hmset("asset_id_1", {"id": 1,"name":"NYC real estate index","price":16255.18,"class":"real-estate"})
+    redis_server.hmset("asset_id_2", {"id": 2,"name":"brent crude oil","price":51.45,"class":"commodity"})
+    redis_server.hmset("asset_id_3", {"id": 3,"name":"US 10Y T-Note","price":130.77,"class":"fixed income"})
 
 """
 def remove_old_database_assets():

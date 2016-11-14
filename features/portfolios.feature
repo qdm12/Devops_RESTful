@@ -53,3 +53,46 @@ Scenario: Remove a user portfolio
     Then I should see status "204"
     When I visit "/portfolios"
     Then I should not see "alice"
+
+Scenario: Add a new asset to a user portfolio
+    Given the following user name
+        | name          |
+        | alice         |
+    When I add an asset for "alice"
+        | asset_id      | quantity      |
+        | 2             | 10            |
+    Then I should see status "201"
+    When I visit "/portfolios/alice/assets"
+    Then I should see "2"
+
+Scenario: Add a conflict asset to a user portfolio
+    Given the following user name
+        | name          |
+        | alice         |
+    Given the following asset for "alice"
+        | asset_id      | quantity      |
+        | 1             | 1             |
+    When I add an asset for "alice"
+        | asset_id      | quantity      |
+        | 1             | 2             |
+    Then I should see status "409"
+
+Scenario: Add an asset to an unknown user portfolio
+    When I add an asset for "unknown"
+        | asset_id      | quantity      |
+        | 1             | 2             |
+    Then I should see status "404"
+
+Scenario: List all assets of a user portfolio
+    Given the following user name
+        | name          |
+        | alice         |
+    Given the following asset for "alice"
+        | asset_id      | quantity      |
+        | 1             | 1             |
+        | 2             | 2             |
+        | 3             | 3             |
+    When I visit "/portfolio/alice/assets"
+    Then I should see "1"
+    AND I should see "2"
+    AND I should see "3"
