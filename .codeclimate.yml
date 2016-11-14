@@ -5,3 +5,4 @@ PHP: false
 
 exclude_paths:
 - features/**/*
+- static/**/*
