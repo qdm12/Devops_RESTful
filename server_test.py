@@ -1,6 +1,5 @@
 import unittest
 import json
-from _memimporter import import_module
 import sys
 
 # Status Codes
@@ -21,6 +20,8 @@ class FakeRedisServer(object):
             or
         * key 'list_users' and value set("john", ...)
         """
+        global server
+        server = __import__("server", globals(), locals(), [''], -1)
         self.database = database
         
     def hget(self, key, field):
