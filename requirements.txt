@@ -3,6 +3,5 @@ redis>=2.10
 nose
 rednose
 coverage
+codeclimate-test-reporter
 behave
-codecov
-pytest-cov

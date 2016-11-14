@@ -1,6 +1,6 @@
 import unittest
-import server
 import json
+import sys
 
 # Status Codes
 HTTP_200_OK = 200
@@ -20,6 +20,8 @@ class FakeRedisServer(object):
             or
         * key 'list_users' and value set("john", ...)
         """
+        global server
+        server = __import__("server", globals(), locals(), [''], -1)
         self.database = database
         
     def hget(self, key, field):
@@ -60,18 +62,42 @@ class FakeRedisServer(object):
         
     def ping(self):
         raise server.ConnectionError()
+    
+class FakeRedisServerWorking(object):
+    def ping(self):
+        return
 
-class NegativeAssetException(unittest.TestCase):
-    def test_exception(self):
+class ServerException(unittest.TestCase):
+    def setUp(self):
+        global server
+        server = __import__("server", globals(), locals(), [''], -1)
+        self.app = server.app.test_client()
+        return
+        
+    def tearDown(self):
+        global server
+        del sys.modules[server.__name__]
+        return
+    
+    def test_neg_exception(self):
         with self.assertRaises(server.NegativeAssetException):
             raise server.NegativeAssetException()
-        
-class AssetNotFoundException(unittest.TestCase):
-    def test_exception(self):
+
+    def test_notfound_exception(self):
         with self.assertRaises(server.AssetNotFoundException):
             raise server.AssetNotFoundException()
         
-class Asset(unittest.TestCase):   
+class Asset(unittest.TestCase):
+    def setUp(self):
+        global server
+        server = __import__("server", globals(), locals(), [''], -1)
+        return
+        
+    def tearDown(self):
+        global server
+        del sys.modules[server.__name__]
+        return
+    
     def test_init(self):
         database = dict()
         database["asset_id_1"] = {"id": 1,"name":"NYC real estate index","price":16255.18,"class":"real-estate"}
@@ -150,6 +176,9 @@ class Asset(unittest.TestCase):
     def test_serialize(self):
         ID = "1"
         Q = 5.5
+        database = dict()
+        database["asset_id_1"] = {"id": 1,"name":"NYC real estate index","price":16255.18,"class":"real-estate"}
+        server.redis_server = FakeRedisServer(database)
         asset = server.Asset(ID, Q)
         data = asset.serialize(ID)
         self.assertEquals(data, "31;352e35", "Serialized data does not match expected result")
@@ -197,8 +226,21 @@ class FakeAsset(object):
 
     def __eq__(self, other):
         return self.id == other.id and self.quantity == other.quantity
+    
+    def __repr__(self):
+        return "(FAKE)[id "+str(self.id)+", name "+str(self.name)+", class "+str(self.asset_class)+", quantity "+str(self.quantity)+", price "+str(self.price)+"]"
         
 class Portfolio(unittest.TestCase):
+    def setUp(self):
+        global server
+        server = __import__("server", globals(), locals(), [''], -1)
+        return
+        
+    def tearDown(self):
+        global server
+        del sys.modules[server.__name__]
+        return
+    
     def test_init(self):
         user = "john"
         portfolio = server.Portfolio(user)
@@ -343,8 +385,10 @@ class Portfolio(unittest.TestCase):
         portfolio_expected.assets = {0: FakeAsset(0, 5.0), 1: FakeAsset(1, 6.0)}
         portfolio_expected.nav = 2.5 * 5.0 + 2.5 * 6.0
         data = "6a6f686e;33303b3335326533302333313b333632653330"
+        temp = server.Asset
         server.Asset = FakeAsset #for the Asset.deserialize method
         portfolio = server.Portfolio.deserialize(data)
+        server.Asset = temp
         self.assertEquals(portfolio, portfolio_expected)
     
     def test_copy(self):
@@ -370,8 +414,15 @@ class Portfolio(unittest.TestCase):
         
 class Static(unittest.TestCase):
     def setUp(self):
+        global server
+        server = __import__("server", globals(), locals(), [''], -1)
         self.app = server.app.test_client()
-        """ BE WARNED: This checks for local files in static/ """
+        return
+        
+    def tearDown(self):
+        global server
+        del sys.modules[server.__name__]
+        return
         
     def test_index(self):
         response = self.app.get("/")
@@ -397,13 +448,29 @@ class Static(unittest.TestCase):
         response = self.app.get("/fonts/DroidSans.ttf")
         self.assertNotEqual(response.status_code, HTTP_404_NOT_FOUND)
 
+    def test_send_url_version(self):
+        response = self.app.get(url_version)
+        parsed_data = json.loads(response.data)
+        self.assertEqual(parsed_data["name"], "Portfolio Management RESTful Service")
+        self.assertEqual(parsed_data["version"], 1.0)
+        self.assertEqual(parsed_data["url"], "/portfolios")
+        self.assertEqual(response.status_code, HTTP_200_OK)
+
 class GET(unittest.TestCase):
     def setUp(self):
+        global server
+        server = __import__("server", globals(), locals(), [''], -1)
         self.app = server.app.test_client()
+        return
+        
+    def tearDown(self):
+        global server
+        del sys.modules[server.__name__]
+        return
         
     def test_list_portfolios(self):
         database = dict()
-        database["asset_id_0"] = {"id": 0,"name":"gold","price":1286.59,"class":"commodity"}
+        database["asset_id_0"] = {"id": 0,"name":"gold","price":10,"class":"commodity"}
         database["user_john"] = {"name":"john", "data":"6a6f686e;33303b3335"}
         database["user_jeremy"] = {"name":"jeremy", "data":"6a6572656d79;"}
         database["list_users"] = set(["john", "jeremy"])
@@ -415,7 +482,7 @@ class GET(unittest.TestCase):
         self.assertEquals(parsed_data["portfolios"][1]["user"], "jeremy")
         self.assertEquals(parsed_data["portfolios"][0]["numberOfAssets"], 1)
         self.assertEquals(parsed_data["portfolios"][1]["numberOfAssets"], 0)
-        self.assertEquals(parsed_data["portfolios"][0]["netAssetValue"], 6432.95)
+        self.assertEquals(parsed_data["portfolios"][0]["netAssetValue"], 50)
         self.assertEquals(parsed_data["portfolios"][1]["netAssetValue"], 0)
         self.assertEquals(parsed_data["portfolios"][0]["links"][0]["rel"], "self")
         self.assertEquals(parsed_data["portfolios"][1]["links"][0]["rel"], "self")
@@ -504,7 +571,15 @@ class GET(unittest.TestCase):
     
 class POST(unittest.TestCase):
     def setUp(self):
+        global server
+        server = __import__("server", globals(), locals(), [''], -1)
         self.app = server.app.test_client()
+        return
+        
+    def tearDown(self):
+        global server
+        del sys.modules[server.__name__]
+        return
     
     def test_create_user(self):
         database = dict()
@@ -605,7 +680,15 @@ class POST(unittest.TestCase):
     
 class PUT(unittest.TestCase):
     def setUp(self):
+        global server
+        server = __import__("server", globals(), locals(), [''], -1)
         self.app = server.app.test_client()
+        return
+        
+    def tearDown(self):
+        global server
+        del sys.modules[server.__name__]
+        return
         
     def test_update_asset(self):
         database = dict()
@@ -680,7 +763,15 @@ class PUT(unittest.TestCase):
     
 class DELETE(unittest.TestCase):
     def setUp(self):
+        global server
+        server = __import__("server", globals(), locals(), [''], -1)
         self.app = server.app.test_client()
+        return
+        
+    def tearDown(self):
+        global server
+        del sys.modules[server.__name__]
+        return
 
     def test_delete_asset(self):
         database = dict()
@@ -704,13 +795,15 @@ class DELETE(unittest.TestCase):
     
 class Utility(unittest.TestCase):
     def setUp(self):
+        global server
+        server = __import__("server", globals(), locals(), [''], -1)
         self.app = server.app.test_client()
-    
-    def test_reply(self):
-        message = "message message message"
-        rc = 404
-        #response = server.reply(message, rc)
-        #self.assertEquals(response, "") XXX
+        return
+        
+    def tearDown(self):
+        global server
+        del sys.modules[server.__name__]
+        return
     
     def test_is_valid_true(self):
         data = {"key1":2312, "key2":434}
@@ -728,6 +821,16 @@ class Utility(unittest.TestCase):
             server.init_redis("localhost:5000", 5000, None)
             
 class Credentials(unittest.TestCase):
+    def setUp(self):
+        global server
+        server = __import__("server", globals(), locals(), [''], -1)
+        return
+        
+    def tearDown(self):
+        global server
+        del sys.modules[server.__name__]
+        return
+    
     def test_init(self):
         no_exception = True
         try:
@@ -756,6 +859,16 @@ class FakeOS(object):
             self.environ["VCAP_SERVICES"] = data
             
 class Other(unittest.TestCase):
+    def setUp(self):
+        global server
+        server = __import__("server", globals(), locals(), [''], -1)
+        return
+        
+    def tearDown(self):
+        global server
+        del sys.modules[server.__name__]
+        return
+    
     def test_determine_credentials_bluemix(self):
         server.os = FakeOS(True, False)
         creds_expected = server.Credentials("Bluemix", "0.0.0.0", 6000, "abcde", "portfoliomgmt.mybluemix.net")
@@ -781,12 +894,14 @@ class Other(unittest.TestCase):
         self.assertEquals(creds, creds_expected)
         
     def test_fill_database_assets(self):
+        temp = server.redis_server
         server.redis_server = FakeRedisServer(dict())
         exception_raised = False
         try:
             server.fill_database_assets()
         except:
             exception_raised = True
+        server.redis_server = temp
         self.assertFalse(exception_raised)
         
         

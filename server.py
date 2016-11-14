@@ -16,6 +16,8 @@ url_version = "/api/v1"
 app_name = "Portfolio Management RESTful Service"
 app_version = 1.0
 
+redis_server = None
+
 class NegativeAssetException(Exception):
     pass
 
@@ -172,7 +174,7 @@ def send_fonts(path):
 
 @app.route(url_version)
 def index_api():
-    return jsonify(name=app_name, version=app_version, url='/portfolios'), HTTP_200_OK
+    return reply({"name":app_name, "version":app_version, "url":"/portfolios"}, HTTP_200_OK)
 
 ######################################################################
 # LIST ALL portfolios
