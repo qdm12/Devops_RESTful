@@ -4,7 +4,6 @@ Feature: The Portfolio Management Service back-end
     So that I can manage user portfolios
 
 Background:
-    Given the server is started
 
 Scenario: The server is running
     When I visit the "home page"

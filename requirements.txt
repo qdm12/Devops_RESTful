@@ -6,3 +6,4 @@ coverage
 behave
 codecov
 pytest-cov
+codeclimate-test-reporter

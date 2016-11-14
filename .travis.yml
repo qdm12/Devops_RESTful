@@ -1,8 +1,15 @@
 language: python
 python:
   - "2.7"
+
 # command to install dependencies
 install: "pip install -r requirements.txt"
+
 # command to run tests
 script:
-  - "python server_test.py"
+  - nosetests
+  - coverage run server_test.py
+  - codeclimate-test-reporter --token 556bde34c1f704485484eff88dd333faeba7a361
+
+after_success:
+  - codecov
