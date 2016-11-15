@@ -98,6 +98,9 @@ Access it at [https://qdm12.github.io/Devops_RESTful/index.html](https://qdm12.g
 1. Turn vagrant on with `vagrant up && vagrant ssh`
 2. Enter `cd /vagrant && behave` and check all the tests pass
 
+## IX - Docstring
+1. You can re-generate the docstring HTML with `python -m pydoc -w server`.
+
 ## For ongoing work, please refer to this page:
 [https://github.com/rofrano/nyu-homework-2](https://github.com/rofrano/nyu-homework-2)
 - PART 1: Deploy the service in Docker Containers on Bluemix (submit URL of service on Bluemix)

@@ -105,9 +105,8 @@ header h2 {
 a.button {
   display: block;
   float: left;
-  width: 18%;
-  height: 30%;
-  padding: 2% 2% 3% 2%;
+  width: 17%;
+  padding: 4% 0% 4% 0%;
   font-size: 12px;
   font-weight: bold;
   margin-left: 2%;
@@ -167,6 +166,10 @@ a.button span {
 #swagger-ui span {
   background: transparent url(../images/swagger.png) 12px 50% no-repeat;
 }
+#pydoc span {
+  background: transparent url(../images/pydoc.png) 12px 50% no-repeat;
+}
+
 
 code, pre {
   margin-bottom: 30px;
