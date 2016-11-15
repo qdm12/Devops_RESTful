@@ -24,6 +24,9 @@ app = Flask(__name__)
 url_version = "/api/v1"
 app_name = "Portfolio Management RESTful Service"
 app_version = 1.0
+
+redis_server = None
+
 """
     Definition of Exception Class
 """
