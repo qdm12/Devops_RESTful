@@ -3,6 +3,12 @@ Ruby: false
 Python: true
 PHP: false
 
+ratings:
+  paths:
+  - "server.py"
+  - "test_server.py"
+  - "features/**/*"
+
 exclude_paths:
 - features/**/*
 - static/**/*
