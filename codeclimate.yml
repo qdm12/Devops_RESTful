@@ -6,3 +6,4 @@ PHP: false
 exclude_paths:
 - features/**/*
 - static/**/*
+- test_server.py

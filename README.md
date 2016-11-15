@@ -92,7 +92,7 @@ Access it at [https://qdm12.github.io/Devops_RESTful/index.html](https://qdm12.g
 ## VII - Test driven development and PyUnit
 1. If not on Vagrant, install **pip** and enter `pip install nose rednose coverage`
 2. Run the server tests and find the test coverage with `nosetests --rednose -v --with-coverage --cover-package=server`
-3. Or you can use `coverage run server_test.py && coverage report -m --include=server.py`
+3. Or you can use `coverage run test_server.py && coverage report -m --include=server.py`
 
 ## VIII - Behavior driven development and behave
 1. Turn vagrant on with `vagrant up && vagrant ssh`
