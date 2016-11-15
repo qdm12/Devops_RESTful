@@ -257,19 +257,6 @@ class Portfolio(unittest.TestCase):
         portfolio2.assets = {0: FakeAsset(0, 7.5), 1: FakeAsset(1, 11.2)}
         portfolio2.nav = 97.9
         self.assertTrue(portfolio1 == portfolio2)
-      
-    def test_buy_sell_zero(self):
-        user = "john"
-        asset_id = 1
-        Q_before = 11.2
-        portfolio = server.Portfolio(user)
-        portfolio.assets = {asset_id: FakeAsset(asset_id, Q_before)}
-        portfolio.nav = 2.5 * Q_before
-        Q = 0
-        portfolio.buy_sell(asset_id, Q)
-        self.assertEquals(portfolio.user, user)
-        self.assertEquals(portfolio.assets[asset_id].quantity, Q_before)
-        self.assertEquals(portfolio.nav, 2.5 * Q_before)
     
     def test_buy_asset_not_present(self):
         database = dict()
@@ -368,7 +355,7 @@ class Portfolio(unittest.TestCase):
         portfolio.assets = {0: FakeAsset(0, 5.0), 1: FakeAsset(1, 7.0)}
         portfolio.nav = nav
         url_root = "http://localhost:5000/"
-        json_data = portfolio.json_serialize(user, url_root)
+        json_data = portfolio.json_serialize(url_root)
         self.assertEquals(json_data, {"user":user, "numberOfAssets":2, "netAssetValue":nav, "links": [{"rel":"self", "href": url_root[:-1]+url_version+"/portfolios/"+user}]})
 
     def test_serialize(self):
