@@ -1,7 +1,16 @@
+# -*- coding: utf-8 -*-
 import os
 from redis import Redis, ConnectionError
 from flask import Flask, jsonify, request, json
-
+import fileinput
+"""
+    server.py
+    Center point of Portfolio Management System.
+    Example usage: python server.py
+    Authur:
+        !!!! Add your name here in alphabeta order!!!!!
+        Zhiyu Feng{@zf499@nyu.edu}
+"""
 # Status Codes
 HTTP_200_OK = 200
 HTTP_201_CREATED = 201
@@ -15,9 +24,9 @@ app = Flask(__name__)
 url_version = "/api/v1"
 app_name = "Portfolio Management RESTful Service"
 app_version = 1.0
-
-redis_server = None
-
+"""
+    Definition of Exception Class
+"""
 class NegativeAssetException(Exception):
     pass
 
@@ -28,7 +37,20 @@ class RedisConnectionException(Exception):
     pass
 
 class Asset(object):
+    """Asset class, basic unit of a Portfolio.
+        Attributes:
+            id(string):                     a unique id
+            quantity(float or int):         the number of assets
+            name(string):                   name of this asset
+            price(float):                   unit price of this asset
+            asset_class(string):            which kind of asset this asset is
+    """
     def __init__(self, ID, Q = 0):
+        """Initialization function of Asset class
+            Args:
+                ID(string): a unique id
+                Q(float or int):  number of assets
+        """
         self.id = int(ID)
         self.quantity = float(Q)
         if self.quantity <= 0:
@@ -38,18 +60,28 @@ class Asset(object):
         self.price = float(redis_server.hget("asset_id_"+str(self.id), "price"))
 
     def buy(self, Q):
-        """ Q is a positive float or int
+        """Buy more asset
+            Args:
+                Q(positive float or int):  number of assets to buy
         """
         self.quantity += Q
 
     def sell(self, Q):
-        """ Q is a positive float or int
+        """Sell some asset
+            Args:
+                Q(positive float or int):  number of assets to sell
         """
         if self.quantity - Q < 0:
             raise NegativeAssetException()
         self.quantity -= Q
 
     def serialize(self, ID):
+        """Serialize this class into a string to store into database
+            Args:
+                ID(int):                    id
+            Return:
+                serialized_data(string):    serialized data
+        """
         #This generates a string from the Asset object (ID, quantity parameters)
         id_hex = str(ID).encode("hex")
         q_hex = str(self.quantity).encode("hex")
@@ -58,6 +90,12 @@ class Asset(object):
 
     @staticmethod
     def deserialize(serialized_data):
+        """Deserialize the string to a Asset class
+            Args:
+                serialized_data(string):    serialized data
+            Return:
+                data(Asset):                Deserialzied class
+        """
         #This takes the string generated from serialize and returns an Asset object
         serialized_data = serialized_data.split(";")
         ID = serialized_data[0].decode("hex")
@@ -65,18 +103,40 @@ class Asset(object):
         return Asset(ID, float(q))
 
     def __eq__(self, other):
+        """Equal method, used to tell whether two Asset are the same
+            Args:
+                other(Asset):    other Asset
+            Return:
+                isEqual(bool):   true if other Asset is the same as this one
+        """
         return self.id == other.id and self.asset_class == other.asset_class and self.name == other.name and self.price == other.price and self.quantity == other.quantity
 
     def __repr__(self):
         return "[id "+str(self.id)+", name "+self.name+", class "+self.asset_class+", quantity "+str(self.quantity)+", price "+str(self.price)+"]"
 
 class Portfolio(object):
+    """Portfolio class, a combination of Asset, represent a user account.
+        Attributes:
+            user(string):               user name
+            assets(dict[string:Asset]): assets that belong to this user
+            nav(int):                   net value of this user's assets
+    """
     def __init__(self, user): #constructor
+        """Initialization function of Portfolio class
+            Args:
+                user(string):   user name
+        """
         self.user = str(user) #only used to serialize and deserialize
         self.assets = dict()
         self.nav = 0
 
     def buy_sell(self, ID, Q, can_be_created=True):
+        """Buy_sell function, used to buy or sell assets
+            Args:
+                ID(string):             id of the target asset for this transaction
+                Q(float or int):        number of assets to buy, when it's negative, means number of asset to sell
+                can_be_created(bool):   when set to true, if the asset to buy does not exist, create it
+        """
         if Q == 0:
             return
         if Q > 0:
@@ -97,11 +157,22 @@ class Portfolio(object):
                     del self.assets[ID]
 
     def remove_asset(self, ID):
+        """Remove a asset from this porfolio
+            Args:
+                ID(string):             id of the target asset to be removed
+        """
         if ID in self.assets:
             self.nav -= self.assets[ID].price * self.assets[ID].quantity
             del self.assets[ID]
 
     def json_serialize(self, user, url_root):
+        """Remove a asset from this porfolio
+            Args:
+                user(string):           user name
+                url_root(string):       root of url
+            Return:
+                data(json):             a json represention of this Portfolio class
+        """
         return {
             "user" : user,
             "numberOfAssets" : len(self.assets),
@@ -110,6 +181,10 @@ class Portfolio(object):
             }
 
     def serialize(self):
+        """Serialize this class into a string to store into database
+            Return:
+                serialized_data(string):    serialized data
+        """
         #This generates a string from the Portfolio object (user, and assets parameters)
         user_hex = self.user.encode("hex")
         assets = "#".join([a.serialize(a_id) for a_id, a in self.assets.iteritems()])
@@ -119,6 +194,12 @@ class Portfolio(object):
 
     @staticmethod
     def deserialize(serialized_data):
+        """Deserialize the string to a Portfolio class
+            Args:
+                serialized_data(string):    serialized data
+            Return:
+                data(Portfolio):                Deserialzied class
+        """
         #This takes the string generated from serialize and returns a Portfolio object
         serialized_data = serialized_data.split(";")
         user = serialized_data[0].decode("hex")
@@ -133,12 +214,20 @@ class Portfolio(object):
         return p
 
     def __eq__(self, other):
+        """Equal method, used to tell whether two Portfolio are the same
+            Args:
+                other(Asset):    other Portfolio
+            Return:
+                isEqual(bool):   true if other Portfolio is the same as this one
+        """
         return self.user == other.user and self.assets == other.assets and self.nav == other.nav
 
     def __repr__(self):
         return "Portfolio details: \n  user: "+self.user+"\n  NAV: "+str(self.nav)+"\n  assets: "+str(self.assets)+"\n"
 
     def copy(self):
+        """Create a copy of this Portfolio class
+        """
         p = Portfolio(self.user)
         p.assets = self.assets
         p.nav = self.nav
@@ -150,6 +239,7 @@ class Portfolio(object):
 ######################################################################
 @app.route('/')
 def index():
+    print "Sending root static file..."
     return app.send_static_file('swagger/index.html')
 
 @app.route('/lib/<path:path>')
@@ -174,7 +264,7 @@ def send_fonts(path):
 
 @app.route(url_version)
 def index_api():
-    return reply({"name":app_name, "version":app_version, "url":"/portfolios"}, HTTP_200_OK)
+    return jsonify(name=app_name, version=app_version, url='/portfolios'), HTTP_200_OK
 
 ######################################################################
 # LIST ALL portfolios
@@ -370,7 +460,7 @@ def delete_asset(user, asset_id):
 def delete_user(user):
     username = redis_server.hget("user_"+user,"name")
     if username:
-        redis_server.hdel("user_"+username, ["name","data"])
+        redis_server.hdel("user_"+username, {"name","data"})
         redis_server.delete("user_"+username)
         redis_server.srem('list_users', user)
     return reply("", HTTP_204_NO_CONTENT)
@@ -399,24 +489,28 @@ class Credentials(object):
         self.port = port
         self.password = password
         self.swagger_host = swagger_host
-        
-    def __eq__(self, other):
-        return self.environment == other.environment and self.host == other.host and self.port == other.port and self.password == other.password and self.swagger_host == other.swagger_host
 
 def determine_credentials():
     if 'VCAP_SERVICES' in os.environ:
         services = json.loads(os.environ['VCAP_SERVICES'])
         redis_creds = services['rediscloud'][0]['credentials']
-        creds = Credentials("Bluemix", redis_creds['hostname'], int(redis_creds['port']), redis_creds['password'], "portfoliomgmt.mybluemix.net")
         if os.path.isfile("/.dockerenv"):
-            creds.environment = "Docker running in Bluemix"
-            creds.swagger_host = "portfoliocontainer.mybluemix.net"
-        return creds
-    # Vagrant
-    if os.path.isfile("/.dockerenv"):
-        return Credentials("Docker running in Vagrant", "redis", 6379, None, "localhost:5000")
-    # Vagrant only
-    return Credentials("Vagrant", "127.0.0.1", 6379, None, "localhost:5000")
+            return Credentials("Docker running in Bluemix",
+                               redis_creds['hostname'],
+                               int(redis_creds['port']),
+                               redis_creds['password'],
+                               "portfoliocontainer.mybluemix.net")
+        else: # Bluemix only
+            return Credentials("Bluemix",
+                               redis_creds['hostname'],
+                               int(redis_creds['port']),
+                               redis_creds['password'],
+                               "portfoliomgmt.mybluemix.net")
+    else: # Vagrant
+        if os.path.isfile("/.dockerenv"):
+            return Credentials("Docker running in Vagrant", "redis", 6379, None, "localhost:5000")
+        else: # Vagrant only
+            return Credentials("Vagrant", "127.0.0.1", 6379, None, "localhost:5000")
 
 def update_swagger_specification(swagger_host):
     spec_dir = os.path.dirname(__file__)
@@ -452,10 +546,10 @@ def fill_database_assets():
 
 """
 def remove_old_database_assets():
-    redis_server.hdel("asset_type0", ["id", "name", "value", "type"])
-    redis_server.hdel("asset_type1", ["id", "name", "value", "type"])
-    redis_server.hdel("asset_type2", ["id", "name", "value", "type"])
-    redis_server.hdel("asset_type3", ["id", "name", "value", "type"])
+    redis_server.hdel("asset_type0", {"id", "name", "value", "type"})
+    redis_server.hdel("asset_type1", {"id", "name", "value", "type"})
+    redis_server.hdel("asset_type2", {"id", "name", "value", "type"})
+    redis_server.hdel("asset_type3", {"id", "name", "value", "type"})
     redis_server.srem("assetTypes",{"asset_type0","asset_type1","asset_type2","asset_type3"})
 
 def fill_database_assets():
@@ -478,10 +572,11 @@ def fill_database_assets():
 ######################################################################
 if __name__ == "__main__":
     creds = determine_credentials()
+    print " ~ Identified the environment as: "+creds.environment
     try:
         init_redis(creds.host, creds.port, creds.password)
     except RedisConnectionException:
-        print("The server could not connect to Redis. Stopping...\n\n")
+        print "The server could not connect to Redis. Stopping...\n\n"
         exit(1)
     update_swagger_specification(creds.swagger_host)
     port = os.getenv('PORT', '5000')
