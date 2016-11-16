@@ -2,9 +2,7 @@
 *The project was developed for the DevOps course of New York University (CSCI-GA.3033-014).*
 
 [![Build Status](https://travis-ci.org/qdm12/Devops_RESTful.svg?branch=master)](https://travis-ci.org/qdm12/Devops_RESTful)
-[![Code Climate](https://codeclimate.com/github/qdm12/Devops_RESTful/badges/gpa.svg)](https://codeclimate.com/github/qdm12/Devops_RESTful)
-[![Test Coverage](https://codeclimate.com/github/qdm12/Devops_RESTful/badges/coverage.svg)](https://codeclimate.com/github/qdm12/Devops_RESTful/coverage)
-[![Issue Count](https://codeclimate.com/github/qdm12/Devops_RESTful/badges/issue_count.svg)](https://codeclimate.com/github/qdm12/Devops_RESTful)
+[![Coverage Status](https://coveralls.io/repos/github/qdm12/Devops_RESTful/badge.svg?branch=master)](https://coveralls.io/github/qdm12/Devops_RESTful?branch=master)
 
 **Bluemix at https://portfoliomgmt.mybluemix.net**
 

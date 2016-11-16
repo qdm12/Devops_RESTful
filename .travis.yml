@@ -10,7 +10,6 @@ script:
   - nosetests
   - coverage run test_server.py
   - coverage report -m --include=server.py
-  - py.test
 
 after_success:
-  - codeclimate-test-reporter
+  - coveralls
