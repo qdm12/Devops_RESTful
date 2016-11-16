@@ -6,7 +6,10 @@ python:
 install: "pip install -r requirements.txt"
 
 # command to run tests
+before_script: redis-cli ping
+
 script:
+  - behave
   - nosetests --with-coverage --cover-erase --cover-package=server
 
 after_success:
