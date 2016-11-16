@@ -7,9 +7,7 @@ install: "pip install -r requirements.txt"
 
 # command to run tests
 script:
-  - nosetests
-  - coverage run test_server.py
-  - coverage report -m --include=server.py
+  - nosetests --with-coverage
 
 after_success:
   - coveralls
