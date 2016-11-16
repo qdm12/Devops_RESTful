@@ -28,6 +28,11 @@ Access it at [https://qdm12.github.io/Devops_RESTful/index.html](https://qdm12.g
 - The root URL uses **Swagger** to show a descriptive list of all available RESTful calls such as `POST`, `DELETE`, `PUT` and `GET`.
 
 ## III - Obtain the source code and minimum requirements
+**NOTE: **
+> If you use a linux machine (not Ubuntu, Vagrant compatibility issues), you can simply 
+run (`sudo`) `bash <(curl -s https://github.com/qdm12/Devops_RESTful/blob/master/lazy_setup.sh)` to 
+download, setup and run the project in Vagrant.
+
 1. Install Vagrant from [vagrantup.com](https://www.vagrantup.com/downloads.html)
 2. Download the project
   - Without git
