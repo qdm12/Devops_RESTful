@@ -1,1 +1,8 @@
+[run]
+source=server
+    
 [report]
+fail_under = 70
+exclude_lines = 
+    if __name__ == .__main__.:
+    
