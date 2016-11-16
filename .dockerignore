@@ -1,0 +1,9 @@
+.vagrant
+.coverage
+.coveragerc
+.gitignore
+.travis.yml
+codeclimate.yml
+README.md
+test_server*
+Vagrantfile
