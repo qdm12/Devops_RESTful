@@ -30,7 +30,7 @@ Access it at [https://qdm12.github.io/Devops_RESTful/index.html](https://qdm12.g
 ## III - Obtain the source code and minimum requirements
 **NOTE: **
 > If you use a linux machine (not Ubuntu, Vagrant compatibility issues), you can simply 
-run `bash <(curl -s https://github.com/qdm12/Devops_RESTful/blob/master/lazy_setup.sh)` to 
+run (`sudo`) `bash <(curl -s https://github.com/qdm12/Devops_RESTful/blob/master/lazy_setup.sh)` to 
 download, setup and run the project in Vagrant.
 
 1. Install Vagrant from [vagrantup.com](https://www.vagrantup.com/downloads.html)
