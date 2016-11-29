@@ -8,6 +8,6 @@ def before_all(context):
     context.server.init_redis(creds.host, creds.port, creds.password)
     context.api_url = context.server.url_version
 
-def after_scenario(context, scenario):
+def before_scenario(context, scenario):
     context.server.redis_server.flushdb()
     context.server.fill_database_assets()
