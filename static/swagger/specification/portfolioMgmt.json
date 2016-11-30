@@ -2,7 +2,7 @@
     "swagger": "2.0",
     "info": {
         "title": "DevOps RESTful Project",
-        "description": "API for portfolio management, implemented for the NYU DevOps course",
+        "description": "API for portfolio management, implemented for the NYU DevOps course.",
         "version": "1.0"
     },
     "host": "portfoliomgmt.mybluemix.net",
@@ -18,7 +18,7 @@
         "/portfolios": {
             "get": {
                 "summary": "All portfolios",
-                "description": "The portfolios endpoint returns all portfolios stored on the system. The response includes the user who owns the portfolio, the number of assets in the portfolio and the net asset value of the portfolio. In addition, a link is provided for each portfolio to its full object.",
+                "description": "IMPORTANT - Admin username is \"admin\" with password \"admin_password\". The portfolios endpoint returns all portfolios stored on the system. The response includes the user who owns the portfolio, the number of assets in the portfolio and the net asset value of the portfolio. In addition, a link is provided for each portfolio to its full object.",
                 "tags": [
                     "Portfolios"
                 ],
@@ -48,6 +48,10 @@
                                 "user": {
                                     "type": "string",
                                     "default": "john"
+                                },
+                                "password": {
+                                    "type": "string",
+                                    "default": "12345"
                                 }
                             }
                         }
