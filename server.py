@@ -1,6 +1,8 @@
 import os
 from redis import Redis, ConnectionError
-from flask import Flask, jsonify, request, json
+from flask import Flask, jsonify, request, json, redirect, Response
+from werkzeug.security import generate_password_hash, check_password_hash
+from functools import wraps
 
 """
     server.py
@@ -18,6 +20,7 @@ HTTP_200_OK = 200
 HTTP_201_CREATED = 201
 HTTP_204_NO_CONTENT = 204
 HTTP_400_BAD_REQUEST = 400
+HTTP_401_UNAUTHORIZED = 401
 HTTP_404_NOT_FOUND = 404
 HTTP_409_CONFLICT = 409
 
@@ -26,8 +29,55 @@ app = Flask(__name__)
 url_version = "/api/v1"
 app_name = "Portfolio Management RESTful Service"
 app_version = 1.0
-
 redis_server = None
+SECURED = True
+FORCE_HTTPS = False
+
+@app.before_request
+def before_request():
+    if FORCE_HTTPS:
+        return redirect(request.url.replace('http://', 'https://', 1), code=301) # XXX to test
+    #if request.url.endswith(url_version+"/portfolios"):
+    #    if request.url.startswith('http://'):
+    #        url = request.url.replace('http://', 'https://', 1)
+    #        return redirect(url, code=301)
+
+def check_auth(username, password, admin=False):
+    if admin:
+        hash_password_stored = redis_server.hget("admin_password_"+username, "hash_password")
+    else:
+        hash_password_stored = redis_server.hget("password_"+username, "hash_password")
+    if not hash_password_stored:
+        return False
+    return check_password_hash(hash_password_stored, password)
+
+def requires_auth(f):
+    @wraps(f)
+    def decorated(user, *args, **kwargs):
+        auth = request.authorization
+        if SECURED:
+            if not auth or auth.username != user or not check_auth(auth.username, auth.password):
+                return Response(
+                                'Could not verify your access level for that URL.\n'
+                                'You have to login with proper credentials', 
+                                HTTP_401_UNAUTHORIZED,
+                                {'WWW-Authenticate': 'Basic realm="Login Required"'})
+        return f(user, *args, **kwargs)
+    return decorated
+
+def requires_auth_admin(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth = request.authorization
+        if SECURED:
+            if not auth or not check_auth(auth.username, auth.password, admin=True):
+                return Response(
+                                'Could not verify your access level for that URL.\n'
+                                'You have to login with proper credentials', 
+                                HTTP_401_UNAUTHORIZED,
+                                {'WWW-Authenticate': 'Basic realm="Login Required"'})
+        return f(*args, **kwargs)
+    return decorated
 
 class NegativeAssetException(Exception):
     """Asset has a negative quantity exception
@@ -398,6 +448,7 @@ def index_api():
     return reply({"name":app_name, "version":app_version, "url":"/portfolios"}, HTTP_200_OK)
 
 @app.route(url_version+"/portfolios", methods=['GET'])
+@requires_auth_admin
 def list_portfolios():
     """Returns a list of all the Portfolio objects present in Redis.
     
@@ -419,6 +470,7 @@ def list_portfolios():
     return reply({"portfolios" : portfolios_array}, HTTP_200_OK)
 
 @app.route(url_version+"/portfolios/<user>/assets", methods=['GET'])
+@requires_auth
 def list_assets(user):
     """Returns a list of all the assets of a portfolio.
     
@@ -438,6 +490,7 @@ def list_assets(user):
     return reply({'assets' : [{'id' : asset.id, 'name' : asset.name} for asset in portfolio.assets.itervalues()]}, HTTP_200_OK)
 
 @app.route(url_version+"/portfolios/<user>/assets/<asset_id>", methods=['GET'])
+@requires_auth
 def get_asset(user, asset_id):
     """Returns the details of an asset of a Portfolio.
     
@@ -460,6 +513,7 @@ def get_asset(user, asset_id):
     return reply({'name' : portfolio.assets[asset_id].name, 'quantity' : portfolio.assets[asset_id].quantity, 'value' : portfolio.assets[asset_id].quantity * portfolio.assets[asset_id].price}, HTTP_200_OK)
 
 @app.route(url_version+"/portfolios/<user>/nav", methods=['GET'])
+@requires_auth
 def get_nav(user):
     """Returns the Net Asset Value (NAV) of a Portfolio.
     
@@ -482,7 +536,8 @@ def create_user():
     """Creates a user
     
         Initiated with a POST to /api/v1/portfolios with 
-        a body {"user": "john"}
+        a body {"user": "john", "password":"pass123"}
+        ONLY WORKS THROUGH HTTPS
     
         Returns:
             response (Response): Returns "" or an error message.
@@ -493,18 +548,21 @@ def create_user():
         return reply({'error' : 'Data {0} is not valid'.format(request.data)}, HTTP_400_BAD_REQUEST)
     if not is_valid(payload, ['user']):
         return reply({'error' : 'Payload {0} is not valid'.format(payload)}, HTTP_400_BAD_REQUEST)
+    if SECURED:
+        if not is_valid(payload, ['password']):
+            return reply({'error' : 'Payload is missing the password {0} (SECURED mode on)'.format(payload)}, HTTP_400_BAD_REQUEST)
     user = payload['user']
-    username = redis_server.hget("user_"+user,"name")
-    if not username:
+    if not redis_server.hget("user_"+user,"name"):
         redis_server.sadd('list_users', user) # Set of users
         redis_server.hmset("user_"+user, {"name": user})
+        if SECURED:
+            hash_password = generate_password_hash(payload['password'])
+            redis_server.hmset("password_"+user, {"hash_password":hash_password})                
         return reply("", HTTP_201_CREATED)
     return reply({'error' : 'User {0} already exists'.format(user)}, HTTP_409_CONFLICT)
 
-######################################################################
-# ADD A NEW asset
-######################################################################
 @app.route(url_version+"/portfolios/<user>/assets", methods=['POST'])
+@requires_auth
 def create_asset(user):
     """Creates an asset in a user's Portfolio.
     
@@ -541,10 +599,8 @@ def create_asset(user):
     redis_server.hmset("user_"+user, {"data": data})
     return reply("", HTTP_201_CREATED)
 
-######################################################################
-# UPDATE AN EXISTING resource
-######################################################################
 @app.route(url_version+"/portfolios/<user>/assets/<asset_id>", methods=['PUT'])
+@requires_auth
 def update_asset(user, asset_id):
     """Creates an asset in a user's Portfolio.
     
@@ -583,6 +639,7 @@ def update_asset(user, asset_id):
     return reply("", HTTP_200_OK)
 
 @app.route(url_version+"/portfolios/<user>/assets/<asset_id>", methods=['DELETE'])
+@requires_auth
 def delete_asset(user, asset_id):
     """Deletes an asset from a user's Portfolio.
     
@@ -602,6 +659,7 @@ def delete_asset(user, asset_id):
     return reply("", HTTP_204_NO_CONTENT)
 
 @app.route(url_version+"/portfolios/<user>", methods=['DELETE'])
+@requires_auth_admin
 def delete_user(user):
     """Deletes a user.
     
@@ -653,7 +711,7 @@ def is_valid(data, keys=[]):
         if k not in data:
             #app.logger.error('Missing key in data: {0}'.format(k))
             return False
-    return True
+    return True   
 
 class Credentials(object):
     """Credentials class, just a structure to store credentials elements.
@@ -708,6 +766,7 @@ def determine_credentials():
             creds (Credentials): A full consistent Credentials object.
     """
     if 'VCAP_SERVICES' in os.environ:
+        FORCE_HTTPS = True # XXX to test
         services = json.loads(os.environ['VCAP_SERVICES'])
         redis_creds = services['rediscloud'][0]['credentials']
         creds = Credentials("Bluemix", redis_creds['hostname'], int(redis_creds['port']), redis_creds['password'], "portfoliomgmt.mybluemix.net")
@@ -765,7 +824,12 @@ def init_redis(hostname, port, password):
     except ConnectionError:
         raise RedisConnectionException()
     #remove_old_database_assets() # to remove once you ran it once on your Vagrant
-    fill_database_assets() # to remove once you ran it once on your Vagrant
+    fill_database_assets() # XXX to remove
+    if SECURED:
+        admin_username = "admin"
+        admin_password = "admin_password"
+        hash_password = generate_password_hash(admin_password)
+        redis_server.hmset("admin_password_"+admin_username, {"hash_password":hash_password})
 
 def fill_database_assets():
     redis_server.hmset("asset_id_0", {"id": 0,"name":"gold","price":1286.59,"class":"commodity"})
@@ -786,7 +850,7 @@ def fill_database_assets():
     # redis_server.hmset("asset_id_2", {"id": 2,"name":"brent crude oil","price":51.45,"class":"commodity"})
     # redis_server.hmset("asset_id_3", {"id": 3,"name":"US 10Y T-Note","price":130.77,"class":"fixed income"})
 
- # def fill_database_fakeusers():
+# def fill_database_fakeusers():
     # redis_server.hmset("user_john", {"name": "john","data":""})
     # redis_server.hmset("user_jeremy", {"name": "jeremy","data":""})
     # redis_server.sadd('list_users', "john")

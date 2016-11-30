@@ -94,21 +94,21 @@ download, setup and run the project in Vagrant.
 
 ## VII - Test driven development and PyUnit
 - Running on **host machine**:
-	1. `pip install nose rednose coverage`.
-	2. Enter `nosetests --rednose -v --with-coverage --cover-package=server` or `coverage run test_server.py && coverage report -m --include=server.py`
+    1. `pip install nose rednose coverage`.
+    2. Enter `nosetests --rednose -v --with-coverage --cover-package=server` or `coverage run test_server.py && coverage report -m --include=server.py`
 - Running on **Vagrant**:
-	1. Turn vagrant on with `vagrant up && vagrant ssh`.
-	2. Enter `cd /vagrant`.
-	3. Run the server tests and coverage with `nosetests --rednose -v --with-coverage --cover-package=server` or `coverage run test_server.py && coverage report -m --include=server.py`.
+    1. Turn vagrant on with `vagrant up && vagrant ssh`.
+    2. Enter `cd /vagrant`.
+    3. Run the server tests and coverage with `nosetests --rednose -v --with-coverage --cover-package=server` or `coverage run test_server.py && coverage report -m --include=server.py`.
+- Running on **Travis CI**: This is automated with the help of the file `.travis.yml`.
 
 ## VIII - Behavior driven development and behave
-- Running on **host machine**:
-	1. Enter `pip install behave`.
-	2. Enter `nosetests --rednose -v --with-coverage --cover-package=server` or `coverage run test_server.py && coverage report -m --include=server.py`
+- Running on **host machine**: Will not work as there is no Redis database !
 - Running on **Vagrant**:
-	1. Turn vagrant on with `vagrant up && vagrant ssh`.
-	2. Enter `pip install behave`. (TEMPORARY)
-	3. Enter `cd /vagrant && behave`.
+    1. Turn vagrant on with `vagrant up && vagrant ssh`.
+    2. Enter `cd /vagrant`.
+    3. Enter `behave`.
+- Running on **Travis CI**: This is automated with the help of the file `.travis.yml`.
 
 ## IX - Docstring
 1. You can re-generate the docstring HTML with `python -m pydoc -w server`.

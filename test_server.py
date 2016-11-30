@@ -64,6 +64,24 @@ class FakeRedisServer(object):
         raise server.ConnectionError()
     
 class FakeRedisServerWorking(object):
+    def __init__(self, database=None):
+        """ database is a dict of a dict:
+        * key 'asset_id_0' and value {"id": 0,"name":"gold","value":1286.59,"class":"commodity"}
+            or
+        * key 'user_john' and value {"name": "john","data":"6a6f686e;33303b3335"}
+            or
+        * key 'list_users' and value set("john", ...)
+        """
+        global server
+        server = __import__("server", globals(), locals(), [''], -1)
+        self.database = database
+        
+    def hmset(self, key, dictionary):
+        if key not in self.database:
+            self.database[key] = dict()
+        for subkey in dictionary:
+            self.database[key][subkey] = dictionary[subkey]
+            
     def ping(self):
         return
 
@@ -91,6 +109,7 @@ class Asset(unittest.TestCase):
     def setUp(self):
         global server
         server = __import__("server", globals(), locals(), [''], -1)
+        server.SECURED = False
         return
         
     def tearDown(self):
@@ -234,6 +253,7 @@ class Portfolio(unittest.TestCase):
     def setUp(self):
         global server
         server = __import__("server", globals(), locals(), [''], -1)
+        server.SECURED = False
         return
         
     def tearDown(self):
@@ -403,6 +423,7 @@ class Static(unittest.TestCase):
     def setUp(self):
         global server
         server = __import__("server", globals(), locals(), [''], -1)
+        server.SECURED = False
         self.app = server.app.test_client()
         return
         
@@ -447,6 +468,7 @@ class GET(unittest.TestCase):
     def setUp(self):
         global server
         server = __import__("server", globals(), locals(), [''], -1)
+        server.SECURED = False
         self.app = server.app.test_client()
         return
         
@@ -560,6 +582,7 @@ class POST(unittest.TestCase):
     def setUp(self):
         global server
         server = __import__("server", globals(), locals(), [''], -1)
+        server.SECURED = False
         self.app = server.app.test_client()
         return
         
@@ -577,6 +600,17 @@ class POST(unittest.TestCase):
             data_empty = True
         self.assertTrue(data_empty)
         self.assertEquals(response.status_code, HTTP_201_CREATED)
+        
+    def test_create_user_SECURED(self):
+        server.SECURED = True
+        database = dict()
+        server.redis_server = FakeRedisServer(database)
+        response = self.app.post(url_version+"/portfolios", data='{"user":"john", "password":"12345"}')
+        data_empty = False
+        if response.data == '{}' or response.data == '""\n':
+            data_empty = True
+        self.assertTrue(data_empty)
+        self.assertEquals(response.status_code, HTTP_201_CREATED)
     
     def test_create_user_data_not_valid(self):
         response = self.app.post(url_version+"/portfolios", data='notjson')
@@ -588,6 +622,13 @@ class POST(unittest.TestCase):
         response = self.app.post(url_version+"/portfolios", data='{"wrong_key":"john"}')
         parsed_data = json.loads(response.data)
         self.assertEquals(parsed_data["error"], "Payload {u'wrong_key': u'john'} is not valid")
+        self.assertEquals(response.status_code, HTTP_400_BAD_REQUEST)
+        
+    def test_create_user_payload_not_valid_SECURED(self):
+        server.SECURED = True
+        response = self.app.post(url_version+"/portfolios", data='{"user":"john", "wrong_key":"12345"}')
+        parsed_data = json.loads(response.data)
+        self.assertEquals(parsed_data["error"], "Payload is missing the password {u'user': u'john', u'wrong_key': u'12345'} (SECURED mode on)")
         self.assertEquals(response.status_code, HTTP_400_BAD_REQUEST)
     
     def test_create_user_already_exists(self):
@@ -669,6 +710,7 @@ class PUT(unittest.TestCase):
     def setUp(self):
         global server
         server = __import__("server", globals(), locals(), [''], -1)
+        server.SECURED = False
         self.app = server.app.test_client()
         return
         
@@ -752,6 +794,7 @@ class DELETE(unittest.TestCase):
     def setUp(self):
         global server
         server = __import__("server", globals(), locals(), [''], -1)
+        server.SECURED = False
         self.app = server.app.test_client()
         return
         
@@ -784,7 +827,6 @@ class Utility(unittest.TestCase):
     def setUp(self):
         global server
         server = __import__("server", globals(), locals(), [''], -1)
-        self.app = server.app.test_client()
         return
         
     def tearDown(self):
@@ -806,6 +848,13 @@ class Utility(unittest.TestCase):
         server.redis_server = FakeRedisServer()
         with self.assertRaises(server.RedisConnectionException):
             server.init_redis("localhost:5000", 5000, None)
+            
+    #def test_init_redis_admin(self):
+    #    server.SECURED = True
+    #    database = dict()
+    #    server.redis_server = FakeRedisServerWorking(database)
+    #    server.init_redis("localhost:5000", 5000, None)
+    #    self.assertEquals(server.redis_server.database["admin_password_admin"], {"hash_password":""})
             
 class Credentials(unittest.TestCase):
     def setUp(self):
