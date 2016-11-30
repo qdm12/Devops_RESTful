@@ -30,7 +30,7 @@ url_version = "/api/v1"
 app_name = "Portfolio Management RESTful Service"
 app_version = 1.0
 redis_server = None
-SECURED = True
+SECURED = False
 FORCE_HTTPS = False
 
 @app.before_request
