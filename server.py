@@ -1,6 +1,6 @@
 import os
 from redis import Redis, ConnectionError
-from flask import Flask, jsonify, request, json, redirect, Response
+from flask import Flask, jsonify, request, json, redirect, Response, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 
@@ -31,16 +31,15 @@ app_name = "Portfolio Management RESTful Service"
 app_version = 1.0
 redis_server = None
 SECURED = True
-FORCE_HTTPS = False
 
-@app.before_request
-def before_request():
-    if FORCE_HTTPS:
-        return redirect(request.url.replace('http://', 'https://', 1), code=301) # XXX to test
-    #if request.url.endswith(url_version+"/portfolios"):
-    #    if request.url.startswith('http://'):
-    #        url = request.url.replace('http://', 'https://', 1)
-    #        return redirect(url, code=301)
+def ssl_required(fn):
+    @wraps(fn)
+    def decorated_view(*args, **kwargs):
+        if current_app.config.get("SSL"):
+            if not request.is_secure:
+                return redirect(request.url.replace("http://", "https://"))
+        return fn(*args, **kwargs) 
+    return decorated_view
 
 def check_auth(username, password, admin=False):
     if admin:
@@ -368,6 +367,7 @@ class Portfolio(object):
 
 
 @app.route('/')
+@ssl_required
 def index():
     """Sends the Swagger main HTML page to the client.
 
@@ -377,6 +377,7 @@ def index():
     return app.send_static_file('swagger/index.html')
 
 @app.route('/lib/<path:path>')
+@ssl_required
 def send_lib(path):
     """Sends the Swagger javascript files from the lib folder.
 
@@ -389,6 +390,7 @@ def send_lib(path):
     return app.send_static_file('swagger/lib/' + path)
 
 @app.route('/specification/<path:path>')
+@ssl_required
 def send_specification(path):
     """Sends the Swagger JS specification from the specification folder.
 
@@ -402,6 +404,7 @@ def send_specification(path):
     return app.send_static_file('swagger/specification/' + path)
 
 @app.route('/images/<path:path>')
+@ssl_required
 def send_images(path):
     """Sends the Swagger image files from the images folder.
 
@@ -414,6 +417,7 @@ def send_images(path):
     return app.send_static_file('swagger/images/' + path)
 
 @app.route('/css/<path:path>')
+@ssl_required
 def send_css(path):
     """Sends the Swagger css files from the css folder.
 
@@ -426,6 +430,7 @@ def send_css(path):
     return app.send_static_file('swagger/css/' + path)
 
 @app.route('/fonts/<path:path>')
+@ssl_required
 def send_fonts(path):
     """Sends the Swagger tff files from the fonts folder.
 
@@ -439,6 +444,7 @@ def send_fonts(path):
     return app.send_static_file('swagger/fonts/' + path)
 
 @app.route(url_version)
+@ssl_required
 def index_api():
     """Sends the name and version of the API to the user in JSON.
 
@@ -448,6 +454,7 @@ def index_api():
     return reply({"name":app_name, "version":app_version, "url":"/portfolios"}, HTTP_200_OK)
 
 @app.route(url_version+"/portfolios", methods=['GET'])
+@ssl_required
 @requires_auth_admin
 def list_portfolios():
     """Returns a list of all the Portfolio objects present in Redis.
@@ -470,6 +477,7 @@ def list_portfolios():
     return reply({"portfolios" : portfolios_array}, HTTP_200_OK)
 
 @app.route(url_version+"/portfolios/<user>/assets", methods=['GET'])
+@ssl_required
 @requires_auth
 def list_assets(user):
     """Returns a list of all the assets of a portfolio.
@@ -490,6 +498,7 @@ def list_assets(user):
     return reply({'assets' : [{'id' : asset.id, 'name' : asset.name} for asset in portfolio.assets.itervalues()]}, HTTP_200_OK)
 
 @app.route(url_version+"/portfolios/<user>/assets/<asset_id>", methods=['GET'])
+@ssl_required
 @requires_auth
 def get_asset(user, asset_id):
     """Returns the details of an asset of a Portfolio.
@@ -513,6 +522,7 @@ def get_asset(user, asset_id):
     return reply({'name' : portfolio.assets[asset_id].name, 'quantity' : portfolio.assets[asset_id].quantity, 'value' : portfolio.assets[asset_id].quantity * portfolio.assets[asset_id].price}, HTTP_200_OK)
 
 @app.route(url_version+"/portfolios/<user>/nav", methods=['GET'])
+@ssl_required
 @requires_auth
 def get_nav(user):
     """Returns the Net Asset Value (NAV) of a Portfolio.
@@ -532,6 +542,8 @@ def get_nav(user):
     return reply({"nav" : portfolio.nav}, HTTP_200_OK)
 
 @app.route(url_version+"/portfolios", methods=['POST'])
+@ssl_required
+@requires_auth_admin
 def create_user():
     """Creates a user
 
@@ -562,6 +574,7 @@ def create_user():
     return reply({'error' : 'User {0} already exists'.format(user)}, HTTP_409_CONFLICT)
 
 @app.route(url_version+"/portfolios/<user>/assets", methods=['POST'])
+@ssl_required
 @requires_auth
 def create_asset(user):
     """Creates an asset in a user's Portfolio.
@@ -600,6 +613,7 @@ def create_asset(user):
     return reply("", HTTP_201_CREATED)
 
 @app.route(url_version+"/portfolios/<user>/assets/<asset_id>", methods=['PUT'])
+@ssl_required
 @requires_auth
 def update_asset(user, asset_id):
     """Creates an asset in a user's Portfolio.
@@ -639,6 +653,7 @@ def update_asset(user, asset_id):
     return reply("", HTTP_200_OK)
 
 @app.route(url_version+"/portfolios/<user>/assets/<asset_id>", methods=['DELETE'])
+@ssl_required
 @requires_auth
 def delete_asset(user, asset_id):
     """Deletes an asset from a user's Portfolio.
@@ -659,6 +674,7 @@ def delete_asset(user, asset_id):
     return reply("", HTTP_204_NO_CONTENT)
 
 @app.route(url_version+"/portfolios/<user>", methods=['DELETE'])
+@ssl_required
 @requires_auth_admin
 def delete_user(user):
     """Deletes a user.
@@ -766,7 +782,6 @@ def determine_credentials():
             creds (Credentials): A full consistent Credentials object.
     """
     if 'VCAP_SERVICES' in os.environ:
-        FORCE_HTTPS = True # XXX to test
         services = json.loads(os.environ['VCAP_SERVICES'])
         redis_creds = services['rediscloud'][0]['credentials']
         creds = Credentials("Bluemix", redis_creds['hostname'], int(redis_creds['port']), redis_creds['password'], "portfoliomgmt.mybluemix.net")
