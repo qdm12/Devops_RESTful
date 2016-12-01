@@ -8,7 +8,6 @@ def before_all(context):
     context.server.init_redis(creds.host, creds.port, creds.password)
     context.api_url = context.server.url_version
     context.server.SECURED = False
-    context.server.FORCE_HTTPS = False
 
 def before_scenario(context, scenario):
     context.server.redis_server.flushdb()
