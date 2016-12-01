@@ -1,6 +1,8 @@
 import unittest
 import json
 import sys
+from base64 import b64encode
+from werkzeug.security import generate_password_hash
 
 # Status Codes
 HTTP_200_OK = 200
@@ -580,9 +582,15 @@ class POST(unittest.TestCase):
         
     def test_create_user_SECURED(self):
         server.SECURED = True
+        admin_username = "admin"
+        admin_password = "admin_password"
+        authorization = {'content-type': 'application/json',
+                         'Authorization': 'Basic %s' % b64encode(admin_username+':'+admin_password)}
+        hash_password = generate_password_hash(admin_password)
         database = dict()
+        database["admin_password_"+admin_username] = {"hash_password":hash_password}
         server.redis_server = FakeRedisServer(database)
-        response = self.app.post(url_version+"/portfolios", data='{"user":"john", "password":"12345"}')
+        response = self.app.post(url_version+"/portfolios", data='{"user":"john", "password":"12345"}', headers=authorization)
         data_empty = False
         if response.data == '{}' or response.data == '""\n':
             data_empty = True
@@ -603,9 +611,15 @@ class POST(unittest.TestCase):
         
     def test_create_user_payload_not_valid_SECURED(self):
         server.SECURED = True
+        admin_username = "admin"
+        admin_password = "admin_password"
+        authorization = {'content-type': 'application/json',
+                         'Authorization': 'Basic %s' % b64encode(admin_username+':'+admin_password)}
+        hash_password = generate_password_hash(admin_password)
         database = dict()
+        database["admin_password_"+admin_username] = {"hash_password":hash_password}
         server.redis_server = FakeRedisServer(database)
-        response = self.app.post(url_version+"/portfolios", data='{"user":"john", "wrong_key":"12345"}')
+        response = self.app.post(url_version+"/portfolios", data='{"user":"john", "wrong_key":"12345"}', headers=authorization)
         parsed_data = json.loads(response.data)
         self.assertEquals(parsed_data["error"], "Payload is missing the password {u'user': u'john', u'wrong_key': u'12345'} (SECURED mode on)")
         self.assertEquals(response.status_code, HTTP_400_BAD_REQUEST)
