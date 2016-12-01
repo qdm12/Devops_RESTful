@@ -30,8 +30,8 @@ url_version = "/api/v1"
 app_name = "Portfolio Management RESTful Service"
 app_version = 1.0
 redis_server = None
-SECURED = False
-FORCE_HTTPS = False
+SECURED = True
+FORCE_HTTPS = True
 
 @app.before_request
 def before_request():
@@ -59,7 +59,7 @@ def requires_auth(f):
             if not auth or auth.username != user or not check_auth(auth.username, auth.password):
                 return Response(
                                 'Could not verify your access level for that URL.\n'
-                                'You have to login with proper credentials', 
+                                'You have to login with proper credentials',
                                 HTTP_401_UNAUTHORIZED,
                                 {'WWW-Authenticate': 'Basic realm="Login Required"'})
         return f(user, *args, **kwargs)
@@ -73,7 +73,7 @@ def requires_auth_admin(f):
             if not auth or not check_auth(auth.username, auth.password, admin=True):
                 return Response(
                                 'Could not verify your access level for that URL.\n'
-                                'You have to login with proper credentials', 
+                                'You have to login with proper credentials',
                                 HTTP_401_UNAUTHORIZED,
                                 {'WWW-Authenticate': 'Basic realm="Login Required"'})
         return f(*args, **kwargs)
@@ -99,7 +99,7 @@ class RedisConnectionException(Exception):
 
 class Asset(object):
     """Asset class, basic unit of a Portfolio.
-    
+
         Attributes:
             id (int): A unique id for this asset type.
             quantity (float): The amount of this asset.
@@ -113,7 +113,7 @@ class Asset(object):
             Args:
                 ID (int, str): The unique id of the asset type.
                 Q (float, int): The quantity number of assets.
-                
+
             Raises:
                 Exception: The quantity argument can't be negative.
         """
@@ -138,7 +138,7 @@ class Asset(object):
 
             Args:
                 Q (float, int): The quantity to buy (positive).
-                
+
             Raises:
                 NegativeAssetException: if the Asset quantity becomes negative.
         """
@@ -148,12 +148,12 @@ class Asset(object):
 
     def serialize(self, ID):
         """Serializes this Asset object into a string to be stored into Redis.
-        
+
             Uses the asset id and its quantity to generate a string for Redis.
-            
+
             Args:
                 ID (int): unique id of the asset type
-                
+
             Returns:
                 serialized_data (str): Two hexadecimal parts joined by ';'.
         """
@@ -165,14 +165,14 @@ class Asset(object):
     @staticmethod
     def deserialize(serialized_data):
         """Deserializes the string from Redis and returns an Asset object.
-        
+
             Determines the asset id and the quantity from the string.
             Fetches the other asset parameters from Redis with the asset id.
             This is a static method.
-            
+
             Args:
                 serialized_data (str): Two hexadecimal parts joined by ';'.
-                
+
             Returns:
                 Asset: Complete Asset object defined by the serialized_data.
         """
@@ -183,22 +183,22 @@ class Asset(object):
 
     def __eq__(self, other):
         """Equal method, used to tell whether two Asset are the same.
-        
-            Compares each attributes of the two Asset objects and returns 
+
+            Compares each attributes of the two Asset objects and returns
             True if these are all equal.
-        
+
             Args:
                 other (Asset): Other Asset object
-                
+
             Returns:
-                isEqual (bool): True if the other Asset has the same 
+                isEqual (bool): True if the other Asset has the same
                                 values as this one.
         """
         return self.id == other.id and self.asset_class == other.asset_class and self.name == other.name and self.price == other.price and self.quantity == other.quantity
 
     def __repr__(self):
         """Representation method, used by the str() and by print for example.
-        
+
             Returns:
                 repr (str): String representation of the Asset object.
         """
@@ -218,7 +218,7 @@ class Portfolio(object):
             Args:
                 user (str): The unique id of the asset type.
                 Q (float, int): The quantity number of assets.
-                
+
             Raises:
                 Exception: The quantity argument can't be negative.
         """
@@ -232,18 +232,18 @@ class Portfolio(object):
             Args:
                 ID (int): Unique asset id.
                 Q (float, int): The quantity to buy (positive) or sell (negative).
-                can_be_created (bool): If true, the asset is created if it 
-                                       does not exist in the portfolio and 
+                can_be_created (bool): If true, the asset is created if it
+                                       does not exist in the portfolio and
                                        if the quantity Q is positive (buy).
-                                       If false, an exception is raised if 
-                                       the asset does not exist in the 
+                                       If false, an exception is raised if
+                                       the asset does not exist in the
                                        portfolio.
-            
+
             Raises:
-                AssetNotFoundException: if asset ID does not exist in the 
-                                        Redis database or if the asset does 
-                                        not exist in the portfolio and can't 
-                                        be created (PUT method). 
+                AssetNotFoundException: if asset ID does not exist in the
+                                        Redis database or if the asset does
+                                        not exist in the portfolio and can't
+                                        be created (PUT method).
         """
         if Q > 0:
             if ID not in self.assets: # asset was not present in portfolio
@@ -274,12 +274,12 @@ class Portfolio(object):
 
     def json_serialize(self, url_root):
         """Prepares the portfolio object to be serialized in JSON.
-        
+
             Args:
                 url_root (str): root of the url
-                
+
             Returns:
-                data (dict): A dictionary illustrating the portfolio for 
+                data (dict): A dictionary illustrating the portfolio for
                              jsonify to produce.
         """
         return {
@@ -290,12 +290,12 @@ class Portfolio(object):
             }
 
     def serialize(self):
-        """Serializes this Portfolio object into a string to be stored 
+        """Serializes this Portfolio object into a string to be stored
            into Redis.
-        
-            Uses the username and the serialized Assets to generate a 
+
+            Uses the username and the serialized Assets to generate a
             string for Redis.
-            
+
             Returns:
                 serialized_data (str): Two hexadecimal parts joined by ';'.
         """
@@ -308,15 +308,15 @@ class Portfolio(object):
     @staticmethod
     def deserialize(serialized_data):
         """Deserializes the string from Redis and returns a Portfolio object.
-        
-            Determines the assets data and the NAV from the serialized 
+
+            Determines the assets data and the NAV from the serialized
             assets data retrieved from Redis. This is a static method.
-            
+
             Args:
                 serialized_data (str): Two hexadecimal parts joined by ';'.
-                
+
             Returns:
-                Portfolio: Complete Portfolio object defined by the 
+                Portfolio: Complete Portfolio object defined by the
                            serialized_data.
         """
         serialized_data = serialized_data.split(";")
@@ -333,22 +333,22 @@ class Portfolio(object):
 
     def __eq__(self, other):
         """Equal method, used to tell whether two Portfolio objects are the same.
-        
-            Compares each attributes of the two Portfolio objects and returns 
+
+            Compares each attributes of the two Portfolio objects and returns
             True if these are all equal.
-        
+
             Args:
                 other (Portfolio): Other Portfolio object
-                
+
             Returns:
-                isEqual (bool): True if the other Portfolio has the same 
+                isEqual (bool): True if the other Portfolio has the same
                                 attributes' values as this one.
         """
         return self.user == other.user and self.assets == other.assets and self.nav == other.nav
 
     def __repr__(self):
         """Representation method, used by the str() and by print for example.
-        
+
             Returns:
                 repr (str): String representation of the Portfolio object.
         """
@@ -356,9 +356,9 @@ class Portfolio(object):
 
     def copy(self):
         """Copy method, to create a Portfolio object with the values of this one.
-        
+
             Returns:
-                p (Portfolio): Portfolio object with the same attributes 
+                p (Portfolio): Portfolio object with the same attributes
                                values of this Portfolio object.
         """
         p = Portfolio(self.user)
@@ -370,7 +370,7 @@ class Portfolio(object):
 @app.route('/')
 def index():
     """Sends the Swagger main HTML page to the client.
-    
+
         Returns:
             response (Response): HTML content of static/swagger/index.html
     """
@@ -379,10 +379,10 @@ def index():
 @app.route('/lib/<path:path>')
 def send_lib(path):
     """Sends the Swagger javascript files from the lib folder.
-    
-        This is uesd by static/swagger/index.html which includes the lib 
+
+        This is uesd by static/swagger/index.html which includes the lib
         folder when executed.
-    
+
         Returns:
             response (Response): JS content of static/swagger/lib/***.js
     """
@@ -391,12 +391,12 @@ def send_lib(path):
 @app.route('/specification/<path:path>')
 def send_specification(path):
     """Sends the Swagger JS specification from the specification folder.
-    
-        This is uesd by static/swagger/index.html which includes the 
+
+        This is uesd by static/swagger/index.html which includes the
         specification JS file when executed.
-    
+
         Returns:
-            response (Response): JS content of 
+            response (Response): JS content of
                                  static/swagger/specification/***.*
     """
     return app.send_static_file('swagger/specification/' + path)
@@ -404,10 +404,10 @@ def send_specification(path):
 @app.route('/images/<path:path>')
 def send_images(path):
     """Sends the Swagger image files from the images folder.
-    
-        This is uesd by static/swagger/index.html which includes the images 
+
+        This is uesd by static/swagger/index.html which includes the images
         folder when executed.
-    
+
         Returns:
             response (Response): PNG content of static/swagger/images/***.png
     """
@@ -416,10 +416,10 @@ def send_images(path):
 @app.route('/css/<path:path>')
 def send_css(path):
     """Sends the Swagger css files from the css folder.
-    
-        This is uesd by static/swagger/index.html which includes the css 
+
+        This is uesd by static/swagger/index.html which includes the css
         folder when executed.
-    
+
         Returns:
             response (Response): CSS content of static/swagger/css/***.css
     """
@@ -428,12 +428,12 @@ def send_css(path):
 @app.route('/fonts/<path:path>')
 def send_fonts(path):
     """Sends the Swagger tff files from the fonts folder.
-    
-        This is uesd by static/swagger/index.html which includes the fonts 
+
+        This is uesd by static/swagger/index.html which includes the fonts
         folder when executed.
-    
+
         Returns:
-            response (Response): Fonts content of 
+            response (Response): Fonts content of
                                  static/swagger/fonts/***.ttf
     """
     return app.send_static_file('swagger/fonts/' + path)
@@ -441,7 +441,7 @@ def send_fonts(path):
 @app.route(url_version)
 def index_api():
     """Sends the name and version of the API to the user in JSON.
-    
+
         Returns:
             response (Response): JSON containing the app name, version.
     """
@@ -451,9 +451,9 @@ def index_api():
 @requires_auth_admin
 def list_portfolios():
     """Returns a list of all the Portfolio objects present in Redis.
-    
+
         Initiated with a GET to /api/v1/portfolios.
-    
+
         Returns:
             response (Response): A list of portfolios information.
     """
@@ -473,11 +473,11 @@ def list_portfolios():
 @requires_auth
 def list_assets(user):
     """Returns a list of all the assets of a portfolio.
-    
+
         Initiated with a GET to /api/v1/portfolios/<user>/assets.
-    
+
         Returns:
-            response (Response): A list of assets (id and name) OR an 
+            response (Response): A list of assets (id and name) OR an
                                  error message.
     """
     username = redis_server.hget("user_"+user,"name")
@@ -493,11 +493,11 @@ def list_assets(user):
 @requires_auth
 def get_asset(user, asset_id):
     """Returns the details of an asset of a Portfolio.
-    
+
         Initiated with a GET to /api/v1/portfolios/<user>/assets/<asset_id>.
-    
+
         Returns:
-            response (Response): Contains the name, quantity and total 
+            response (Response): Contains the name, quantity and total
                                  value of an asset OR an error message.
     """
     username = redis_server.hget("user_"+user,"name")
@@ -516,9 +516,9 @@ def get_asset(user, asset_id):
 @requires_auth
 def get_nav(user):
     """Returns the Net Asset Value (NAV) of a Portfolio.
-    
+
         Initiated with a GET to /api/v1/portfolios/<user>/nav.
-    
+
         Returns:
             response (Response): Contains the NAV value.
     """
@@ -534,11 +534,11 @@ def get_nav(user):
 @app.route(url_version+"/portfolios", methods=['POST'])
 def create_user():
     """Creates a user
-    
-        Initiated with a POST to /api/v1/portfolios with 
+
+        Initiated with a POST to /api/v1/portfolios with
         a body {"user": "john", "password":"pass123"}
         ONLY WORKS THROUGH HTTPS
-    
+
         Returns:
             response (Response): Returns "" or an error message.
     """
@@ -557,7 +557,7 @@ def create_user():
         redis_server.hmset("user_"+user, {"name": user})
         if SECURED:
             hash_password = generate_password_hash(payload['password'])
-            redis_server.hmset("password_"+user, {"hash_password":hash_password})                
+            redis_server.hmset("password_"+user, {"hash_password":hash_password})
         return reply("", HTTP_201_CREATED)
     return reply({'error' : 'User {0} already exists'.format(user)}, HTTP_409_CONFLICT)
 
@@ -565,10 +565,10 @@ def create_user():
 @requires_auth
 def create_asset(user):
     """Creates an asset in a user's Portfolio.
-    
-        Initiated with a POST to /api/v1/portfolios/<user>/assets with 
+
+        Initiated with a POST to /api/v1/portfolios/<user>/assets with
         a body {"asset_id": 2, "quantity": 10}
-    
+
         Returns:
             response (Response): Returns "" or an error message.
     """
@@ -603,10 +603,10 @@ def create_asset(user):
 @requires_auth
 def update_asset(user, asset_id):
     """Creates an asset in a user's Portfolio.
-    
-        Initiated with a PUT to /api/v1/portfolios/<user>/assets/<asset_id> 
+
+        Initiated with a PUT to /api/v1/portfolios/<user>/assets/<asset_id>
         with a body {"quantity": -4.2}
-    
+
         Returns:
             response (Response): Returns "" or an error message.
     """
@@ -642,9 +642,9 @@ def update_asset(user, asset_id):
 @requires_auth
 def delete_asset(user, asset_id):
     """Deletes an asset from a user's Portfolio.
-    
+
         Initiated with a DELETE to /api/v1/portfolios/<user>/assets/<asset_id>
-    
+
         Returns:
             response (Response): Returns "" with status HTTP_204_NO_CONTENT.
     """
@@ -662,9 +662,9 @@ def delete_asset(user, asset_id):
 @requires_auth_admin
 def delete_user(user):
     """Deletes a user.
-    
+
         Initiated with a DELETE to /api/v1/portfolios/<user>.
-    
+
         Returns:
             response (Response): Returns "" with status HTTP_204_NO_CONTENT.
     """
@@ -681,13 +681,13 @@ def delete_user(user):
 ######################################################################
 def reply(message, rc):
     """Generates a JSON Response object from a message and a response code.
-       
+
         Args:
             message (str): Message to be sent in the Response.
             rc (int): Response status code
-    
+
         Returns:
-            response (Response): Returns "{message}" with 
+            response (Response): Returns "{message}" with
                                  status code HTTP_204_NO_CONTENT.
     """
     response = jsonify(message)
@@ -697,13 +697,13 @@ def reply(message, rc):
 
 def is_valid(data, keys=[]):
     """Verifies the payload received contains all the necessary elements.
-    
+
         Checks that every necessary key is present in the payload.
-       
+
         Args:
             data (dict): Parsed JSON payload.
             keys (list): List of required dictionary keys.
-    
+
         Returns:
             isValid (bool): True if it is valid, otherwise False.
     """
@@ -711,7 +711,7 @@ def is_valid(data, keys=[]):
         if k not in data:
             #app.logger.error('Missing key in data: {0}'.format(k))
             return False
-    return True   
+    return True
 
 class Credentials(object):
     """Credentials class, just a structure to store credentials elements.
@@ -738,30 +738,30 @@ class Credentials(object):
         self.port = port
         self.password = password
         self.swagger_host = swagger_host
-        
+
     def __eq__(self, other):
         """Equal method, used to tell whether two Credentials are the same.
-        
-            Compares each attributes of the two Credentials objects and 
+
+            Compares each attributes of the two Credentials objects and
             returns True if these are all equal.
-        
+
             Args:
                 other (Credentials): Other Credentials object
-                
+
             Returns:
-                isEqual (bool): True if the other Credentials has the same 
+                isEqual (bool): True if the other Credentials has the same
                                 values as this one.
         """
         return self.environment == other.environment and self.host == other.host and self.port == other.port and self.password == other.password and self.swagger_host == other.swagger_host
 
 def determine_credentials():
     """Determines the environment, the Redis credentials and the Swagger URL.
-    
-        This uses various conditions to deduct the environment running the 
+
+        This uses various conditions to deduct the environment running the
         service (Vagrant, Container, Bluemix...). Depending on the finding,
-        different Redis credentials and hostnames are assigned to a 
+        different Redis credentials and hostnames are assigned to a
         Credentials object which is returned at the end.
-       
+
         Returns:
             creds (Credentials): A full consistent Credentials object.
     """
@@ -782,12 +782,12 @@ def determine_credentials():
 
 def update_swagger_specification(swagger_host):
     """Generates the JS Swagger from the JSON and update the "host" variable.
-    
+
         It reads the JSON Swagger specification to create the JS Swagger
-        specification in the same directory where the JSON content is 
-        assigned to the variable spec and where the "host":"...." is 
+        specification in the same directory where the JSON content is
+        assigned to the variable spec and where the "host":"...." is
         replaced by the swagger_host provided (dynamic hostname).
-        
+
         Args:
             swagger_host (str): URL to access the swagger UI.
     """
@@ -808,12 +808,12 @@ def update_swagger_specification(swagger_host):
 
 def init_redis(hostname, port, password):
     """Initializes the connection to the Redis server and checks for errors.
-        
+
         Args:
             hostname (str): Hostname of the Redis service.
             port (int): Port of the Redis service.
             password (None, str): Password to access the Redis service.
-            
+
         Raises:
             RedisConnectionException: If Redis can't be pinged.
     """
