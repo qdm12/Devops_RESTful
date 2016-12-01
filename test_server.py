@@ -87,15 +87,11 @@ class FakeRedisServerWorking(object):
 
 class ServerException(unittest.TestCase):
     def setUp(self):
-        global server
         server = __import__("server", globals(), locals(), [''], -1)
         self.app = server.app.test_client()
-        return
         
     def tearDown(self):
-        global server
         del sys.modules[server.__name__]
-        return
     
     def test_neg_exception(self):
         with self.assertRaises(server.NegativeAssetException):
@@ -107,15 +103,11 @@ class ServerException(unittest.TestCase):
         
 class Asset(unittest.TestCase):
     def setUp(self):
-        global server
         server = __import__("server", globals(), locals(), [''], -1)
         server.SECURED = False
-        return
         
     def tearDown(self):
-        global server
         del sys.modules[server.__name__]
-        return
     
     def test_init(self):
         database = dict()
@@ -251,15 +243,11 @@ class FakeAsset(object):
         
 class Portfolio(unittest.TestCase):
     def setUp(self):
-        global server
         server = __import__("server", globals(), locals(), [''], -1)
         server.SECURED = False
-        return
         
     def tearDown(self):
-        global server
         del sys.modules[server.__name__]
-        return
     
     def test_init(self):
         user = "john"
@@ -421,16 +409,12 @@ class Portfolio(unittest.TestCase):
         
 class Static(unittest.TestCase):
     def setUp(self):
-        global server
         server = __import__("server", globals(), locals(), [''], -1)
         server.SECURED = False
         self.app = server.app.test_client()
-        return
         
     def tearDown(self):
-        global server
         del sys.modules[server.__name__]
-        return
         
     def test_index(self):
         response = self.app.get("/")
@@ -466,16 +450,12 @@ class Static(unittest.TestCase):
 
 class GET(unittest.TestCase):
     def setUp(self):
-        global server
         server = __import__("server", globals(), locals(), [''], -1)
         server.SECURED = False
         self.app = server.app.test_client()
-        return
         
     def tearDown(self):
-        global server
         del sys.modules[server.__name__]
-        return
         
     def test_list_portfolios(self):
         database = dict()
@@ -584,12 +564,9 @@ class POST(unittest.TestCase):
         server = __import__("server", globals(), locals(), [''], -1)
         server.SECURED = False
         self.app = server.app.test_client()
-        return
         
     def tearDown(self):
-        global server
         del sys.modules[server.__name__]
-        return
     
     def test_create_user(self):
         database = dict()
@@ -626,6 +603,8 @@ class POST(unittest.TestCase):
         
     def test_create_user_payload_not_valid_SECURED(self):
         server.SECURED = True
+        database = dict()
+        server.redis_server = FakeRedisServer(database)
         response = self.app.post(url_version+"/portfolios", data='{"user":"john", "wrong_key":"12345"}')
         parsed_data = json.loads(response.data)
         self.assertEquals(parsed_data["error"], "Payload is missing the password {u'user': u'john', u'wrong_key': u'12345'} (SECURED mode on)")
@@ -708,16 +687,12 @@ class POST(unittest.TestCase):
     
 class PUT(unittest.TestCase):
     def setUp(self):
-        global server
         server = __import__("server", globals(), locals(), [''], -1)
         server.SECURED = False
         self.app = server.app.test_client()
-        return
         
     def tearDown(self):
-        global server
         del sys.modules[server.__name__]
-        return
         
     def test_update_asset(self):
         database = dict()
@@ -792,16 +767,12 @@ class PUT(unittest.TestCase):
     
 class DELETE(unittest.TestCase):
     def setUp(self):
-        global server
         server = __import__("server", globals(), locals(), [''], -1)
         server.SECURED = False
         self.app = server.app.test_client()
-        return
         
     def tearDown(self):
-        global server
         del sys.modules[server.__name__]
-        return
 
     def test_delete_asset(self):
         database = dict()
@@ -825,14 +796,10 @@ class DELETE(unittest.TestCase):
     
 class Utility(unittest.TestCase):
     def setUp(self):
-        global server
         server = __import__("server", globals(), locals(), [''], -1)
-        return
         
     def tearDown(self):
-        global server
         del sys.modules[server.__name__]
-        return
     
     def test_is_valid_true(self):
         data = {"key1":2312, "key2":434}
@@ -858,14 +825,10 @@ class Utility(unittest.TestCase):
             
 class Credentials(unittest.TestCase):
     def setUp(self):
-        global server
         server = __import__("server", globals(), locals(), [''], -1)
-        return
         
     def tearDown(self):
-        global server
         del sys.modules[server.__name__]
-        return
     
     def test_init(self):
         no_exception = True
@@ -896,14 +859,10 @@ class FakeOS(object):
             
 class Other(unittest.TestCase):
     def setUp(self):
-        global server
         server = __import__("server", globals(), locals(), [''], -1)
-        return
         
     def tearDown(self):
-        global server
         del sys.modules[server.__name__]
-        return
     
     def test_determine_credentials_bluemix(self):
         server.os = FakeOS(True, False)
