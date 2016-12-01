@@ -31,7 +31,7 @@ app_name = "Portfolio Management RESTful Service"
 app_version = 1.0
 redis_server = None
 SECURED = True
-FORCE_HTTPS = True
+FORCE_HTTPS = False
 
 @app.before_request
 def before_request():
