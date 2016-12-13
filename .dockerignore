@@ -4,6 +4,8 @@
 .gitignore
 .travis.yml
 codeclimate.yml
+features
 README.md
 test_server*
 Vagrantfile
+lazysetup*
