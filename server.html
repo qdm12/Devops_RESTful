@@ -64,14 +64,14 @@ Attributes:<br>
 <td width="100%">Methods defined here:<br>
 <dl><dt><a name="Asset-__eq__"><strong>__eq__</strong></a>(self, other)</dt><dd><tt>Equal&nbsp;method,&nbsp;used&nbsp;to&nbsp;tell&nbsp;whether&nbsp;two&nbsp;<a href="#Asset">Asset</a>&nbsp;are&nbsp;the&nbsp;same.<br>
 &nbsp;<br>
-Compares&nbsp;each&nbsp;attributes&nbsp;of&nbsp;the&nbsp;two&nbsp;<a href="#Asset">Asset</a>&nbsp;objects&nbsp;and&nbsp;returns&nbsp;<br>
+Compares&nbsp;each&nbsp;attributes&nbsp;of&nbsp;the&nbsp;two&nbsp;<a href="#Asset">Asset</a>&nbsp;objects&nbsp;and&nbsp;returns<br>
 True&nbsp;if&nbsp;these&nbsp;are&nbsp;all&nbsp;equal.<br>
 &nbsp;<br>
 Args:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;other&nbsp;(<a href="#Asset">Asset</a>):&nbsp;Other&nbsp;<a href="#Asset">Asset</a>&nbsp;<a href="__builtin__.html#object">object</a><br>
-&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;<br>
 Returns:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;isEqual&nbsp;(bool):&nbsp;True&nbsp;if&nbsp;the&nbsp;other&nbsp;<a href="#Asset">Asset</a>&nbsp;has&nbsp;the&nbsp;same&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;isEqual&nbsp;(bool):&nbsp;True&nbsp;if&nbsp;the&nbsp;other&nbsp;<a href="#Asset">Asset</a>&nbsp;has&nbsp;the&nbsp;same<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;values&nbsp;as&nbsp;this&nbsp;one.</tt></dd></dl>
 
 <dl><dt><a name="Asset-__init__"><strong>__init__</strong></a>(self, ID, Q<font color="#909090">=0</font>)</dt><dd><tt>Constructor&nbsp;of&nbsp;the&nbsp;<a href="#Asset">Asset</a>&nbsp;class.<br>
@@ -79,7 +79,7 @@ Returns:<br>
 Args:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;(int,&nbsp;str):&nbsp;The&nbsp;unique&nbsp;id&nbsp;of&nbsp;the&nbsp;asset&nbsp;type.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Q&nbsp;(float,&nbsp;int):&nbsp;The&nbsp;quantity&nbsp;number&nbsp;of&nbsp;assets.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;<br>
 Raises:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="exceptions.html#Exception">Exception</a>:&nbsp;The&nbsp;quantity&nbsp;argument&nbsp;can't&nbsp;be&nbsp;negative.</tt></dd></dl>
 
@@ -97,7 +97,7 @@ Args:<br>
 &nbsp;<br>
 Args:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Q&nbsp;(float,&nbsp;int):&nbsp;The&nbsp;quantity&nbsp;to&nbsp;buy&nbsp;(positive).<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;<br>
 Raises:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#NegativeAssetException">NegativeAssetException</a>:&nbsp;if&nbsp;the&nbsp;<a href="#Asset">Asset</a>&nbsp;quantity&nbsp;becomes&nbsp;negative.</tt></dd></dl>
 
@@ -107,7 +107,7 @@ Uses&nbsp;the&nbsp;asset&nbsp;id&nbsp;and&nbsp;its&nbsp;quantity&nbsp;to&nbsp;ge
 &nbsp;<br>
 Args:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;(int):&nbsp;unique&nbsp;id&nbsp;of&nbsp;the&nbsp;asset&nbsp;type<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;<br>
 Returns:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;serialized_data&nbsp;(str):&nbsp;Two&nbsp;hexadecimal&nbsp;parts&nbsp;joined&nbsp;by&nbsp;';'.</tt></dd></dl>
 
@@ -121,7 +121,7 @@ This&nbsp;is&nbsp;a&nbsp;static&nbsp;method.<br>
 &nbsp;<br>
 Args:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;serialized_data&nbsp;(str):&nbsp;Two&nbsp;hexadecimal&nbsp;parts&nbsp;joined&nbsp;by&nbsp;';'.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;<br>
 Returns:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#Asset">Asset</a>:&nbsp;Complete&nbsp;<a href="#Asset">Asset</a>&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;defined&nbsp;by&nbsp;the&nbsp;serialized_data.</tt></dd></dl>
 
@@ -212,14 +212,14 @@ Attributes:<br>
 <td width="100%">Methods defined here:<br>
 <dl><dt><a name="Credentials-__eq__"><strong>__eq__</strong></a>(self, other)</dt><dd><tt>Equal&nbsp;method,&nbsp;used&nbsp;to&nbsp;tell&nbsp;whether&nbsp;two&nbsp;<a href="#Credentials">Credentials</a>&nbsp;are&nbsp;the&nbsp;same.<br>
 &nbsp;<br>
-Compares&nbsp;each&nbsp;attributes&nbsp;of&nbsp;the&nbsp;two&nbsp;<a href="#Credentials">Credentials</a>&nbsp;objects&nbsp;and&nbsp;<br>
+Compares&nbsp;each&nbsp;attributes&nbsp;of&nbsp;the&nbsp;two&nbsp;<a href="#Credentials">Credentials</a>&nbsp;objects&nbsp;and<br>
 returns&nbsp;True&nbsp;if&nbsp;these&nbsp;are&nbsp;all&nbsp;equal.<br>
 &nbsp;<br>
 Args:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;other&nbsp;(<a href="#Credentials">Credentials</a>):&nbsp;Other&nbsp;<a href="#Credentials">Credentials</a>&nbsp;<a href="__builtin__.html#object">object</a><br>
-&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;<br>
 Returns:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;isEqual&nbsp;(bool):&nbsp;True&nbsp;if&nbsp;the&nbsp;other&nbsp;<a href="#Credentials">Credentials</a>&nbsp;has&nbsp;the&nbsp;same&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;isEqual&nbsp;(bool):&nbsp;True&nbsp;if&nbsp;the&nbsp;other&nbsp;<a href="#Credentials">Credentials</a>&nbsp;has&nbsp;the&nbsp;same<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;values&nbsp;as&nbsp;this&nbsp;one.</tt></dd></dl>
 
 <dl><dt><a name="Credentials-__init__"><strong>__init__</strong></a>(self, environment, host, port, password, swagger_host)</dt><dd><tt>Constructor&nbsp;of&nbsp;the&nbsp;<a href="#Credentials">Credentials</a>&nbsp;class.<br>
@@ -316,14 +316,14 @@ Attributes:<br>
 <td width="100%">Methods defined here:<br>
 <dl><dt><a name="Portfolio-__eq__"><strong>__eq__</strong></a>(self, other)</dt><dd><tt>Equal&nbsp;method,&nbsp;used&nbsp;to&nbsp;tell&nbsp;whether&nbsp;two&nbsp;<a href="#Portfolio">Portfolio</a>&nbsp;objects&nbsp;are&nbsp;the&nbsp;same.<br>
 &nbsp;<br>
-Compares&nbsp;each&nbsp;attributes&nbsp;of&nbsp;the&nbsp;two&nbsp;<a href="#Portfolio">Portfolio</a>&nbsp;objects&nbsp;and&nbsp;returns&nbsp;<br>
+Compares&nbsp;each&nbsp;attributes&nbsp;of&nbsp;the&nbsp;two&nbsp;<a href="#Portfolio">Portfolio</a>&nbsp;objects&nbsp;and&nbsp;returns<br>
 True&nbsp;if&nbsp;these&nbsp;are&nbsp;all&nbsp;equal.<br>
 &nbsp;<br>
 Args:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;other&nbsp;(<a href="#Portfolio">Portfolio</a>):&nbsp;Other&nbsp;<a href="#Portfolio">Portfolio</a>&nbsp;<a href="__builtin__.html#object">object</a><br>
-&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;<br>
 Returns:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;isEqual&nbsp;(bool):&nbsp;True&nbsp;if&nbsp;the&nbsp;other&nbsp;<a href="#Portfolio">Portfolio</a>&nbsp;has&nbsp;the&nbsp;same&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;isEqual&nbsp;(bool):&nbsp;True&nbsp;if&nbsp;the&nbsp;other&nbsp;<a href="#Portfolio">Portfolio</a>&nbsp;has&nbsp;the&nbsp;same<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;attributes'&nbsp;values&nbsp;as&nbsp;this&nbsp;one.</tt></dd></dl>
 
 <dl><dt><a name="Portfolio-__init__"><strong>__init__</strong></a>(self, user)</dt><dd><tt>Constructor&nbsp;of&nbsp;the&nbsp;<a href="#Portfolio">Portfolio</a>&nbsp;class.<br>
@@ -331,7 +331,7 @@ Returns:<br>
 Args:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;user&nbsp;(str):&nbsp;The&nbsp;unique&nbsp;id&nbsp;of&nbsp;the&nbsp;asset&nbsp;type.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Q&nbsp;(float,&nbsp;int):&nbsp;The&nbsp;quantity&nbsp;number&nbsp;of&nbsp;assets.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;<br>
 Raises:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="exceptions.html#Exception">Exception</a>:&nbsp;The&nbsp;quantity&nbsp;argument&nbsp;can't&nbsp;be&nbsp;negative.</tt></dd></dl>
 
@@ -345,32 +345,32 @@ Returns:<br>
 Args:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;(int):&nbsp;Unique&nbsp;asset&nbsp;id.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Q&nbsp;(float,&nbsp;int):&nbsp;The&nbsp;quantity&nbsp;to&nbsp;buy&nbsp;(positive)&nbsp;or&nbsp;sell&nbsp;(negative).<br>
-&nbsp;&nbsp;&nbsp;&nbsp;can_be_created&nbsp;(bool):&nbsp;If&nbsp;true,&nbsp;the&nbsp;asset&nbsp;is&nbsp;created&nbsp;if&nbsp;it&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;does&nbsp;not&nbsp;exist&nbsp;in&nbsp;the&nbsp;portfolio&nbsp;and&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;can_be_created&nbsp;(bool):&nbsp;If&nbsp;true,&nbsp;the&nbsp;asset&nbsp;is&nbsp;created&nbsp;if&nbsp;it<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;does&nbsp;not&nbsp;exist&nbsp;in&nbsp;the&nbsp;portfolio&nbsp;and<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;the&nbsp;quantity&nbsp;Q&nbsp;is&nbsp;positive&nbsp;(buy).<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;If&nbsp;false,&nbsp;an&nbsp;exception&nbsp;is&nbsp;raised&nbsp;if&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;asset&nbsp;does&nbsp;not&nbsp;exist&nbsp;in&nbsp;the&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;If&nbsp;false,&nbsp;an&nbsp;exception&nbsp;is&nbsp;raised&nbsp;if<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;asset&nbsp;does&nbsp;not&nbsp;exist&nbsp;in&nbsp;the<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;portfolio.<br>
 &nbsp;<br>
 Raises:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#AssetNotFoundException">AssetNotFoundException</a>:&nbsp;if&nbsp;asset&nbsp;ID&nbsp;does&nbsp;not&nbsp;exist&nbsp;in&nbsp;the&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Redis&nbsp;database&nbsp;or&nbsp;if&nbsp;the&nbsp;asset&nbsp;does&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;not&nbsp;exist&nbsp;in&nbsp;the&nbsp;portfolio&nbsp;and&nbsp;can't&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#AssetNotFoundException">AssetNotFoundException</a>:&nbsp;if&nbsp;asset&nbsp;ID&nbsp;does&nbsp;not&nbsp;exist&nbsp;in&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Redis&nbsp;database&nbsp;or&nbsp;if&nbsp;the&nbsp;asset&nbsp;does<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;not&nbsp;exist&nbsp;in&nbsp;the&nbsp;portfolio&nbsp;and&nbsp;can't<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;be&nbsp;created&nbsp;(PUT&nbsp;method).</tt></dd></dl>
 
 <dl><dt><a name="Portfolio-copy"><strong>copy</strong></a>(self)</dt><dd><tt>Copy&nbsp;method,&nbsp;to&nbsp;create&nbsp;a&nbsp;<a href="#Portfolio">Portfolio</a>&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;with&nbsp;the&nbsp;values&nbsp;of&nbsp;this&nbsp;one.<br>
 &nbsp;<br>
 Returns:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;p&nbsp;(<a href="#Portfolio">Portfolio</a>):&nbsp;<a href="#Portfolio">Portfolio</a>&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;with&nbsp;the&nbsp;same&nbsp;attributes&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;p&nbsp;(<a href="#Portfolio">Portfolio</a>):&nbsp;<a href="#Portfolio">Portfolio</a>&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;with&nbsp;the&nbsp;same&nbsp;attributes<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;values&nbsp;of&nbsp;this&nbsp;<a href="#Portfolio">Portfolio</a>&nbsp;<a href="__builtin__.html#object">object</a>.</tt></dd></dl>
 
 <dl><dt><a name="Portfolio-json_serialize"><strong>json_serialize</strong></a>(self, url_root)</dt><dd><tt>Prepares&nbsp;the&nbsp;portfolio&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;to&nbsp;be&nbsp;serialized&nbsp;in&nbsp;JSON.<br>
 &nbsp;<br>
 Args:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;url_root&nbsp;(str):&nbsp;root&nbsp;of&nbsp;the&nbsp;url<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;<br>
 Returns:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;data&nbsp;(dict):&nbsp;A&nbsp;dictionary&nbsp;illustrating&nbsp;the&nbsp;portfolio&nbsp;for&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;data&nbsp;(dict):&nbsp;A&nbsp;dictionary&nbsp;illustrating&nbsp;the&nbsp;portfolio&nbsp;for<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;jsonify&nbsp;to&nbsp;produce.</tt></dd></dl>
 
 <dl><dt><a name="Portfolio-remove_asset"><strong>remove_asset</strong></a>(self, ID)</dt><dd><tt>Removes&nbsp;an&nbsp;asset&nbsp;with&nbsp;id&nbsp;ID&nbsp;from&nbsp;the&nbsp;portfolio.<br>
@@ -378,10 +378,10 @@ Returns:<br>
 Args:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;(int):&nbsp;Unique&nbsp;asset&nbsp;id.</tt></dd></dl>
 
-<dl><dt><a name="Portfolio-serialize"><strong>serialize</strong></a>(self)</dt><dd><tt>Serializes&nbsp;this&nbsp;<a href="#Portfolio">Portfolio</a>&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;into&nbsp;a&nbsp;string&nbsp;to&nbsp;be&nbsp;stored&nbsp;<br>
+<dl><dt><a name="Portfolio-serialize"><strong>serialize</strong></a>(self)</dt><dd><tt>Serializes&nbsp;this&nbsp;<a href="#Portfolio">Portfolio</a>&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;into&nbsp;a&nbsp;string&nbsp;to&nbsp;be&nbsp;stored<br>
 into&nbsp;Redis.<br>
 &nbsp;<br>
-&nbsp;Uses&nbsp;the&nbsp;username&nbsp;and&nbsp;the&nbsp;serialized&nbsp;Assets&nbsp;to&nbsp;generate&nbsp;a&nbsp;<br>
+&nbsp;Uses&nbsp;the&nbsp;username&nbsp;and&nbsp;the&nbsp;serialized&nbsp;Assets&nbsp;to&nbsp;generate&nbsp;a<br>
 &nbsp;string&nbsp;for&nbsp;Redis.<br>
 &nbsp;<br>
 &nbsp;Returns:<br>
@@ -391,14 +391,14 @@ into&nbsp;Redis.<br>
 Static methods defined here:<br>
 <dl><dt><a name="Portfolio-deserialize"><strong>deserialize</strong></a>(serialized_data)</dt><dd><tt>Deserializes&nbsp;the&nbsp;string&nbsp;from&nbsp;Redis&nbsp;and&nbsp;returns&nbsp;a&nbsp;<a href="#Portfolio">Portfolio</a>&nbsp;<a href="__builtin__.html#object">object</a>.<br>
 &nbsp;<br>
-Determines&nbsp;the&nbsp;assets&nbsp;data&nbsp;and&nbsp;the&nbsp;NAV&nbsp;from&nbsp;the&nbsp;serialized&nbsp;<br>
+Determines&nbsp;the&nbsp;assets&nbsp;data&nbsp;and&nbsp;the&nbsp;NAV&nbsp;from&nbsp;the&nbsp;serialized<br>
 assets&nbsp;data&nbsp;retrieved&nbsp;from&nbsp;Redis.&nbsp;This&nbsp;is&nbsp;a&nbsp;static&nbsp;method.<br>
 &nbsp;<br>
 Args:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;serialized_data&nbsp;(str):&nbsp;Two&nbsp;hexadecimal&nbsp;parts&nbsp;joined&nbsp;by&nbsp;';'.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;<br>
 Returns:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#Portfolio">Portfolio</a>:&nbsp;Complete&nbsp;<a href="#Portfolio">Portfolio</a>&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;defined&nbsp;by&nbsp;the&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#Portfolio">Portfolio</a>:&nbsp;Complete&nbsp;<a href="#Portfolio">Portfolio</a>&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;defined&nbsp;by&nbsp;the<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;serialized_data.</tt></dd></dl>
 
 <hr>
@@ -476,27 +476,41 @@ Data descriptors inherited from <a href="exceptions.html#BaseException">exceptio
 <font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
     
 <tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><dl><dt><a name="-create_asset"><strong>create_asset</strong></a>(user)</dt><dd><tt>Creates&nbsp;an&nbsp;asset&nbsp;in&nbsp;a&nbsp;user's&nbsp;<a href="#Portfolio">Portfolio</a>.<br>
+<td width="100%"><dl><dt><a name="-check_auth"><strong>check_auth</strong></a>(username, password, admin<font color="#909090">=False</font>)</dt><dd><tt>Checks&nbsp;the&nbsp;credentials&nbsp;provided&nbsp;against&nbsp;the&nbsp;ones&nbsp;stored&nbsp;in&nbsp;Redis.<br>
 &nbsp;<br>
-Initiated&nbsp;with&nbsp;a&nbsp;POST&nbsp;to&nbsp;/api/v1/portfolios/&lt;user&gt;/assets&nbsp;with&nbsp;<br>
+It&nbsp;searches&nbsp;for&nbsp;the&nbsp;username&nbsp;key&nbsp;in&nbsp;the&nbsp;Redis&nbsp;database,&nbsp;and&nbsp;then<br>
+compares&nbsp;the&nbsp;hash&nbsp;of&nbsp;the&nbsp;password&nbsp;with&nbsp;the&nbsp;hash&nbsp;of&nbsp;the&nbsp;password&nbsp;<br>
+stored&nbsp;in&nbsp;the&nbsp;Redis&nbsp;database.&nbsp;If&nbsp;it&nbsp;matches,&nbsp;it&nbsp;returns&nbsp;True.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;username&nbsp;(string):&nbsp;Name&nbsp;of&nbsp;the&nbsp;username&nbsp;of&nbsp;administrator.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;password&nbsp;(string):&nbsp;Plaintext&nbsp;password&nbsp;of&nbsp;the&nbsp;username&nbsp;or&nbsp;admin.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;admin&nbsp;(boolean):&nbsp;True&nbsp;if&nbsp;the&nbsp;username&nbsp;is&nbsp;an&nbsp;administrator.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;True&nbsp;or&nbsp;False:&nbsp;Returns&nbsp;True&nbsp;if&nbsp;the&nbsp;user&nbsp;is&nbsp;authorized.</tt></dd></dl>
+ <dl><dt><a name="-create_asset"><strong>create_asset</strong></a>(user, *args, **kwargs)</dt><dd><tt>Creates&nbsp;an&nbsp;asset&nbsp;in&nbsp;a&nbsp;user's&nbsp;<a href="#Portfolio">Portfolio</a>.<br>
+&nbsp;<br>
+Initiated&nbsp;with&nbsp;a&nbsp;POST&nbsp;to&nbsp;/api/v1/portfolios/&lt;user&gt;/assets&nbsp;with<br>
 a&nbsp;body&nbsp;{"asset_id":&nbsp;2,&nbsp;"quantity":&nbsp;10}<br>
 &nbsp;<br>
 Returns:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;response&nbsp;(Response):&nbsp;Returns&nbsp;""&nbsp;or&nbsp;an&nbsp;error&nbsp;message.</tt></dd></dl>
- <dl><dt><a name="-create_user"><strong>create_user</strong></a>()</dt><dd><tt>Creates&nbsp;a&nbsp;user<br>
+ <dl><dt><a name="-create_user"><strong>create_user</strong></a>(*args, **kwargs)</dt><dd><tt>Creates&nbsp;a&nbsp;user<br>
 &nbsp;<br>
-Initiated&nbsp;with&nbsp;a&nbsp;POST&nbsp;to&nbsp;/api/v1/portfolios&nbsp;with&nbsp;<br>
-a&nbsp;body&nbsp;{"user":&nbsp;"john"}<br>
+Initiated&nbsp;with&nbsp;a&nbsp;POST&nbsp;to&nbsp;/api/v1/portfolios&nbsp;with<br>
+a&nbsp;body&nbsp;{"user":&nbsp;"john",&nbsp;"password":"pass123"}<br>
+ONLY&nbsp;WORKS&nbsp;THROUGH&nbsp;HTTPS<br>
 &nbsp;<br>
 Returns:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;response&nbsp;(Response):&nbsp;Returns&nbsp;""&nbsp;or&nbsp;an&nbsp;error&nbsp;message.</tt></dd></dl>
- <dl><dt><a name="-delete_asset"><strong>delete_asset</strong></a>(user, asset_id)</dt><dd><tt>Deletes&nbsp;an&nbsp;asset&nbsp;from&nbsp;a&nbsp;user's&nbsp;<a href="#Portfolio">Portfolio</a>.<br>
+ <dl><dt><a name="-delete_asset"><strong>delete_asset</strong></a>(user, *args, **kwargs)</dt><dd><tt>Deletes&nbsp;an&nbsp;asset&nbsp;from&nbsp;a&nbsp;user's&nbsp;<a href="#Portfolio">Portfolio</a>.<br>
 &nbsp;<br>
 Initiated&nbsp;with&nbsp;a&nbsp;DELETE&nbsp;to&nbsp;/api/v1/portfolios/&lt;user&gt;/assets/&lt;asset_id&gt;<br>
 &nbsp;<br>
 Returns:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;response&nbsp;(Response):&nbsp;Returns&nbsp;""&nbsp;with&nbsp;status&nbsp;HTTP_204_NO_CONTENT.</tt></dd></dl>
- <dl><dt><a name="-delete_user"><strong>delete_user</strong></a>(user)</dt><dd><tt>Deletes&nbsp;a&nbsp;user.<br>
+ <dl><dt><a name="-delete_user"><strong>delete_user</strong></a>(*args, **kwargs)</dt><dd><tt>Deletes&nbsp;a&nbsp;user.<br>
 &nbsp;<br>
 Initiated&nbsp;with&nbsp;a&nbsp;DELETE&nbsp;to&nbsp;/api/v1/portfolios/&lt;user&gt;.<br>
 &nbsp;<br>
@@ -504,22 +518,22 @@ Returns:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;response&nbsp;(Response):&nbsp;Returns&nbsp;""&nbsp;with&nbsp;status&nbsp;HTTP_204_NO_CONTENT.</tt></dd></dl>
  <dl><dt><a name="-determine_credentials"><strong>determine_credentials</strong></a>()</dt><dd><tt>Determines&nbsp;the&nbsp;environment,&nbsp;the&nbsp;Redis&nbsp;credentials&nbsp;and&nbsp;the&nbsp;Swagger&nbsp;URL.<br>
 &nbsp;<br>
-This&nbsp;uses&nbsp;various&nbsp;conditions&nbsp;to&nbsp;deduct&nbsp;the&nbsp;environment&nbsp;running&nbsp;the&nbsp;<br>
+This&nbsp;uses&nbsp;various&nbsp;conditions&nbsp;to&nbsp;deduct&nbsp;the&nbsp;environment&nbsp;running&nbsp;the<br>
 service&nbsp;(Vagrant,&nbsp;Container,&nbsp;Bluemix...).&nbsp;Depending&nbsp;on&nbsp;the&nbsp;finding,<br>
-different&nbsp;Redis&nbsp;credentials&nbsp;and&nbsp;hostnames&nbsp;are&nbsp;assigned&nbsp;to&nbsp;a&nbsp;<br>
+different&nbsp;Redis&nbsp;credentials&nbsp;and&nbsp;hostnames&nbsp;are&nbsp;assigned&nbsp;to&nbsp;a<br>
 <a href="#Credentials">Credentials</a>&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;which&nbsp;is&nbsp;returned&nbsp;at&nbsp;the&nbsp;end.<br>
 &nbsp;<br>
 Returns:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;creds&nbsp;(<a href="#Credentials">Credentials</a>):&nbsp;A&nbsp;full&nbsp;consistent&nbsp;<a href="#Credentials">Credentials</a>&nbsp;<a href="__builtin__.html#object">object</a>.</tt></dd></dl>
- <dl><dt><a name="-fill_database_assets"><strong>fill_database_assets</strong></a>()</dt></dl>
- <dl><dt><a name="-get_asset"><strong>get_asset</strong></a>(user, asset_id)</dt><dd><tt>Returns&nbsp;the&nbsp;details&nbsp;of&nbsp;an&nbsp;asset&nbsp;of&nbsp;a&nbsp;<a href="#Portfolio">Portfolio</a>.<br>
+ <dl><dt><a name="-fill_database_assets"><strong>fill_database_assets</strong></a>()</dt><dd><tt>Fill&nbsp;the&nbsp;Redis&nbsp;database&nbsp;with&nbsp;common&nbsp;assets&nbsp;to&nbsp;all&nbsp;users.</tt></dd></dl>
+ <dl><dt><a name="-get_asset"><strong>get_asset</strong></a>(user, *args, **kwargs)</dt><dd><tt>Returns&nbsp;the&nbsp;details&nbsp;of&nbsp;an&nbsp;asset&nbsp;of&nbsp;a&nbsp;<a href="#Portfolio">Portfolio</a>.<br>
 &nbsp;<br>
 Initiated&nbsp;with&nbsp;a&nbsp;GET&nbsp;to&nbsp;/api/v1/portfolios/&lt;user&gt;/assets/&lt;asset_id&gt;.<br>
 &nbsp;<br>
 Returns:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;response&nbsp;(Response):&nbsp;Contains&nbsp;the&nbsp;name,&nbsp;quantity&nbsp;and&nbsp;total&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;response&nbsp;(Response):&nbsp;Contains&nbsp;the&nbsp;name,&nbsp;quantity&nbsp;and&nbsp;total<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;value&nbsp;of&nbsp;an&nbsp;asset&nbsp;OR&nbsp;an&nbsp;error&nbsp;message.</tt></dd></dl>
- <dl><dt><a name="-get_nav"><strong>get_nav</strong></a>(user)</dt><dd><tt>Returns&nbsp;the&nbsp;Net&nbsp;<a href="#Asset">Asset</a>&nbsp;Value&nbsp;(NAV)&nbsp;of&nbsp;a&nbsp;<a href="#Portfolio">Portfolio</a>.<br>
+ <dl><dt><a name="-get_nav"><strong>get_nav</strong></a>(user, *args, **kwargs)</dt><dd><tt>Returns&nbsp;the&nbsp;Net&nbsp;<a href="#Asset">Asset</a>&nbsp;Value&nbsp;(NAV)&nbsp;of&nbsp;a&nbsp;<a href="#Portfolio">Portfolio</a>.<br>
 &nbsp;<br>
 Initiated&nbsp;with&nbsp;a&nbsp;GET&nbsp;to&nbsp;/api/v1/portfolios/&lt;user&gt;/nav.<br>
 &nbsp;<br>
@@ -539,7 +553,7 @@ Args:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;hostname&nbsp;(str):&nbsp;Hostname&nbsp;of&nbsp;the&nbsp;Redis&nbsp;service.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;port&nbsp;(int):&nbsp;Port&nbsp;of&nbsp;the&nbsp;Redis&nbsp;service.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;password&nbsp;(None,&nbsp;str):&nbsp;Password&nbsp;to&nbsp;access&nbsp;the&nbsp;Redis&nbsp;service.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;<br>
 Raises:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#RedisConnectionException">RedisConnectionException</a>:&nbsp;If&nbsp;Redis&nbsp;can't&nbsp;be&nbsp;pinged.</tt></dd></dl>
  <dl><dt><a name="-is_valid"><strong>is_valid</strong></a>(data, keys<font color="#909090">=[]</font>)</dt><dd><tt>Verifies&nbsp;the&nbsp;payload&nbsp;received&nbsp;contains&nbsp;all&nbsp;the&nbsp;necessary&nbsp;elements.<br>
@@ -552,14 +566,14 @@ Args:<br>
 &nbsp;<br>
 Returns:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;isValid&nbsp;(bool):&nbsp;True&nbsp;if&nbsp;it&nbsp;is&nbsp;valid,&nbsp;otherwise&nbsp;False.</tt></dd></dl>
- <dl><dt><a name="-list_assets"><strong>list_assets</strong></a>(user)</dt><dd><tt>Returns&nbsp;a&nbsp;list&nbsp;of&nbsp;all&nbsp;the&nbsp;assets&nbsp;of&nbsp;a&nbsp;portfolio.<br>
+ <dl><dt><a name="-list_assets"><strong>list_assets</strong></a>(user, *args, **kwargs)</dt><dd><tt>Returns&nbsp;a&nbsp;list&nbsp;of&nbsp;all&nbsp;the&nbsp;assets&nbsp;of&nbsp;a&nbsp;portfolio.<br>
 &nbsp;<br>
 Initiated&nbsp;with&nbsp;a&nbsp;GET&nbsp;to&nbsp;/api/v1/portfolios/&lt;user&gt;/assets.<br>
 &nbsp;<br>
 Returns:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;response&nbsp;(Response):&nbsp;A&nbsp;list&nbsp;of&nbsp;assets&nbsp;(id&nbsp;and&nbsp;name)&nbsp;OR&nbsp;an&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;response&nbsp;(Response):&nbsp;A&nbsp;list&nbsp;of&nbsp;assets&nbsp;(id&nbsp;and&nbsp;name)&nbsp;OR&nbsp;an<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;error&nbsp;message.</tt></dd></dl>
- <dl><dt><a name="-list_portfolios"><strong>list_portfolios</strong></a>()</dt><dd><tt>Returns&nbsp;a&nbsp;list&nbsp;of&nbsp;all&nbsp;the&nbsp;<a href="#Portfolio">Portfolio</a>&nbsp;objects&nbsp;present&nbsp;in&nbsp;Redis.<br>
+ <dl><dt><a name="-list_portfolios"><strong>list_portfolios</strong></a>(*args, **kwargs)</dt><dd><tt>Returns&nbsp;a&nbsp;list&nbsp;of&nbsp;all&nbsp;the&nbsp;<a href="#Portfolio">Portfolio</a>&nbsp;objects&nbsp;present&nbsp;in&nbsp;Redis.<br>
 &nbsp;<br>
 Initiated&nbsp;with&nbsp;a&nbsp;GET&nbsp;to&nbsp;/api/v1/portfolios.<br>
 &nbsp;<br>
@@ -572,48 +586,75 @@ Args:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;rc&nbsp;(int):&nbsp;Response&nbsp;status&nbsp;code<br>
 &nbsp;<br>
 Returns:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;response&nbsp;(Response):&nbsp;Returns&nbsp;"{message}"&nbsp;with&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;response&nbsp;(Response):&nbsp;Returns&nbsp;"{message}"&nbsp;with<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;status&nbsp;code&nbsp;HTTP_204_NO_CONTENT.</tt></dd></dl>
+ <dl><dt><a name="-requires_auth"><strong>requires_auth</strong></a>(f)</dt><dd><tt>Prompts&nbsp;the&nbsp;user&nbsp;for&nbsp;the&nbsp;his/her&nbsp;username&nbsp;and&nbsp;password&nbsp;credentials.<br>
+&nbsp;<br>
+It&nbsp;uses&nbsp;the&nbsp;authorization&nbsp;header&nbsp;of&nbsp;the&nbsp;request&nbsp;and&nbsp;compare&nbsp;the&nbsp;<br>
+hash&nbsp;of&nbsp;the&nbsp;password&nbsp;received&nbsp;with&nbsp;the&nbsp;hash&nbsp;of&nbsp;the&nbsp;user&nbsp;password<br>
+stored&nbsp;in&nbsp;Redis.&nbsp;Multiple&nbsp;user&nbsp;accounts&nbsp;can&nbsp;be&nbsp;setup&nbsp;in&nbsp;Redis,&nbsp;with<br>
+the&nbsp;RESTful&nbsp;API&nbsp;(using&nbsp;POST&nbsp;to&nbsp;/portfolios).<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;f&nbsp;(function):&nbsp;Function&nbsp;that&nbsp;requires&nbsp;user&nbsp;authentication.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;f(*args,&nbsp;**kwargs):&nbsp;The&nbsp;function&nbsp;with&nbsp;its&nbsp;original&nbsp;arguments,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;authorized.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Response:&nbsp;Error&nbsp;response&nbsp;with&nbsp;status&nbsp;code&nbsp;401&nbsp;if&nbsp;not&nbsp;authorized.</tt></dd></dl>
+ <dl><dt><a name="-requires_auth_admin"><strong>requires_auth_admin</strong></a>(f)</dt><dd><tt>Prompts&nbsp;the&nbsp;user&nbsp;for&nbsp;the&nbsp;admin&nbsp;username&nbsp;and&nbsp;admin&nbsp;password.<br>
+&nbsp;<br>
+It&nbsp;uses&nbsp;the&nbsp;authorization&nbsp;header&nbsp;of&nbsp;the&nbsp;request&nbsp;and&nbsp;compare&nbsp;the&nbsp;<br>
+hash&nbsp;of&nbsp;the&nbsp;password&nbsp;received&nbsp;with&nbsp;the&nbsp;hash&nbsp;of&nbsp;the&nbsp;admin&nbsp;password<br>
+stored&nbsp;in&nbsp;Redis.&nbsp;Multiple&nbsp;admin&nbsp;accounts&nbsp;can&nbsp;be&nbsp;setup&nbsp;in&nbsp;Redis.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;f&nbsp;(function):&nbsp;Function&nbsp;that&nbsp;requires&nbsp;admin&nbsp;authentication.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;f(*args,&nbsp;**kwargs):&nbsp;The&nbsp;function&nbsp;with&nbsp;its&nbsp;original&nbsp;arguments,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;authorized.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Response:&nbsp;Error&nbsp;response&nbsp;with&nbsp;status&nbsp;code&nbsp;401&nbsp;if&nbsp;not&nbsp;authorized.</tt></dd></dl>
  <dl><dt><a name="-send_css"><strong>send_css</strong></a>(path)</dt><dd><tt>Sends&nbsp;the&nbsp;Swagger&nbsp;css&nbsp;files&nbsp;from&nbsp;the&nbsp;css&nbsp;folder.<br>
 &nbsp;<br>
-This&nbsp;is&nbsp;uesd&nbsp;by&nbsp;static/swagger/index.html&nbsp;which&nbsp;includes&nbsp;the&nbsp;css&nbsp;<br>
+This&nbsp;is&nbsp;uesd&nbsp;by&nbsp;static/swagger/index.html&nbsp;which&nbsp;includes&nbsp;the&nbsp;css<br>
 folder&nbsp;when&nbsp;executed.<br>
 &nbsp;<br>
 Returns:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;response&nbsp;(Response):&nbsp;CSS&nbsp;content&nbsp;of&nbsp;static/swagger/css/***.css</tt></dd></dl>
  <dl><dt><a name="-send_fonts"><strong>send_fonts</strong></a>(path)</dt><dd><tt>Sends&nbsp;the&nbsp;Swagger&nbsp;tff&nbsp;files&nbsp;from&nbsp;the&nbsp;fonts&nbsp;folder.<br>
 &nbsp;<br>
-This&nbsp;is&nbsp;uesd&nbsp;by&nbsp;static/swagger/index.html&nbsp;which&nbsp;includes&nbsp;the&nbsp;fonts&nbsp;<br>
+This&nbsp;is&nbsp;uesd&nbsp;by&nbsp;static/swagger/index.html&nbsp;which&nbsp;includes&nbsp;the&nbsp;fonts<br>
 folder&nbsp;when&nbsp;executed.<br>
 &nbsp;<br>
 Returns:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;response&nbsp;(Response):&nbsp;Fonts&nbsp;content&nbsp;of&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;response&nbsp;(Response):&nbsp;Fonts&nbsp;content&nbsp;of<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;static/swagger/fonts/***.ttf</tt></dd></dl>
  <dl><dt><a name="-send_images"><strong>send_images</strong></a>(path)</dt><dd><tt>Sends&nbsp;the&nbsp;Swagger&nbsp;image&nbsp;files&nbsp;from&nbsp;the&nbsp;images&nbsp;folder.<br>
 &nbsp;<br>
-This&nbsp;is&nbsp;uesd&nbsp;by&nbsp;static/swagger/index.html&nbsp;which&nbsp;includes&nbsp;the&nbsp;images&nbsp;<br>
+This&nbsp;is&nbsp;uesd&nbsp;by&nbsp;static/swagger/index.html&nbsp;which&nbsp;includes&nbsp;the&nbsp;images<br>
 folder&nbsp;when&nbsp;executed.<br>
 &nbsp;<br>
 Returns:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;response&nbsp;(Response):&nbsp;PNG&nbsp;content&nbsp;of&nbsp;static/swagger/images/***.png</tt></dd></dl>
  <dl><dt><a name="-send_lib"><strong>send_lib</strong></a>(path)</dt><dd><tt>Sends&nbsp;the&nbsp;Swagger&nbsp;javascript&nbsp;files&nbsp;from&nbsp;the&nbsp;lib&nbsp;folder.<br>
 &nbsp;<br>
-This&nbsp;is&nbsp;uesd&nbsp;by&nbsp;static/swagger/index.html&nbsp;which&nbsp;includes&nbsp;the&nbsp;lib&nbsp;<br>
+This&nbsp;is&nbsp;uesd&nbsp;by&nbsp;static/swagger/index.html&nbsp;which&nbsp;includes&nbsp;the&nbsp;lib<br>
 folder&nbsp;when&nbsp;executed.<br>
 &nbsp;<br>
 Returns:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;response&nbsp;(Response):&nbsp;JS&nbsp;content&nbsp;of&nbsp;static/swagger/lib/***.js</tt></dd></dl>
  <dl><dt><a name="-send_specification"><strong>send_specification</strong></a>(path)</dt><dd><tt>Sends&nbsp;the&nbsp;Swagger&nbsp;JS&nbsp;specification&nbsp;from&nbsp;the&nbsp;specification&nbsp;folder.<br>
 &nbsp;<br>
-This&nbsp;is&nbsp;uesd&nbsp;by&nbsp;static/swagger/index.html&nbsp;which&nbsp;includes&nbsp;the&nbsp;<br>
+This&nbsp;is&nbsp;uesd&nbsp;by&nbsp;static/swagger/index.html&nbsp;which&nbsp;includes&nbsp;the<br>
 specification&nbsp;JS&nbsp;file&nbsp;when&nbsp;executed.<br>
 &nbsp;<br>
 Returns:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;response&nbsp;(Response):&nbsp;JS&nbsp;content&nbsp;of&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;response&nbsp;(Response):&nbsp;JS&nbsp;content&nbsp;of<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;static/swagger/specification/***.*</tt></dd></dl>
- <dl><dt><a name="-update_asset"><strong>update_asset</strong></a>(user, asset_id)</dt><dd><tt>Creates&nbsp;an&nbsp;asset&nbsp;in&nbsp;a&nbsp;user's&nbsp;<a href="#Portfolio">Portfolio</a>.<br>
+ <dl><dt><a name="-update_asset"><strong>update_asset</strong></a>(user, *args, **kwargs)</dt><dd><tt>Creates&nbsp;an&nbsp;asset&nbsp;in&nbsp;a&nbsp;user's&nbsp;<a href="#Portfolio">Portfolio</a>.<br>
 &nbsp;<br>
-Initiated&nbsp;with&nbsp;a&nbsp;PUT&nbsp;to&nbsp;/api/v1/portfolios/&lt;user&gt;/assets/&lt;asset_id&gt;&nbsp;<br>
+Initiated&nbsp;with&nbsp;a&nbsp;PUT&nbsp;to&nbsp;/api/v1/portfolios/&lt;user&gt;/assets/&lt;asset_id&gt;<br>
 with&nbsp;a&nbsp;body&nbsp;{"quantity":&nbsp;-4.2}<br>
 &nbsp;<br>
 Returns:<br>
@@ -621,8 +662,8 @@ Returns:<br>
  <dl><dt><a name="-update_swagger_specification"><strong>update_swagger_specification</strong></a>(swagger_host)</dt><dd><tt>Generates&nbsp;the&nbsp;JS&nbsp;Swagger&nbsp;from&nbsp;the&nbsp;JSON&nbsp;and&nbsp;update&nbsp;the&nbsp;"host"&nbsp;variable.<br>
 &nbsp;<br>
 It&nbsp;reads&nbsp;the&nbsp;JSON&nbsp;Swagger&nbsp;specification&nbsp;to&nbsp;create&nbsp;the&nbsp;JS&nbsp;Swagger<br>
-specification&nbsp;in&nbsp;the&nbsp;same&nbsp;directory&nbsp;where&nbsp;the&nbsp;JSON&nbsp;content&nbsp;is&nbsp;<br>
-assigned&nbsp;to&nbsp;the&nbsp;variable&nbsp;spec&nbsp;and&nbsp;where&nbsp;the&nbsp;"host":"...."&nbsp;is&nbsp;<br>
+specification&nbsp;in&nbsp;the&nbsp;same&nbsp;directory&nbsp;where&nbsp;the&nbsp;JSON&nbsp;content&nbsp;is<br>
+assigned&nbsp;to&nbsp;the&nbsp;variable&nbsp;spec&nbsp;and&nbsp;where&nbsp;the&nbsp;"host":"...."&nbsp;is<br>
 replaced&nbsp;by&nbsp;the&nbsp;swagger_host&nbsp;provided&nbsp;(dynamic&nbsp;hostname).<br>
 &nbsp;<br>
 Args:<br>
@@ -638,8 +679,10 @@ Args:<br>
 <strong>HTTP_201_CREATED</strong> = 201<br>
 <strong>HTTP_204_NO_CONTENT</strong> = 204<br>
 <strong>HTTP_400_BAD_REQUEST</strong> = 400<br>
+<strong>HTTP_401_UNAUTHORIZED</strong> = 401<br>
 <strong>HTTP_404_NOT_FOUND</strong> = 404<br>
 <strong>HTTP_409_CONFLICT</strong> = 409<br>
+<strong>SECURED</strong> = True<br>
 <strong>app</strong> = &lt;Flask 'server'&gt;<br>
 <strong>app_name</strong> = 'Portfolio Management RESTful Service'<br>
 <strong>app_version</strong> = 1.0<br>

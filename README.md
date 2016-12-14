@@ -12,8 +12,9 @@
 
 [![Bluemix container](https://img.shields.io/website-up-down-green-red/http/shields.io.svg)](https://portfoliocontainer.mybluemix.net)
 
-**Github page and Swagger (Bluemix)**
-Access it at [https://qdm12.github.io/Devops_RESTful/index.html](https://qdm12.github.io/Devops_RESTful/index.html).
+**Github page, Pydoc, Swagger**
+
+Access it at [**https://qdm12.github.io/Devops_RESTful**](https://qdm12.github.io/Devops_RESTful).
 
 ## I - What is it?
 - It is a RESTful API for a portfolio management.
@@ -24,7 +25,7 @@ Access it at [https://qdm12.github.io/Devops_RESTful/index.html](https://qdm12.g
 ## II - Access the API
 - Access the root URL of the API on Bluemix at [https://portfoliomgmt.mybluemix.net](https://portfoliomgmt.mybluemix.net)
 - Access the root URL of the API on the Bluemix container at [http://portfoliocontainer.mybluemix.net/](http://portfoliocontainer.mybluemix.net/)
-- Access it on your virtual Vagrant machine at [localhost:5000](localhost:5000)
+- Access it on your virtual Vagrant machine at [localhost:5000](http://localhost:5000)
 - The root URL uses **Swagger** to show a descriptive list of all available RESTful calls such as `POST`, `DELETE`, `PUT` and `GET`.
 
 ## III - Obtain the source code and minimum requirements
@@ -44,15 +45,15 @@ download, setup and run the project in Vagrant.
 3. Go to the project directory with a terminal with `cd Devops_RESTFUL`
 
 ## IV - Run it on your machine with Vagrant
-1. Make sure to follow the steps of **III - Obtain the source code and minimum requirements**. 
+1. Make sure to follow the steps of [**III - Obtain the source code and minimum requirements**](https://github.com/qdm12/Devops_RESTful#iii---obtain-the-source-code-and-minimum-requirements). 
 2. Enter `vagrant up && vagrant ssh` (this will install the box, docker etc.)
 3. Enter `python /vagrant/server.py` (in the virtual machine you just logged in)
-4. Access the Python Flask server with your browser at [localhost:5000](localhost:5000). You can then make API calls with Swagger.
-5. You can also use the Chrome extension `Postman` for example to send RESTful requests such as `POST`. Install it [here](https://chrome.google.com/webstore/detail/postman/fhbjgbiflinjbdggehcddcbncdddomop?hl=en).
+4. Access the Python Flask server with your browser at [localhost:5000](http://localhost:5000). You can then make API calls with Swagger.
+5. You can also use the Chrome extension *Postman* for example to send RESTful requests such as *POST*. Install it [here](https://chrome.google.com/webstore/detail/postman/fhbjgbiflinjbdggehcddcbncdddomop?hl=en).
 6. To update Swagger, refer to the information in the [Github `static` directory](https://github.com/qdm12/Devops_RESTful/tree/master/static).
 
 ## V - Run it on Bluemix
-1. Make sure to follow the steps of **III - Obtain the source code and minimum requirements** although you don't need Vagrant.
+1. Make sure to follow the steps of [**III - Obtain the source code and minimum requirements**](https://github.com/qdm12/Devops_RESTful#iii---obtain-the-source-code-and-minimum-requirements) although you don't need Vagrant.
 2. Login to Bluemix as follows:
   - `cf login https://api.ng.bluemix.net -u username -o organization -s "Portfolio Management"`
   - Enter the API endpoint as `https://api.ng.bluemix.net`
@@ -112,12 +113,6 @@ download, setup and run the project in Vagrant.
 
 ## IX - Docstring
 1. You can re-generate the docstring HTML with `python -m pydoc -w server`.
-
-## For ongoing work, please refer to this page:
-[https://github.com/rofrano/nyu-homework-2](https://github.com/rofrano/nyu-homework-2)
-- PART 1: Deploy the service in Docker Containers on Bluemix (submit URL of service on Bluemix)
-- PART 2: BDD and TDD Automated Testing (Good testing coverage required)
-- PART 3: Add an automated CI/CD DevOps Pipeline
 
 ## To contribute
 - Send me an email at quentin.mcgaw @ gmail . com with your Github username and a reason.

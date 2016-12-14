@@ -1,6 +1,6 @@
 import os
 from redis import Redis, ConnectionError
-from flask import Flask, jsonify, request, json, redirect, Response, current_app
+from flask import Flask, jsonify, request, json, Response
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 
@@ -32,16 +32,21 @@ app_version = 1.0
 redis_server = None
 SECURED = True
 
-def ssl_required(fn):
-    @wraps(fn)
-    def decorated_view(*args, **kwargs):
-        if current_app.config.get("SSL"):
-            if not request.is_secure:
-                return redirect(request.url.replace("http://", "https://"))
-        return fn(*args, **kwargs) 
-    return decorated_view
-
 def check_auth(username, password, admin=False):
+    """Checks the credentials provided against the ones stored in Redis.
+
+        It searches for the username key in the Redis database, and then
+        compares the hash of the password with the hash of the password 
+        stored in the Redis database. If it matches, it returns True.
+
+        Args:
+            username (string): Name of the username of administrator.
+            password (string): Plaintext password of the username or admin.
+            admin (boolean): True if the username is an administrator.
+
+        Returns:
+            True or False: Returns True if the user is authorized.
+    """
     if admin:
         hash_password_stored = redis_server.hget("admin_password_"+username, "hash_password")
     else:
@@ -51,6 +56,21 @@ def check_auth(username, password, admin=False):
     return check_password_hash(hash_password_stored, password)
 
 def requires_auth(f):
+    """Prompts the user for the his/her username and password credentials.
+
+        It uses the authorization header of the request and compare the 
+        hash of the password received with the hash of the user password
+        stored in Redis. Multiple user accounts can be setup in Redis, with
+        the RESTful API (using POST to /portfolios).
+
+        Args:
+            f (function): Function that requires user authentication.
+
+        Returns:
+            f(*args, **kwargs): The function with its original arguments,
+                                if authorized.
+            Response: Error response with status code 401 if not authorized.
+    """
     @wraps(f)
     def decorated(user, *args, **kwargs):
         auth = request.authorization
@@ -65,6 +85,20 @@ def requires_auth(f):
     return decorated
 
 def requires_auth_admin(f):
+    """Prompts the user for the admin username and admin password.
+
+        It uses the authorization header of the request and compare the 
+        hash of the password received with the hash of the admin password
+        stored in Redis. Multiple admin accounts can be setup in Redis.
+
+        Args:
+            f (function): Function that requires admin authentication.
+
+        Returns:
+            f(*args, **kwargs): The function with its original arguments,
+                                if authorized.
+            Response: Error response with status code 401 if not authorized.
+    """
     @wraps(f)
     def decorated(*args, **kwargs):
         auth = request.authorization
@@ -367,7 +401,6 @@ class Portfolio(object):
 
 
 @app.route('/')
-@ssl_required
 def index():
     """Sends the Swagger main HTML page to the client.
 
@@ -377,7 +410,6 @@ def index():
     return app.send_static_file('swagger/index.html')
 
 @app.route('/lib/<path:path>')
-@ssl_required
 def send_lib(path):
     """Sends the Swagger javascript files from the lib folder.
 
@@ -390,7 +422,6 @@ def send_lib(path):
     return app.send_static_file('swagger/lib/' + path)
 
 @app.route('/specification/<path:path>')
-@ssl_required
 def send_specification(path):
     """Sends the Swagger JS specification from the specification folder.
 
@@ -404,7 +435,6 @@ def send_specification(path):
     return app.send_static_file('swagger/specification/' + path)
 
 @app.route('/images/<path:path>')
-@ssl_required
 def send_images(path):
     """Sends the Swagger image files from the images folder.
 
@@ -417,7 +447,6 @@ def send_images(path):
     return app.send_static_file('swagger/images/' + path)
 
 @app.route('/css/<path:path>')
-@ssl_required
 def send_css(path):
     """Sends the Swagger css files from the css folder.
 
@@ -430,7 +459,6 @@ def send_css(path):
     return app.send_static_file('swagger/css/' + path)
 
 @app.route('/fonts/<path:path>')
-@ssl_required
 def send_fonts(path):
     """Sends the Swagger tff files from the fonts folder.
 
@@ -444,7 +472,6 @@ def send_fonts(path):
     return app.send_static_file('swagger/fonts/' + path)
 
 @app.route(url_version)
-@ssl_required
 def index_api():
     """Sends the name and version of the API to the user in JSON.
 
@@ -454,7 +481,6 @@ def index_api():
     return reply({"name":app_name, "version":app_version, "url":"/portfolios"}, HTTP_200_OK)
 
 @app.route(url_version+"/portfolios", methods=['GET'])
-@ssl_required
 @requires_auth_admin
 def list_portfolios():
     """Returns a list of all the Portfolio objects present in Redis.
@@ -477,7 +503,6 @@ def list_portfolios():
     return reply({"portfolios" : portfolios_array}, HTTP_200_OK)
 
 @app.route(url_version+"/portfolios/<user>/assets", methods=['GET'])
-@ssl_required
 @requires_auth
 def list_assets(user):
     """Returns a list of all the assets of a portfolio.
@@ -498,7 +523,6 @@ def list_assets(user):
     return reply({'assets' : [{'id' : asset.id, 'name' : asset.name} for asset in portfolio.assets.itervalues()]}, HTTP_200_OK)
 
 @app.route(url_version+"/portfolios/<user>/assets/<asset_id>", methods=['GET'])
-@ssl_required
 @requires_auth
 def get_asset(user, asset_id):
     """Returns the details of an asset of a Portfolio.
@@ -522,7 +546,6 @@ def get_asset(user, asset_id):
     return reply({'name' : portfolio.assets[asset_id].name, 'quantity' : portfolio.assets[asset_id].quantity, 'value' : portfolio.assets[asset_id].quantity * portfolio.assets[asset_id].price}, HTTP_200_OK)
 
 @app.route(url_version+"/portfolios/<user>/nav", methods=['GET'])
-@ssl_required
 @requires_auth
 def get_nav(user):
     """Returns the Net Asset Value (NAV) of a Portfolio.
@@ -542,7 +565,6 @@ def get_nav(user):
     return reply({"nav" : portfolio.nav}, HTTP_200_OK)
 
 @app.route(url_version+"/portfolios", methods=['POST'])
-@ssl_required
 @requires_auth_admin
 def create_user():
     """Creates a user
@@ -574,7 +596,6 @@ def create_user():
     return reply({'error' : 'User {0} already exists'.format(user)}, HTTP_409_CONFLICT)
 
 @app.route(url_version+"/portfolios/<user>/assets", methods=['POST'])
-@ssl_required
 @requires_auth
 def create_asset(user):
     """Creates an asset in a user's Portfolio.
@@ -613,7 +634,6 @@ def create_asset(user):
     return reply("", HTTP_201_CREATED)
 
 @app.route(url_version+"/portfolios/<user>/assets/<asset_id>", methods=['PUT'])
-@ssl_required
 @requires_auth
 def update_asset(user, asset_id):
     """Creates an asset in a user's Portfolio.
@@ -653,7 +673,6 @@ def update_asset(user, asset_id):
     return reply("", HTTP_200_OK)
 
 @app.route(url_version+"/portfolios/<user>/assets/<asset_id>", methods=['DELETE'])
-@ssl_required
 @requires_auth
 def delete_asset(user, asset_id):
     """Deletes an asset from a user's Portfolio.
@@ -674,7 +693,6 @@ def delete_asset(user, asset_id):
     return reply("", HTTP_204_NO_CONTENT)
 
 @app.route(url_version+"/portfolios/<user>", methods=['DELETE'])
-@ssl_required
 @requires_auth_admin
 def delete_user(user):
     """Deletes a user.
@@ -789,10 +807,8 @@ def determine_credentials():
             creds.environment = "Docker running in Bluemix"
             creds.swagger_host = "portfoliocontainer.mybluemix.net"
         return creds
-    # Vagrant
     if os.path.isfile("/.dockerenv"):
         return Credentials("Docker running in Vagrant", "redis", 6379, None, "localhost:5000")
-    # Vagrant only
     return Credentials("Vagrant", "127.0.0.1", 6379, None, "localhost:5000")
 
 def update_swagger_specification(swagger_host):
@@ -838,8 +854,7 @@ def init_redis(hostname, port, password):
         redis_server.ping()
     except ConnectionError:
         raise RedisConnectionException()
-    #remove_old_database_assets() # to remove once you ran it once on your Vagrant
-    fill_database_assets() # XXX to remove
+    fill_database_assets()
     if SECURED:
         admin_username = "admin"
         admin_password = "admin_password"
@@ -847,23 +862,13 @@ def init_redis(hostname, port, password):
         redis_server.hmset("admin_password_"+admin_username, {"hash_password":hash_password})
 
 def fill_database_assets():
+    """Fill the Redis database with common assets to all users.
+
+    """
     redis_server.hmset("asset_id_0", {"id": 0,"name":"gold","price":1286.59,"class":"commodity"})
     redis_server.hmset("asset_id_1", {"id": 1,"name":"NYC real estate index","price":16255.18,"class":"real-estate"})
     redis_server.hmset("asset_id_2", {"id": 2,"name":"brent crude oil","price":51.45,"class":"commodity"})
     redis_server.hmset("asset_id_3", {"id": 3,"name":"US 10Y T-Note","price":130.77,"class":"fixed income"})
-
-# def remove_old_database_assets():
-    # redis_server.hdel("asset_type0", ["id", "name", "value", "type"])
-    # redis_server.hdel("asset_type1", ["id", "name", "value", "type"])
-    # redis_server.hdel("asset_type2", ["id", "name", "value", "type"])
-    # redis_server.hdel("asset_type3", ["id", "name", "value", "type"])
-    # redis_server.srem("assetTypes",{"asset_type0","asset_type1","asset_type2","asset_type3"})
-
-# def fill_database_assets():
-    # redis_server.hmset("asset_id_0", {"id": 0,"name":"gold","price":1286.59,"class":"commodity"})
-    # redis_server.hmset("asset_id_1", {"id": 1,"name":"NYC real estate index","price":16255.18,"class":"real-estate"})
-    # redis_server.hmset("asset_id_2", {"id": 2,"name":"brent crude oil","price":51.45,"class":"commodity"})
-    # redis_server.hmset("asset_id_3", {"id": 3,"name":"US 10Y T-Note","price":130.77,"class":"fixed income"})
 
 # def fill_database_fakeusers():
     # redis_server.hmset("user_john", {"name": "john","data":""})
