@@ -12,8 +12,9 @@
 
 [![Bluemix container](https://img.shields.io/website-up-down-green-red/http/shields.io.svg)](https://portfoliocontainer.mybluemix.net)
 
-**Github page and Swagger (Bluemix)**
-Access it at [https://qdm12.github.io/Devops_RESTful/index.html](https://qdm12.github.io/Devops_RESTful/index.html).
+**Github page, Pydoc, Swagger**
+
+Access it at [**https://qdm12.github.io/Devops_RESTful**](https://qdm12.github.io/Devops_RESTful).
 
 ## I - What is it?
 - It is a RESTful API for a portfolio management.
