@@ -1,6 +1,6 @@
 import os
 from redis import Redis, ConnectionError
-from flask import Flask, jsonify, request, json, redirect, Response
+from flask import Flask, jsonify, request, json, Response
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 
@@ -31,22 +31,6 @@ app_name = "Portfolio Management RESTful Service"
 app_version = 1.0
 redis_server = None
 SECURED = True
-FORCE_HTTPS = False
-
-@app.before_request
-def beforeRequest():
-    """This redirects to HTTPS if available, before each request is processed.
-
-        If FORCE_HTTPS is set to True (Bluemix case, where HTTPS is available),
-        and if the URL does not start with HTTPS, the traffic is redirected
-        to the HTTPS version of the URL. This is to ensure secured communication
-        of credentials through SSL tunnels.
-
-        Returns:
-            Response: Response that, when processed, redirects to HTTPS.
-    """
-    if request.url.startswith('https'):
-        return redirect(request.url.replace('http', 'https', 1))
 
 def check_auth(username, password, admin=False):
     """Checks the credentials provided against the ones stored in Redis.
@@ -822,7 +806,6 @@ def determine_credentials():
         if os.path.isfile("/.dockerenv"):
             creds.environment = "Docker running in Bluemix"
             creds.swagger_host = "portfoliocontainer.mybluemix.net"
-        FORCE_HTTPS = True
         return creds
     if os.path.isfile("/.dockerenv"):
         return Credentials("Docker running in Vagrant", "redis", 6379, None, "localhost:5000")
