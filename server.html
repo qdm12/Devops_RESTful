@@ -476,16 +476,7 @@ Data descriptors inherited from <a href="exceptions.html#BaseException">exceptio
 <font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
     
 <tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><dl><dt><a name="-beforeRequest"><strong>beforeRequest</strong></a>()</dt><dd><tt>This&nbsp;redirects&nbsp;to&nbsp;HTTPS&nbsp;if&nbsp;available,&nbsp;before&nbsp;each&nbsp;request&nbsp;is&nbsp;processed.<br>
-&nbsp;<br>
-If&nbsp;FORCE_HTTPS&nbsp;is&nbsp;set&nbsp;to&nbsp;True&nbsp;(Bluemix&nbsp;case,&nbsp;where&nbsp;HTTPS&nbsp;is&nbsp;available),<br>
-and&nbsp;if&nbsp;the&nbsp;URL&nbsp;does&nbsp;not&nbsp;start&nbsp;with&nbsp;HTTPS,&nbsp;the&nbsp;traffic&nbsp;is&nbsp;redirected<br>
-to&nbsp;the&nbsp;HTTPS&nbsp;version&nbsp;of&nbsp;the&nbsp;URL.&nbsp;This&nbsp;is&nbsp;to&nbsp;ensure&nbsp;secured&nbsp;communication<br>
-of&nbsp;credentials&nbsp;through&nbsp;SSL&nbsp;tunnels.<br>
-&nbsp;<br>
-Returns:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Response:&nbsp;Response&nbsp;that,&nbsp;when&nbsp;processed,&nbsp;redirects&nbsp;to&nbsp;HTTPS.</tt></dd></dl>
- <dl><dt><a name="-check_auth"><strong>check_auth</strong></a>(username, password, admin<font color="#909090">=False</font>)</dt><dd><tt>Checks&nbsp;the&nbsp;credentials&nbsp;provided&nbsp;against&nbsp;the&nbsp;ones&nbsp;stored&nbsp;in&nbsp;Redis.<br>
+<td width="100%"><dl><dt><a name="-check_auth"><strong>check_auth</strong></a>(username, password, admin<font color="#909090">=False</font>)</dt><dd><tt>Checks&nbsp;the&nbsp;credentials&nbsp;provided&nbsp;against&nbsp;the&nbsp;ones&nbsp;stored&nbsp;in&nbsp;Redis.<br>
 &nbsp;<br>
 It&nbsp;searches&nbsp;for&nbsp;the&nbsp;username&nbsp;key&nbsp;in&nbsp;the&nbsp;Redis&nbsp;database,&nbsp;and&nbsp;then<br>
 compares&nbsp;the&nbsp;hash&nbsp;of&nbsp;the&nbsp;password&nbsp;with&nbsp;the&nbsp;hash&nbsp;of&nbsp;the&nbsp;password&nbsp;<br>
@@ -683,8 +674,7 @@ Args:<br>
 <font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
     
 <tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><strong>FORCE_HTTPS</strong> = False<br>
-<strong>HTTP_200_OK</strong> = 200<br>
+<td width="100%"><strong>HTTP_200_OK</strong> = 200<br>
 <strong>HTTP_201_CREATED</strong> = 201<br>
 <strong>HTTP_204_NO_CONTENT</strong> = 204<br>
 <strong>HTTP_400_BAD_REQUEST</strong> = 400<br>
