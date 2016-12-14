@@ -854,18 +854,18 @@ def init_redis(hostname, port, password):
         redis_server.ping()
     except ConnectionError:
         raise RedisConnectionException()
-    #fill_database_assets() - Used for new Vagrant machines where Redis is empty.
+    fill_database_assets() - Used for new Vagrant machines where Redis is empty.
     if SECURED:
         admin_username = "admin"
         admin_password = "admin_password"
         hash_password = generate_password_hash(admin_password)
         redis_server.hmset("admin_password_"+admin_username, {"hash_password":hash_password})
 
-# def fill_database_assets():
-    # redis_server.hmset("asset_id_0", {"id": 0,"name":"gold","price":1286.59,"class":"commodity"})
-    # redis_server.hmset("asset_id_1", {"id": 1,"name":"NYC real estate index","price":16255.18,"class":"real-estate"})
-    # redis_server.hmset("asset_id_2", {"id": 2,"name":"brent crude oil","price":51.45,"class":"commodity"})
-    # redis_server.hmset("asset_id_3", {"id": 3,"name":"US 10Y T-Note","price":130.77,"class":"fixed income"})
+def fill_database_assets():
+    redis_server.hmset("asset_id_0", {"id": 0,"name":"gold","price":1286.59,"class":"commodity"})
+    redis_server.hmset("asset_id_1", {"id": 1,"name":"NYC real estate index","price":16255.18,"class":"real-estate"})
+    redis_server.hmset("asset_id_2", {"id": 2,"name":"brent crude oil","price":51.45,"class":"commodity"})
+    redis_server.hmset("asset_id_3", {"id": 3,"name":"US 10Y T-Note","price":130.77,"class":"fixed income"})
 
 # def fill_database_fakeusers():
     # redis_server.hmset("user_john", {"name": "john","data":""})
