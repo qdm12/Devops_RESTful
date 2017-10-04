@@ -4,13 +4,9 @@
 [![Build Status](https://travis-ci.org/qdm12/Devops_RESTful.svg?branch=master)](https://travis-ci.org/qdm12/Devops_RESTful)
 [![Coverage Status](https://coveralls.io/repos/github/qdm12/Devops_RESTful/badge.svg?branch=master)](https://coveralls.io/github/qdm12/Devops_RESTful?branch=master)
 
-**Bluemix at https://portfoliomgmt.mybluemix.net**
+**Bluemix at https://portfoliomgmt.mybluemix.net** (*Not live anymore*)
 
-[![Bluemix](https://img.shields.io/website-up-down-green-red/http/shields.io.svg)](https://portfoliomgmt.mybluemix.net)
-
-**Bluemix container at https://portfoliocontainer.mybluemix.net**
-
-[![Bluemix container](https://img.shields.io/website-up-down-green-red/http/shields.io.svg)](https://portfoliocontainer.mybluemix.net)
+**Bluemix container at https://portfoliocontainer.mybluemix.net** (*Not live anymore*)
 
 **Github page, Pydoc, Swagger**
 
